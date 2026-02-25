@@ -19,12 +19,28 @@
 ===============================================================================================
 */
 
-#include "Bounds.hpp"
+#ifndef __VIEW_HPP__
+#define __VIEW_HPP__
 
-crBounds::crBounds( void )
+class crView
 {
-}
+public:
+    crView( void );
+    ~crView( void );
 
-crBounds::~crBounds( void )
-{
-}
+    crView*         Next( void ) const { return m_next; }
+    crGeometry*     Geometry( void ) const { return m_geometryChain; }
+    crMatrix4       ViewMatrix( void ) const;
+    crVec3f         Position( void ) const { return m_position; }
+    crVec3f         Orientation( void ) const { return m_orientation; }
+    
+    
+private:
+    crMatrix4       m_viewMatrix;
+    crVec3f         m_position;
+    crVec3f         m_orientation;
+    crView*         m_next;
+    crGeometry*     m_geometryChain;
+};
+
+#endif //!__VIEW_HPP__

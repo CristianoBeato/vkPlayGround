@@ -19,12 +19,31 @@
 ===============================================================================================
 */
 
-#include "Bounds.hpp"
+#ifndef __MESH_HPP__
+#define __MESH_HPP__
 
-crBounds::crBounds( void )
+class crMesh
 {
-}
+public:
+    enum type_t : uint8_t
+    {
+        MESH_STATIC,        // static mesh
+        MESH_ANIMATE,       // animate model
+        MESH_PARTICLE,      // particle mesh
+        MESH_TERRAIN        // terrain
+    };
 
-crBounds::~crBounds( void )
-{
-}
+    crMesh( void );
+    ~crMesh( void );
+
+    /// @brief Type of the mesh  
+    virtual type_t  Type( void ) const { return MESH_STATIC; }
+ 
+private:
+    crMaterial*     m_material;
+    
+};
+
+
+
+#endif //!__RENDER_MESH_HPP__

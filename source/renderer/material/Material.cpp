@@ -19,12 +19,12 @@
 ===============================================================================================
 */
 
-#include "Bounds.hpp"
+#include "Material.hpp"
 
-crBounds::crBounds( void )
+crMaterial::crMaterial( void )
 {
 }
 
-crBounds::~crBounds( void )
+crMaterial::~crMaterial( void )
 {
 }

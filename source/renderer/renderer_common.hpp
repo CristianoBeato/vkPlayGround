@@ -19,12 +19,21 @@
 ===============================================================================================
 */
 
+#ifndef __RENDERER_COMMON_HPP__
+#define __RENDERER_COMMON_HPP__
+
+#include "RenderSystem.hpp"
+
 #include "Bounds.hpp"
+#include "Vertexes.hpp"
+#include "backend/VertexCache.hpp"
+#include "Surface.hpp"
+#include "Mesh.hpp"
+#include "models/Model.hpp"
+#include "world/Light.hpp"
+#include "world/Geometry.hpp"
+#include "world/View.hpp"
+#include "backend/Backend.hpp"
+#include "RenderSystemLocal.hpp"
 
-crBounds::crBounds( void )
-{
-}
-
-crBounds::~crBounds( void )
-{
-}
+#endif //!__RENDERER_COMMON_HPP__

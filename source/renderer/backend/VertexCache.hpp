@@ -19,12 +19,28 @@
 ===============================================================================================
 */
 
-#include "Bounds.hpp"
+#ifndef __VERTEX_CACHE_HPP__
+#define __VERTEX_CACHE_HPP__
 
-crBounds::crBounds( void )
-{
-}
+#include "Vulkan/Core.hpp"
 
-crBounds::~crBounds( void )
+struct cache_t
 {
-}
+    uintptr_t           offset = 0;
+    size_t              size = 0;
+    vkBufferHandle_t*   buffer = nullptr;
+};
+
+class crVertexCache
+{
+public:
+    static crVertexCache*  Get( void );
+
+    crVertexCache( void );
+    ~crVertexCache( void );
+
+private:
+
+};
+
+#endif //!__VERTEX_CACHE_HPP__

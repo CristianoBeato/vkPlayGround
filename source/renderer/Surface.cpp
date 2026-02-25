@@ -19,12 +19,16 @@
 ===============================================================================================
 */
 
-#include "Bounds.hpp"
+#include "Surface.hpp"
 
-crBounds::crBounds( void )
+crSurface::crSurface( void ) :
+    m_indexCount( 0 ),
+    m_vertexCount( 0 ),
+    m_indexOffset( 0 ),
+    m_vertexOffset( 0 ) 
 {
 }
 
-crBounds::~crBounds( void )
+crSurface::~crSurface( void )
 {
 }

@@ -19,12 +19,18 @@
 ===============================================================================================
 */
 
-#include "Bounds.hpp"
+#include "VertexCache.hpp"
 
-crBounds::crBounds( void )
+crVertexCache *crVertexCache::Get(void)
+{
+    static crVertexCache gVertexCache = crVertexCache();
+    return &gVertexCache;
+}
+
+crVertexCache::crVertexCache(void)
 {
 }
 
-crBounds::~crBounds( void )
+crVertexCache::~crVertexCache( void )
 {
 }

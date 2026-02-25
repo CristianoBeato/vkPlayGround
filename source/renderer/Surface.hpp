@@ -19,12 +19,29 @@
 ===============================================================================================
 */
 
-#include "Bounds.hpp"
+#ifndef __SURFACE_HPP__
+#define __SURFACE_HPP__
 
-crBounds::crBounds( void )
+class crSurface
 {
-}
+public:
+    crSurface( void );
+    ~crSurface( void );
 
-crBounds::~crBounds( void )
-{
-}
+    uint32_t    Indexes( void ) const { return m_indexCount; }
+    uint32_t    VertexCount( void ) const { return m_vertexCount; }
+    uint32_t    BaseVertex( void ) const { return m_baseVertex; }
+    cache_t*    IndexesCache( void ) const { return m_indexCache; }
+    cache_t*    VertexPosition( void ) const { return m_positionCache; }
+    cache_t*    VertexNormals( void ) const { return m_normalCache; }
+
+private:
+    uint32_t    m_indexCount;
+    uint32_t    m_vertexCount;
+    uint32_t    m_baseVertex;
+    cache_t*    m_indexCache;
+    cache_t*    m_positionCache;
+    cache_t*    m_normalCache;    
+};
+
+#endif //!__SURFACE_HPP__

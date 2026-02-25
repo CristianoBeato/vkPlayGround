@@ -19,12 +19,41 @@
 ===============================================================================================
 */
 
-#include "Bounds.hpp"
+#ifndef __PIPELINE_MANAGER_HPP__
+#define __PIPELINE_MANAGER_HPP__
 
-crBounds::crBounds( void )
+enum programs_e
 {
-}
+    PROGRAM_VERTEX_COLOR,
+    PROGRAM_VERTEX_TEXTURED,
+    PROGRAM_VERTEX_TEXTURED_SKINED,
+    PROGRAM_VERTEX_TEXTURED_MATERIAL,
+    PROGRAM_VERTEX_GEOMETRYPASS,
+    PROGRAM_VERTEX_GEOMETRYPASS_SKINED,
+    PROGRAM_VERTEX_GEOMETRYPASS_MATERIAL,
+    PROGRAM_FRAGMENT_COLOR,
+    PROGRAM_FRAGMENT_TEXTURED,
+    PROGRAM_FRAGMENT_GEOMETRYPASS,
+    PROGRAM_FRAGMENT_ADDITIVE,
+    PROGRAM_COUNT    
+};
 
-crBounds::~crBounds( void )
+class crPipelineManager
 {
-}
+public:
+    static crPipelineManager* Get( void );
+
+    crPipelineManager( void );
+    ~crPipelineManager( void );
+    void    StartUp( void );
+    void    ShutDown( void );
+    void    Reload( void );
+    void    BindPipeline( void)
+
+private:
+    bool    LoadProgram( void );
+    
+    
+};
+
+#endif //!__PIPELINE_MANAGER_HPP__

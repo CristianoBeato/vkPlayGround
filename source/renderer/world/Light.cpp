@@ -19,12 +19,12 @@
 ===============================================================================================
 */
 
-#include "Bounds.hpp"
+#include "Light.hpp"
 
-crBounds::crBounds( void )
+crLight::crLight( void )
 {
 }
 
-crBounds::~crBounds( void )
+crLight::~crLight( void )
 {
 }

@@ -19,12 +19,12 @@
 ===============================================================================================
 */
 
-#include "Bounds.hpp"
+#include "Model.hpp"
 
-crBounds::crBounds( void )
+crModel::crModel( void )
 {
 }
 
-crBounds::~crBounds( void )
+crModel::~crModel( void )
 {
 }

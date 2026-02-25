@@ -19,12 +19,29 @@
 ===============================================================================================
 */
 
-#include "Bounds.hpp"
+#ifndef __GEOMETRY_HPP__
+#define __GEOMETRY_HPP__
 
-crBounds::crBounds( void )
+class crGeometry
 {
-}
+public:
+    crGeometry( void );
+    ~crGeometry( void );
 
-crBounds::~crBounds( void )
-{
-}
+    crBounds        Bounds( void ) const { return m_bounds; }
+    crMatrix4       ModelMatrix( void ) { return m_modelMatrix; }
+    crGeometry*     Next( void ) const { return m_next; }
+    crMesh*         Mesh( void ) const { return m_mesh; }
+    crModel*        Model( void ) const { return m_model; }
+    crMaterial*     Material( void ) const { return m_material; }
+
+private:
+    crBounds        m_bounds;
+    crMatrix4       m_modelMatrix;
+    crGeometry*     m_next;
+    crModel*        m_model;
+    crMaterial*     m_material;
+    crMesh*         m_mesh;
+};
+
+#endif //!__GEOMETRY_HPP__

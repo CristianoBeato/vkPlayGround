@@ -19,12 +19,28 @@
 ===============================================================================================
 */
 
-#include "Bounds.hpp"
+#include "PipelineManager.hpp"
 
-crBounds::crBounds( void )
+enum programs_e
+{
+    PROGRAM_VERTEX_COLOR,
+    PROGRAM_VERTEX_TEXTURED,
+    PROGRAM_VERTEX_TEXTURED_SKINED,
+    PROGRAM_VERTEX_TEXTURED_MATERIAL,
+    PROGRAM_VERTEX_GEOMETRYPASS,
+    PROGRAM_VERTEX_GEOMETRYPASS_SKINED,
+    PROGRAM_VERTEX_GEOMETRYPASS_MATERIAL,
+    PROGRAM_FRAGMENT_COLOR,
+    PROGRAM_FRAGMENT_TEXTURED,
+    PROGRAM_FRAGMENT_GEOMETRYPASS,
+    PROGRAM_FRAGMENT_ADDITIVE,
+    PROGRAM_COUNT    
+};
+
+crPipelineManager::crPipelineManager( void )
 {
 }
 
-crBounds::~crBounds( void )
+crPipelineManager::~crPipelineManager( void )
 {
 }

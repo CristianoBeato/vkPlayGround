@@ -19,12 +19,12 @@
 ===============================================================================================
 */
 
-#include "Bounds.hpp"
+#include "Mesh.hpp"
 
-crBounds::crBounds( void )
+crMesh::crMesh( void )
 {
 }
 
-crBounds::~crBounds( void )
+crMesh::~crMesh( void )
 {
 }

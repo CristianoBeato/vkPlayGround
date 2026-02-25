@@ -19,12 +19,12 @@
 ===============================================================================================
 */
 
-#include "Bounds.hpp"
+#include "View.hpp"
 
-crBounds::crBounds( void )
+crView::crView( void )
 {
 }
 
-crBounds::~crBounds( void )
+crView::~crView( void )
 {
 }

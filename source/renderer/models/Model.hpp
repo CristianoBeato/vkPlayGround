@@ -19,12 +19,21 @@
 ===============================================================================================
 */
 
-#include "Bounds.hpp"
+#ifndef __MODEL_HPP__
+#define __MODEL_HPP__
 
-crBounds::crBounds( void )
+class crModel
 {
-}
+public:
+    crModel( void );
+    ~crModel( void );
 
-crBounds::~crBounds( void )
-{
-}
+    virtual void    Time( const uint32_t in_time );
+    virtual void    View( const crVec3 in_viewPoint );
+    virtual void    Update( void );
+
+private:
+
+};
+
+#endif //!__MODEL_HPP__

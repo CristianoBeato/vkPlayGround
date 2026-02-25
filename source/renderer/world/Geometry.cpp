@@ -19,12 +19,12 @@
 ===============================================================================================
 */
 
-#include "Bounds.hpp"
+#include "Geometry.hpp" 
 
-crBounds::crBounds( void )
+crGeometry::crGeometry( void )
 {
 }
 
-crBounds::~crBounds( void )
+crGeometry::~crGeometry( void )
 {
 }
