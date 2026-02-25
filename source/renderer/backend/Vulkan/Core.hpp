@@ -207,15 +207,6 @@ extern PFN_vkDestroyDebugUtilsMessengerEXT              vkDestroyDebugUtilsMesse
 
 extern VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT in_severity, VkDebugUtilsMessageTypeFlagsEXT in_types, const VkDebugUtilsMessengerCallbackDataEXT* in_data, void *in_user );
 
-typedef struct vkBufferHandle_s
-{
-    VkPipelineStageFlags2   stage = VK_PIPELINE_STAGE_NONE;
-    VkAccessFlags2          access = VK_ACCESS_NONE;
-    VkBuffer                buffer = nullptr;
-
-    operator VkBuffer( void ) const { return buffer; }
-} vkBufferHandle_t;
-
 // Helper to manage texture 
 typedef struct vkImageHandle_s
 {
@@ -230,12 +221,12 @@ typedef struct vkImageHandle_s
 } vkImageHandle_t;
 
 extern void VkImageStateTransition( vkImageHandle_t* in_image, const VkCommandBuffer in_commandBuffer, const VkImageLayout in_newLayout, const VkPipelineStageFlags2 in_stageMask, const VkAccessFlags2 in_accessMask );
-extern void VkBufferStateTransition( vkBufferHandle_t* in_buffer, const VkCommandBuffer in_commandBuffer, const VkImageLayout in_newLayout,  const VkPipelineStageFlags2 in_stageMask, const VkAccessFlags2 in_accessMask );
 
 #include "Utils.hpp"
 #include "Device.hpp"
 #include "Context.hpp"
 #include "Commandbuffer.hpp"
+#include "Buffer.hpp"
 #include "Image.hpp"
 #include "Framebuffer.hpp"
 #include "Swapchain.hpp"

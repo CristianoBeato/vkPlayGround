@@ -525,34 +525,3 @@ void VkImageStateTransition( vkImageHandle_t* in_image,
     in_image->stageMask = in_stageMask;
     in_image->accessMask = in_accessMask;
 }
-
-void VkBufferStateTransition(vkBufferHandle_t *in_buffer, const VkCommandBuffer in_commandBuffer, const VkImageLayout in_newLayout, const VkPipelineStageFlags2 in_stageMask, const VkAccessFlags2 in_accessMask )
-{
-    assert( in_buffer != nullptr );
-
-    VkBufferMemoryBarrier2 destinationBarrier{}; 
-    destinationBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2;
-    destinationBarrier.pNext = nullptr;
-    destinationBarrier.srcStageMask = in_buffer->stage;
-    destinationBarrier.srcAccessMask = in_buffer->access;
-    destinationBarrier.dstStageMask = in_stageMask;
-    destinationBarrier.dstAccessMask = in_accessMask;
-    destinationBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    destinationBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    destinationBarrier.buffer = in_buffer->buffer;
-    destinationBarrier.offset = 0;
-    destinationBarrier.size = VK_WHOLE_SIZE;
-
-    /// perform a state transition to destination
-    VkDependencyInfo dependencyInfo{};
-    dependencyInfo.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
-    dependencyInfo.pNext = nullptr;
-    dependencyInfo.dependencyFlags = 0;
-    dependencyInfo.memoryBarrierCount = 0;
-    dependencyInfo.pMemoryBarriers = nullptr;
-    dependencyInfo.bufferMemoryBarrierCount = 1;
-    dependencyInfo.pBufferMemoryBarriers = &destinationBarrier;
-    dependencyInfo.imageMemoryBarrierCount = 0;
-    dependencyInfo.pImageMemoryBarriers = nullptr;
-    vkCmdPipelineBarrier2( in_commandBuffer, &dependencyInfo );    
-}
