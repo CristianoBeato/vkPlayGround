@@ -1,0 +1,80 @@
+/*
+===========================================================================================
+    This file is part of vkPlayGround a Vulkan testing c++ engine.
+
+    Copyright (c) 2026 Cristiano B. Santos <cristianobeato_dm@hotmail.com>
+    Contributor(s): none yet.
+
+-------------------------------------------------------------------------------------------
+
+ This file is part of the vkPlayGround library and is licensed under the
+ MIT License with Attribution Requirement.
+
+ You are free to use, modify, and distribute this file (even commercially),
+ as long as you give credit to the original author:
+
+     “Based on vkPlayGround by Cristiano Beato – https://github.com/CristianoBeato”
+
+ For full license terms, see the LICENSE file in the root of this repository.
+===============================================================================================
+*/
+
+#include "Utils.hpp"
+#include "Core.hpp"
+
+#define STR(r) case VK_ ##r: return crString( #r )
+
+crString VulkanErrorString( VkResult errorCode )
+{
+    switch (errorCode)
+    {
+	    STR( NOT_READY ); 
+        STR( TIMEOUT ); 
+        STR( EVENT_SET ); 
+        STR( EVENT_RESET ); 
+        STR( INCOMPLETE ); 
+        STR( ERROR_OUT_OF_HOST_MEMORY ); 
+        STR( ERROR_OUT_OF_DEVICE_MEMORY ); 
+        STR( ERROR_INITIALIZATION_FAILED ); 
+        STR( ERROR_DEVICE_LOST ); 
+        STR( ERROR_MEMORY_MAP_FAILED ); 
+        STR( ERROR_LAYER_NOT_PRESENT ); 
+        STR( ERROR_EXTENSION_NOT_PRESENT ); 
+        STR( ERROR_FEATURE_NOT_PRESENT ); 
+        STR( ERROR_INCOMPATIBLE_DRIVER ); 
+        STR( ERROR_TOO_MANY_OBJECTS ); 
+        STR( ERROR_FORMAT_NOT_SUPPORTED ); 
+        STR( ERROR_FRAGMENTED_POOL ); 
+        STR( ERROR_UNKNOWN ); 
+        STR( ERROR_OUT_OF_POOL_MEMORY ); 
+        STR( ERROR_INVALID_EXTERNAL_HANDLE ); 
+        STR( ERROR_FRAGMENTATION ); 
+        STR( ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS ); 
+        STR( PIPELINE_COMPILE_REQUIRED ); 
+        STR( ERROR_SURFACE_LOST_KHR ); 
+        STR( ERROR_NATIVE_WINDOW_IN_USE_KHR ); 
+        STR( SUBOPTIMAL_KHR ); 
+        STR( ERROR_OUT_OF_DATE_KHR ); 
+        STR( ERROR_INCOMPATIBLE_DISPLAY_KHR ); 
+        STR( ERROR_VALIDATION_FAILED_EXT ); 
+        STR( ERROR_INVALID_SHADER_NV ); 
+    #ifdef VK_ENABLE_BETA_EXTENSIONS
+        STR( ERROR_IMAGE_USAGE_NOT_SUPPORTED_KHR ); 
+        STR( ERROR_VIDEO_PICTURE_LAYOUT_NOT_SUPPORTED_KHR ); 
+        STR( ERROR_VIDEO_PROFILE_OPERATION_NOT_SUPPORTED_KHR ); 
+        STR( ERROR_VIDEO_PROFILE_FORMAT_NOT_SUPPORTED_KHR ); 
+        STR( ERROR_VIDEO_PROFILE_CODEC_NOT_SUPPORTED_KHR ); 
+        STR( ERROR_VIDEO_STD_VERSION_NOT_SUPPORTED_KHR ); 
+    #endif
+        STR( ERROR_NOT_PERMITTED_KHR ); 
+        STR( ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT ); 
+        STR( THREAD_IDLE_KHR ); 
+        STR( THREAD_DONE_KHR ); 
+        STR( OPERATION_DEFERRED_KHR ); 
+        STR( OPERATION_NOT_DEFERRED_KHR ); 
+        STR( ERROR_COMPRESSION_EXHAUSTED_EXT );
+	default:
+		return "UNKNOWN_ERROR";
+    }
+}
+#undef STR
