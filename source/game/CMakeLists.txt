@@ -18,55 +18,33 @@
 ## For full license terms, see the LICENSE file in the root of this repository.
 ##===============================================================================================
 ##
-cmake_minimum_required(VERSION 3.13)
 
-##
-## Project Name
-##
-project( vkPlayGround )
+## Game logic 
+##################################################################
 
-##
-## Uses STD c++ 20
-##
-set( CMAKE_CXX_STANDARD 20 )
+set( GAME_SOURCES 
+    ${CMAKE_CURRENT_SOURCE_DIR}/Damange.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Damange.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Protection.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Protection.hpp
+    )
 
-##
-## External Libraries
-##
-find_package( SDL3 REQUIRED CONFIG )
-include_directories( SDL3::Headers )
+add_library( game SHARED ${GAME_SOURCES} )
 
-##
-## set the engine source root path
-##
-include_directories( ${CMAKE_SOURCE_DIR} )
+#set the sound specific definitions
+target_compile_definitions( game PRIVATE __GAMED_DLL__ ) 
 
-##
-## common librarires
-##
-add_subdirectory( common )
+#set the sound root dir as include
+target_include_directories( game PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ) 
 
-##
-## engine framework systems
-##
-add_subdirectory( framework )
-
-##
-## engine render systems
-##
-add_subdirectory( renderer )
-
-##
-## engine sound system
-## 
-add_subdirectory( sound )
-
-##
-## engine system entry
-##
-add_subdirectory( system )
-
-##
-## game logic system
-##
-add_subdirectory( game )
+# set the precompiled common
+target_precompile_headers( game 
+	PUBLIC
+		${CMAKE_SOURCE_DIR}/system/Platform.hpp
+        ${CMAKE_SOURCE_DIR}/system/Includes.hpp
+		${CMAKE_SOURCE_DIR}/common/Lib.hpp
+		${CMAKE_SOURCE_DIR}/system/Systems.hpp
+		${CMAKE_SOURCE_DIR}/framework/Framework.hpp
+	PRIVATE 
+		${CMAKE_CURRENT_SOURCE_DIR}/game_common.hpp
+	) 
