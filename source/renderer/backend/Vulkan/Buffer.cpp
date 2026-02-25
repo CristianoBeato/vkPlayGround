@@ -21,10 +21,95 @@
 
 #include "Buffer.hpp" 
 
-crBuffer::vkBuffer( void )
+crSubBuffer::crSubBuffer( void ) : 
+    m_size( 0 ),
+    m_offset( 0 ),
+    m_buffer( nullptr )
 {
 }
 
-crBuffer::~vkBuffer( void )
+crSubBuffer::~crSubBuffer( void )
 {
+}
+
+void crSubBuffer::State(const VkCommandBuffer in_commandBuffer, const VkPipelineStageFlags2 in_stageMask, const VkAccessFlags2 in_accessMask)
+{
+    assert( m_buffer != nullptr );
+
+    VkBufferMemoryBarrier2 destinationBarrier{}; 
+    destinationBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2;
+    destinationBarrier.pNext = nullptr;
+    destinationBarrier.srcStageMask = m_stage;
+    destinationBarrier.srcAccessMask = m_access;
+    destinationBarrier.dstStageMask = in_stageMask;
+    destinationBarrier.dstAccessMask = in_accessMask;
+    destinationBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    destinationBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    destinationBarrier.buffer = m_buffer;
+
+    // update whole buffer, no region change
+    destinationBarrier.offset = m_offset;
+    destinationBarrier.size = m_size;
+
+    /// perform a state transition to destination
+    VkDependencyInfo dependencyInfo{};
+    dependencyInfo.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
+    dependencyInfo.pNext = nullptr;
+    dependencyInfo.dependencyFlags = 0;
+    dependencyInfo.memoryBarrierCount = 0;
+    dependencyInfo.pMemoryBarriers = nullptr;
+    dependencyInfo.bufferMemoryBarrierCount = 1;
+    dependencyInfo.pBufferMemoryBarriers = &destinationBarrier;
+    dependencyInfo.imageMemoryBarrierCount = 0;
+    dependencyInfo.pImageMemoryBarriers = nullptr;
+    vkCmdPipelineBarrier2( in_commandBuffer, &dependencyInfo );
+
+    // update buffer stage
+    m_stage = in_stageMask;
+    m_access = in_accessMask;
+}
+
+crBuffer::crBuffer( void )
+{
+}
+
+crBuffer::~crBuffer( void )
+{
+}
+
+void crBuffer::State(const VkCommandBuffer in_commandBuffer, const VkPipelineStageFlags2 in_stageMask, const VkAccessFlags2 in_accessMask)
+{
+    assert( m_buffer != nullptr );
+
+    VkBufferMemoryBarrier2 destinationBarrier{}; 
+    destinationBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2;
+    destinationBarrier.pNext = nullptr;
+    destinationBarrier.srcStageMask = m_stage;
+    destinationBarrier.srcAccessMask = m_access;
+    destinationBarrier.dstStageMask = in_stageMask;
+    destinationBarrier.dstAccessMask = in_accessMask;
+    destinationBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    destinationBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    destinationBarrier.buffer = m_buffer;
+
+    // update whole buffer, no region change
+    destinationBarrier.offset = 0;  
+    destinationBarrier.size = VK_WHOLE_SIZE;
+
+    /// perform a state transition to destination
+    VkDependencyInfo dependencyInfo{};
+    dependencyInfo.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
+    dependencyInfo.pNext = nullptr;
+    dependencyInfo.dependencyFlags = 0;
+    dependencyInfo.memoryBarrierCount = 0;
+    dependencyInfo.pMemoryBarriers = nullptr;
+    dependencyInfo.bufferMemoryBarrierCount = 1;
+    dependencyInfo.pBufferMemoryBarriers = &destinationBarrier;
+    dependencyInfo.imageMemoryBarrierCount = 0;
+    dependencyInfo.pImageMemoryBarriers = nullptr;
+    vkCmdPipelineBarrier2( in_commandBuffer, &dependencyInfo );
+
+    // update buffer stage
+    m_stage = in_stageMask;
+    m_access = in_accessMask;
 }
