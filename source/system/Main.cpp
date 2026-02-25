@@ -37,6 +37,10 @@ crAppMain::crAppMain( void )
     auto events = crEventsInput::Get();    
     events->StartUp();
 
+    // initialize audio 
+    auto sound = crSoundSystem::Get();
+    sound->StarUp();
+
     // initialize renderer
     auto renderer = crRenderSystem::Get();
     renderer->StartUp();
@@ -44,14 +48,17 @@ crAppMain::crAppMain( void )
 
 crAppMain::~crAppMain( void )
 {
-    auto events = crEventsInput::Get();
-    events->ShutDown();
+    auto renderer = crRenderSystem::Get();
+    renderer->ShutDown();
+
+    auto sound = crSoundSystem::Get();
+    sound->ShutDown();
 
     auto video = crVideo::Get();
     video->ShutDown();
 
-    auto renderer = crRenderSystem::Get();
-    renderer->ShutDown();
+    auto events = crEventsInput::Get();
+    events->ShutDown();
 
     SDL_Quit();
 }
