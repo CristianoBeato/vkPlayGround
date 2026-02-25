@@ -79,7 +79,7 @@ public:
 class crSoundSystem
 {
 public:
-    crSoundSystem*  Get( void );
+    static crSoundSystem*  Get( void );
     crSoundSystem( void );
     ~crSoundSystem( void );
 

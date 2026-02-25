@@ -28,20 +28,22 @@ public:
     crSurface( void );
     ~crSurface( void );
 
-    uint32_t    Indexes( void ) const { return m_indexCount; }
-    uint32_t    VertexCount( void ) const { return m_vertexCount; }
-    uint32_t    BaseVertex( void ) const { return m_baseVertex; }
-    cache_t*    IndexesCache( void ) const { return m_indexCache; }
-    cache_t*    VertexPosition( void ) const { return m_positionCache; }
-    cache_t*    VertexNormals( void ) const { return m_normalCache; }
+    uint32_t        Indexes( void ) const { return m_indexCount; }
+    uint32_t        VertexCount( void ) const { return m_vertexCount; }
+    uint32_t        BaseVertex( void ) const { return m_baseVertex; }
+    crSubBuffer*    IndexesCache( void ) const { return m_indexCache; }
+    crSubBuffer*    VertexPosition( void ) const { return m_positionCache; }
+    crSubBuffer*    VertexNormals( void ) const { return m_normalCache; }
+    crSubBuffer*    VertexWeights( void ) const { return m_weightCache; }
 
 private:
-    uint32_t    m_indexCount;
-    uint32_t    m_vertexCount;
-    uint32_t    m_baseVertex;
-    cache_t*    m_indexCache;
-    cache_t*    m_positionCache;
-    cache_t*    m_normalCache;    
+    uint32_t        m_indexCount;
+    uint32_t        m_vertexCount;
+    uint32_t        m_baseVertex;
+    crSubBuffer*    m_indexCache;
+    crSubBuffer*    m_positionCache;
+    crSubBuffer*    m_normalCache;
+    crSubBuffer*    m_weightCache;
 };
 
 #endif //!__SURFACE_HPP__

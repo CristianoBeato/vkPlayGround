@@ -21,20 +21,19 @@
 
 #include "Matrices.hpp"
 
-constexpr float alignas( 16 ) k_IDENTITY3x3[9] 
+alignas( 16 ) constexpr float k_IDENTITY3x3[9] 
 {
     1.0f, 0.0f, 0.0f,
     0.0f, 1.0f, 0.0f,
     0.0f, 0.0f, 1.0f,
 };
 
-constexpr float alignas( 16 ) k_IDENTITY4x4[16] 
+alignas( 16 ) constexpr float k_IDENTITY4x4[16] 
 {
     1.0f, 0.0f, 0.0f, 0.0f,
     0.0f, 1.0f, 0.0f, 0.0f,
     0.0f, 0.0f, 1.0f, 0.0f,
     0.0f, 0.0f, 0.0f, 1.0f,
-    
 };
 
 crMatrix3::crMatrix3( void )

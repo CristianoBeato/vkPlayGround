@@ -60,7 +60,7 @@ target_precompile_headers( vkPlayGround
         ${CMAKE_CURRENT_SOURCE_DIR}/Includes.hpp
 		${CMAKE_SOURCE_DIR}/common/Lib.hpp
 		${CMAKE_SOURCE_DIR}/renderer/RenderSystem.hpp
-		${CMAKE_SOURCE_DIR}/renderer/SoundSystem.hpp
+		${CMAKE_SOURCE_DIR}/sound/SoundSystem.hpp
 	##PRIVATE 
 	##	${CMAKE_CURRENT_SOURCE_DIR}/Lib.h
 	) 

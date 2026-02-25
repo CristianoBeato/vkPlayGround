@@ -28,7 +28,6 @@ struct cache_t
 {
     uintptr_t           offset = 0;
     size_t              size = 0;
-    vkBufferHandle_t*   buffer = nullptr;
 };
 
 class crVertexCache

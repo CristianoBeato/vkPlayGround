@@ -24,8 +24,10 @@
 crSurface::crSurface( void ) :
     m_indexCount( 0 ),
     m_vertexCount( 0 ),
-    m_indexOffset( 0 ),
-    m_vertexOffset( 0 ) 
+    m_baseVertex( 0 ),
+    m_indexCache( nullptr ),
+    m_positionCache( nullptr ),
+    m_normalCache( nullptr )
 {
 }
 

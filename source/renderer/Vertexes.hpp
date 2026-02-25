@@ -26,8 +26,7 @@
 inline constexpr uint32_t VERTEX_BINDING_POSI = 0; //
 inline constexpr uint32_t VERTEX_BINDING_NORM = 1; //
 inline constexpr uint32_t VERTEX_BINDING_SKIN = 2; //
-inline constexpr uint32_t VERTEX_BINDING_MATE = 3; //
-inline constexpr uint32_t VERTEX_BINDING_COUNT = 4;
+inline constexpr uint32_t VERTEX_BINDING_COUNT = 3;
 
 // attributes
 inline constexpr uint32_t VERTEX_ATTRIBUTE_POSI = 0; // 
@@ -35,8 +34,7 @@ inline constexpr uint32_t VERTEX_ATTRIBUTE_TEXT = 1; //
 inline constexpr uint32_t VERTEX_ATTRIBUTE_NORM = 2; //
 inline constexpr uint32_t VERTEX_ATTRIBUTE_TANG = 3; //
 inline constexpr uint32_t VERTEX_ATTRIBUTE_STAR = 4; // 
-inline constexpr uint32_t VERTEX_ATTRIBUTE_COUN = 5; // 
-inline constexpr uint32_t VERTEX_ATTRIBUTE_MATE = 6; // 
+inline constexpr uint32_t VERTEX_ATTRIBUTE_COUN = 5; //
 inline constexpr uint32_t VERTEX_ATTRIBUTE_COUNT = 7;
 
 /// @brief Store vertex position and texture coordinate
@@ -59,9 +57,11 @@ struct VertSkin_t
     int32_t count;  // Weigth count
 };
 
-struct VertMat_t
+struct VertWeigth_t
 {
-    uint32_t    surfID; // the material of the 
+    float x, y, z;  // w pos
+    float weigth;
+    uint32_t joint;
 };
 
 #endif //!__INCLUDE_VERTICES_HPP__

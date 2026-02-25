@@ -39,7 +39,7 @@ crAppMain::crAppMain( void )
 
     // initialize audio 
     auto sound = crSoundSystem::Get();
-    sound->StarUp();
+    sound->StartUp();
 
     // initialize renderer
     auto renderer = crRenderSystem::Get();
