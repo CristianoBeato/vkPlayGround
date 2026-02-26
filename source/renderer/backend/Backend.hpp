@@ -34,7 +34,7 @@ public:
 
     void    StartUp( void );
     void    ShutDown( void );
-    void    SetBuffer( void );
+    void    SetBuffers( void );
     void    SwapBuffers( void );
     void    DrawView( void );
     crSwapchain*    Swapchain( void ) const { return m_swapchain; }

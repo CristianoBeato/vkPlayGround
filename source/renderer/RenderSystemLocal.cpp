@@ -107,7 +107,7 @@ void crRenderSystemLocal::ReleaseRenderSystem(void)
 void crRenderSystemLocal::BeginFrame(void)
 {
     auto backend = crBackend::Get();
-    backend->BeginFrame();
+    backend->SetBuffers();
 }
 
 void crRenderSystemLocal::EndFrame(void)

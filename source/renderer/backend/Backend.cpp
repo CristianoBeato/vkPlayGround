@@ -80,7 +80,7 @@ void crBackend::ShutDown(void)
     }
 }
 
-void crBackend::SetBuffer(void)
+void crBackend::SetBuffers(void)
 {
     /// begin record
     m_graphicCMD->Begin( m_frame );
@@ -98,7 +98,7 @@ void crBackend::SetBuffer(void)
     presentImages->State( *m_graphicCMD, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_2_NONE );
 #endif
 
-    m_defaultFB->Bind();
+    m_defaultFB->Bind( m_graphicCMD, m_frame );
 }
 
 void crBackend::SwapBuffers(void)
@@ -106,7 +106,7 @@ void crBackend::SwapBuffers(void)
     VkResult result = VK_SUCCESS;
 
     /// release frame buffer
-    m_defaultFB->Unbind();
+    m_defaultFB->Unbind( m_graphicCMD );
 
     auto presentImages = m_swapchain->Image(); 
 
@@ -146,7 +146,7 @@ void crBackend::SwapBuffers(void)
     /// End frame rendering
     vkCmdEndRendering( *m_graphicCMD );
 
-    m_defaultFB->BlitColorAttachament( { 0, 0, 0, 10, 10, 0, 800, 600, 1, 790, 590, 1, presentImages } );
+    m_defaultFB->BlitColorAttachament( m_graphicCMD, { 0, 0, 0, 10, 10, 0, 800, 600, 1, 790, 590, 1, presentImages } );
 
     ///
     /// prepare image to be presented
@@ -267,7 +267,7 @@ void crBackend::TransparenGeometryPass(void)
 void crBackend::FillGeometryBuffer(void)
 {
     /// bind to draw geometry buffer
-    m_geometrFB->Bind();
+    m_geometrFB->Bind( m_graphicCMD, m_frame );
 
     /// draw all opaque textures first
     OpaqueGeometryPass();
@@ -276,7 +276,7 @@ void crBackend::FillGeometryBuffer(void)
     TransparenGeometryPass();
     
     /// finish geometry rendering 
-    m_geometrFB->Unbind();
+    m_geometrFB->Unbind( m_graphicCMD );
 }
 
 void crBackend::LighBlending(void)

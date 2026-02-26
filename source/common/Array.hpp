@@ -72,14 +72,14 @@ crArray<__type__, __count__>::const_pointer crArray<__type__, __count__>::Ptr(vo
 template <typename __type__, uint32_t __count__>
 crArray<__type__, __count__>::reference crArray<__type__, __count__>::operator[](const uint32_t in_index)
 {
-    static_assert( in_index < __count__ );
+    assert( in_index < __count__ );
     return m_elements[in_index];
 }
 
 template <typename __type__, uint32_t __count__>
 crArray<__type__, __count__>::const_reference crArray<__type__, __count__>::operator[](const uint32_t in_index) const
 {
-    static_assert( in_index < __count__ );
+    assert( in_index < __count__ );
     return m_elements[in_index];
 }
 
