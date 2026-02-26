@@ -191,7 +191,7 @@ void crFramebuffer::Create( const createInfo_t &in_createInfo )
         if( m_properties.colorFormat != VK_FORMAT_UNDEFINED )
         {
             // create color image handle 
-            result = vkCreateImage( *device, &colorImageCI, k_allocationCallbacks, &m_colorAttachament[i].image );
+            result = vkCreateImage( *device, &colorImageCI, k_allocationCallbacks, &m_colorAttachament[i].m_image );
             if ( result != VK_SUCCESS ) 
                 printf( "crFramebuffer::Create::vkCreateImage ERROR: %s\n", VulkanErrorString( result ).c_str() );
 
@@ -216,7 +216,7 @@ void crFramebuffer::Create( const createInfo_t &in_createInfo )
         if( m_properties.depthStencilFormat != VK_FORMAT_UNDEFINED )
         {
             // create depth stencil image handle 
-            result = vkCreateImage( *device, &depthStencilImageCI, k_allocationCallbacks, &m_depthAttachament[i].image );
+            result = vkCreateImage( *device, &depthStencilImageCI, k_allocationCallbacks, &m_depthAttachament[i].m_image );
             if ( result != VK_SUCCESS ) 
                 printf( "vkSwapchain::PrepareImages::vkCreateImage ERROR: %s\n", VulkanErrorString( result ).c_str() );
 
@@ -264,7 +264,7 @@ void crFramebuffer::Create( const createInfo_t &in_createInfo )
 
             // create image view
             colorImageViewCI.image = m_colorAttachament[i];
-            result = vkCreateImageView( *device, &colorImageViewCI, k_allocationCallbacks, &m_colorAttachament[i].view );
+            result = vkCreateImageView( *device, &colorImageViewCI, k_allocationCallbacks, &m_colorAttachament[i].m_view );
             if( result != VK_SUCCESS )
                 printf( "crFramebuffer::Create::vkCreateImageView ERROR: %s\n", VulkanErrorString( result ).c_str() );
         }
@@ -288,7 +288,7 @@ void crFramebuffer::Create( const createInfo_t &in_createInfo )
 
             // create image view
             depthStencilImageViewCI.image = m_depthAttachament[i];
-            result = vkCreateImageView( *device, &depthStencilImageViewCI, k_allocationCallbacks, &m_depthAttachament[i].view );
+            result = vkCreateImageView( *device, &depthStencilImageViewCI, k_allocationCallbacks, &m_depthAttachament[i].m_view );
             if( result != VK_SUCCESS )
                 printf( "vkSwapchain::PrepareImages::vkCreateImageView ERROR: %s\n", VulkanErrorString( result ).c_str() );
         }
@@ -303,24 +303,21 @@ void crFramebuffer::Destroy(void)
 
     for ( uint32_t i = 0; i < SMP_FRAMES; i++)
     {
-        vkDestroyImageView( *device, m_depthAttachament[i].view, k_allocationCallbacks );
-        vkDestroyImageView( *device, m_colorAttachament[i].view, k_allocationCallbacks );
-        vkDestroyImage( *device, m_depthAttachament[i].image, k_allocationCallbacks );
-        vkDestroyImage( *device, m_colorAttachament[i].image, k_allocationCallbacks );
+        m_depthAttachament[i].Destroy();
+        m_colorAttachament[i].Destroy();
     }
 
     vkFreeMemory( *device, m_unifiedMemory, k_allocationCallbacks );
 }
 
-void crFramebuffer::Bind(void)
+void crFramebuffer::Bind( const crCommandbuffer* in_command, const uint64_t in_frame )
 {
     uint32_t barriers = 0;
     VkImageMemoryBarrier2 acquireBarrier[2]{{},{}};
     VkRenderingAttachmentInfo colorAttachment{};
     VkRenderingAttachmentInfo depthStencilAttachment{};
 
-    auto swapChain = crBackend::Get()->Swapchain();
-    m_frame = swapChain->Frame();
+    m_frame = in_frame % SMP_FRAMES;
 
     ///
     /// If we have color atacchament, bind it
@@ -328,11 +325,11 @@ void crFramebuffer::Bind(void)
     if( m_properties.colorFormat != VK_FORMAT_UNDEFINED )
     {   
         acquireBarrier[barriers].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
-        acquireBarrier[barriers].srcStageMask = m_colorAttachament[m_frame].stageMask;
-        acquireBarrier[barriers].srcAccessMask = m_colorAttachament[m_frame].accessMask;
+        acquireBarrier[barriers].srcStageMask = m_colorAttachament[m_frame].m_stage;
+        acquireBarrier[barriers].srcAccessMask = m_colorAttachament[m_frame].m_access;
         acquireBarrier[barriers].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         acquireBarrier[barriers].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-        acquireBarrier[barriers].oldLayout = m_colorAttachament[m_frame].layout;
+        acquireBarrier[barriers].oldLayout = m_colorAttachament[m_frame].m_layout;
         acquireBarrier[barriers].newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
         acquireBarrier[barriers].image = m_colorAttachament[m_frame];
         acquireBarrier[barriers].subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -340,9 +337,9 @@ void crFramebuffer::Bind(void)
         acquireBarrier[barriers].subresourceRange.layerCount = 1;
 
         /// update image state
-        m_colorAttachament[m_frame].layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-        m_colorAttachament[m_frame].stageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-        m_colorAttachament[m_frame].accessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        m_colorAttachament[m_frame].m_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        m_colorAttachament[m_frame].m_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        m_colorAttachament[m_frame].m_access = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
         /// bind color to render
         colorAttachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO; 
@@ -368,11 +365,11 @@ void crFramebuffer::Bind(void)
     if ( m_properties.depthStencilFormat != VK_FORMAT_UNDEFINED )
     {
         acquireBarrier[barriers].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
-        acquireBarrier[barriers].srcStageMask = m_depthAttachament[m_frame].stageMask;
-        acquireBarrier[barriers].srcAccessMask = m_depthAttachament[m_frame].accessMask;
+        acquireBarrier[barriers].srcStageMask = m_depthAttachament[m_frame].m_stage;
+        acquireBarrier[barriers].srcAccessMask = m_depthAttachament[m_frame].m_access;
         acquireBarrier[barriers].dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
         acquireBarrier[barriers].dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-        acquireBarrier[barriers].oldLayout = m_depthAttachament[m_frame].layout; // Sempre trate como Undefined ao adquirir
+        acquireBarrier[barriers].oldLayout = m_depthAttachament[m_frame].m_layout; // Sempre trate como Undefined ao adquirir
         acquireBarrier[barriers].newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
         acquireBarrier[barriers].image = m_depthAttachament[m_frame];
         acquireBarrier[barriers].subresourceRange.aspectMask = 0;
@@ -383,9 +380,9 @@ void crFramebuffer::Bind(void)
         acquireBarrier[barriers].subresourceRange.layerCount = 1;
 
         /// update image state
-        m_depthAttachament[m_frame].layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-        m_depthAttachament[m_frame].stageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
-        m_depthAttachament[m_frame].accessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+        m_depthAttachament[m_frame].m_layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        m_depthAttachament[m_frame].m_stage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+        m_depthAttachament[m_frame].m_access = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
         /// bind depth stencil to render
         depthStencilAttachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO; 
@@ -409,7 +406,7 @@ void crFramebuffer::Bind(void)
     depInfo.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
     depInfo.imageMemoryBarrierCount = barriers;
     depInfo.pImageMemoryBarriers = acquireBarrier;
-    vkCmdPipelineBarrier2( swapChain->CommandBuffer(), &depInfo );
+    vkCmdPipelineBarrier2( *in_command, &depInfo );
     
     VkRenderingInfo renderingInfo{};
     renderingInfo.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
@@ -440,10 +437,10 @@ void crFramebuffer::Bind(void)
     else
         renderingInfo.pStencilAttachment = nullptr;
 
-    vkCmdBeginRendering( swapChain->CommandBuffer(), &renderingInfo );
+    vkCmdBeginRendering( *in_command, &renderingInfo );
 }
 
-void crFramebuffer::Unbind(void)
+void crFramebuffer::Unbind( const crCommandbuffer* in_command )
 {
     uint32_t barriers = 0;
     VkImageMemoryBarrier2 acquireBarrier[2];
@@ -452,7 +449,7 @@ void crFramebuffer::Unbind(void)
     ///
     ///
     /// End frame rendering
-    vkCmdEndRendering( swapChain->CommandBuffer() );
+    vkCmdEndRendering( *in_command );
 
     ///
     ///
@@ -461,11 +458,11 @@ void crFramebuffer::Unbind(void)
     {
         acquireBarrier[barriers].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
         acquireBarrier[barriers].pNext = nullptr;
-        acquireBarrier[barriers].srcStageMask = m_colorAttachament[m_frame].stageMask;
-        acquireBarrier[barriers].srcAccessMask = m_colorAttachament[m_frame].accessMask;
+        acquireBarrier[barriers].srcStageMask = m_colorAttachament[m_frame].m_stage;
+        acquireBarrier[barriers].srcAccessMask = m_colorAttachament[m_frame].m_access;
         acquireBarrier[barriers].dstStageMask = VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT;
         acquireBarrier[barriers].dstAccessMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT | VK_PIPELINE_STAGE_2_BLIT_BIT;
-        acquireBarrier[barriers].oldLayout = m_colorAttachament[m_frame].layout;
+        acquireBarrier[barriers].oldLayout = m_colorAttachament[m_frame].m_layout;
         acquireBarrier[barriers].newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
         acquireBarrier[barriers].srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED; //m_graphicQueue->Family();
         acquireBarrier[barriers].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED; //m_presentQueue->Family();
@@ -478,9 +475,9 @@ void crFramebuffer::Unbind(void)
         barriers++;
 
         /// update image state
-        m_colorAttachament[m_frame].layout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-        m_colorAttachament[m_frame].stageMask = VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT;
-        m_colorAttachament[m_frame].accessMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT | VK_PIPELINE_STAGE_2_BLIT_BIT;
+        m_colorAttachament[m_frame].m_layout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        m_colorAttachament[m_frame].m_stage = VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT;
+        m_colorAttachament[m_frame].m_access = VK_PIPELINE_STAGE_2_TRANSFER_BIT | VK_PIPELINE_STAGE_2_BLIT_BIT;
     }
 
     ///
@@ -490,11 +487,11 @@ void crFramebuffer::Unbind(void)
     {
         acquireBarrier[barriers].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
         acquireBarrier[barriers].pNext = nullptr;
-        acquireBarrier[barriers].srcStageMask = m_depthAttachament[m_frame].stageMask;
-        acquireBarrier[barriers].srcAccessMask = m_depthAttachament[m_frame].accessMask;
+        acquireBarrier[barriers].srcStageMask = m_depthAttachament[m_frame].m_stage;
+        acquireBarrier[barriers].srcAccessMask = m_depthAttachament[m_frame].m_access;
         acquireBarrier[barriers].dstStageMask = VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT;
         acquireBarrier[barriers].dstAccessMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT | VK_PIPELINE_STAGE_2_BLIT_BIT;
-        acquireBarrier[barriers].oldLayout = m_depthAttachament[m_frame].layout;
+        acquireBarrier[barriers].oldLayout = m_depthAttachament[m_frame].m_layout;
         acquireBarrier[barriers].newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
         acquireBarrier[barriers].srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED; //m_graphicQueue->Family();
         acquireBarrier[barriers].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED; //m_presentQueue->Family();
@@ -509,10 +506,9 @@ void crFramebuffer::Unbind(void)
         barriers++;
 
         /// update image state
-        m_depthAttachament[m_frame].layout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-        m_depthAttachament[m_frame].stageMask = VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT;
-        m_depthAttachament[m_frame].accessMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT | VK_PIPELINE_STAGE_2_BLIT_BIT;
-
+        m_depthAttachament[m_frame].m_layout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        m_depthAttachament[m_frame].m_stage = VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT;
+        m_depthAttachament[m_frame].m_access = VK_PIPELINE_STAGE_2_TRANSFER_BIT | VK_PIPELINE_STAGE_2_BLIT_BIT;
     }
 
     VkDependencyInfo dependencyInfo{};
@@ -525,33 +521,33 @@ void crFramebuffer::Unbind(void)
     dependencyInfo.pBufferMemoryBarriers = nullptr;
     dependencyInfo.imageMemoryBarrierCount = barriers;
     dependencyInfo.pImageMemoryBarriers = acquireBarrier;
-    vkCmdPipelineBarrier2( swapChain->CommandBuffer(), &dependencyInfo );
+    vkCmdPipelineBarrier2( *in_command, &dependencyInfo );
 }
 
-void crFramebuffer::Clear(void)
+void crFramebuffer::Clear( const crCommandbuffer* in_command )
 {
 }
 
-void crFramebuffer::BlitDepthStencilAttachament(const blitInfo_t &in_blitInfo)
+void crFramebuffer::BlitDepthStencilAttachament( const crCommandbuffer* in_command, const blitInfo_t &in_blitInfo)
 {
 }
 
-void crFramebuffer::BlitColorAttachament( const blitInfo_t &in_blitInfo )
+void crFramebuffer::BlitColorAttachament( const crCommandbuffer* in_command, const blitInfo_t &in_blitInfo )
 {
     auto swapChain = crBackend::Get()->Swapchain();
 
     VkImageMemoryBarrier2 destinationBarrier{};
     destinationBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
     destinationBarrier.pNext = nullptr;
-    destinationBarrier.srcStageMask = in_blitInfo.dstImage->stageMask;
-    destinationBarrier.srcAccessMask = in_blitInfo.dstImage->accessMask;
+    destinationBarrier.srcStageMask = in_blitInfo.dstImage->m_stage;
+    destinationBarrier.srcAccessMask = in_blitInfo.dstImage->m_access;
     destinationBarrier.dstStageMask = VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT;
     destinationBarrier.dstAccessMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT | VK_PIPELINE_STAGE_2_BLIT_BIT;
-    destinationBarrier.oldLayout = in_blitInfo.dstImage->layout;
+    destinationBarrier.oldLayout = in_blitInfo.dstImage->m_layout;
     destinationBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
     destinationBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED; //m_graphicQueue->Family();
     destinationBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED; //m_presentQueue->Family();
-    destinationBarrier.image = in_blitInfo.dstImage->image;
+    destinationBarrier.image = in_blitInfo.dstImage->m_image;
     destinationBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     destinationBarrier.subresourceRange.baseMipLevel = 0;
     destinationBarrier.subresourceRange.levelCount = 1;
@@ -559,9 +555,9 @@ void crFramebuffer::BlitColorAttachament( const blitInfo_t &in_blitInfo )
     destinationBarrier.subresourceRange.layerCount = 1;
 
     /// update image state
-    in_blitInfo.dstImage->layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-    in_blitInfo.dstImage->stageMask = VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT;
-    in_blitInfo.dstImage->accessMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT | VK_PIPELINE_STAGE_2_BLIT_BIT;
+    in_blitInfo.dstImage->m_layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    in_blitInfo.dstImage->m_stage = VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT;
+    in_blitInfo.dstImage->m_access = VK_PIPELINE_STAGE_2_TRANSFER_BIT | VK_PIPELINE_STAGE_2_BLIT_BIT;
         
     /// perform a state transition to destination
     VkDependencyInfo dependencyInfo{};
@@ -574,7 +570,7 @@ void crFramebuffer::BlitColorAttachament( const blitInfo_t &in_blitInfo )
     dependencyInfo.pBufferMemoryBarriers = nullptr;
     dependencyInfo.imageMemoryBarrierCount = 1;
     dependencyInfo.pImageMemoryBarriers = &destinationBarrier;
-    vkCmdPipelineBarrier2( swapChain->CommandBuffer(), &dependencyInfo );
+    vkCmdPipelineBarrier2( *in_command, &dependencyInfo );
 
     VkImageBlit2 imageBlit{};
     imageBlit.sType = VK_STRUCTURE_TYPE_IMAGE_BLIT_2;
@@ -605,10 +601,10 @@ void crFramebuffer::BlitColorAttachament( const blitInfo_t &in_blitInfo )
     blitImageInfo.pNext = nullptr;
     blitImageInfo.srcImage = m_colorAttachament[m_frame];
     blitImageInfo.srcImageLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-    blitImageInfo.dstImage = in_blitInfo.dstImage->image;
+    blitImageInfo.dstImage = in_blitInfo.dstImage->m_image;
     blitImageInfo.dstImageLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
     blitImageInfo.regionCount = 1;
     blitImageInfo.pRegions = &imageBlit;
     blitImageInfo.filter = VK_FILTER_LINEAR;
-    vkCmdBlitImage2( swapChain->CommandBuffer(), &blitImageInfo );
+    vkCmdBlitImage2( *in_command, &blitImageInfo );
 }

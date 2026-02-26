@@ -42,21 +42,25 @@ public:
     void        Destroy( void );
     void        State( const VkCommandBuffer in_commandBuffer, const VkImageLayout in_newLayout, const VkPipelineStageFlags2 in_stageMask, const VkAccessFlags2 in_accessMask );
 
-    inline VkFormat     Format( void ) const { return m_format; }
-    inline VkImage      Image( void ) const { return m_image; }
-    inline VkImageView  View( void ) const { return m_view; }
+    inline VkPipelineStageFlags2    StageMask( void ) const { return m_stage; }
+    inline VkAccessFlags2           AccessMask( void ) const { return m_access; } 
+    inline VkImageViewType          ViewType( void ) const { return m_type; }
+    inline VkFormat                 Format( void ) const { return m_format; }
+    inline VkImage                  Image( void ) const { return m_image; }
+    inline VkImageView              View( void ) const { return m_view; }
     inline operator VkImage( void ) const { return m_image; }
     inline operator VkImageView( void ) const { return m_view; }
 
-private:
+protected:
+    friend class            crFramebuffer;
+    VkImageAspectFlags      m_aspectMask;
+    VkAccessFlags2          m_access;
+    VkPipelineStageFlags2   m_stage;
+    VkImageLayout           m_layout;
     uint32_t                m_levelCount;
     uint32_t                m_layerCount;
     VkImageViewType         m_type;
     VkFormat                m_format;
-    VkImageAspectFlags      m_aspectMask;
-    VkImageLayout           m_layout;
-    VkPipelineStageFlags2   m_stage;
-    VkAccessFlags2          m_access;
     VkImage                 m_image;
     VkImageView             m_view;
     crRenderDevicep         m_device;

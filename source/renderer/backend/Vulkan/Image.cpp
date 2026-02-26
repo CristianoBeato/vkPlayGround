@@ -78,6 +78,9 @@ void crImage::Create( const VkImage in_image, const VkFormat in_format, const Vk
 {
     VkResult    result = VK_SUCCESS;
 
+    crRenderSystemLocal*    renderer =  dynamic_cast<crRenderSystemLocal*>( crRenderSystem::Get() );
+    m_device = renderer->GetDevice();
+
     /// image is create externally
     m_image = in_image;
     m_format = in_format;

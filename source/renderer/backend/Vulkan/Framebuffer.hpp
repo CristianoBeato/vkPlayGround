@@ -49,7 +49,7 @@ public:
         uint32_t            dstWidth = 0;
         uint32_t            dstHeigth = 0;
         uint32_t            dstDepth = 0;
-        vkImageHandle_t*    dstImage = nullptr;
+        crImage*            dstImage = nullptr;
     };
 
     crFramebuffer( void );
@@ -57,20 +57,20 @@ public:
 
     void                Create( const createInfo_t &in_createInfo );
     void                Destroy( void );
-    void                Bind( void );
-    void                Unbind( void );
-    void                Clear( void );
-    void                BlitColorAttachament( const blitInfo_t &in_blitInfo );
-    void                BlitDepthStencilAttachament( const blitInfo_t &in_blitInfo );
-    vkImageHandle_t*    ImageColor( void ) const { return const_cast<vkImageHandle_t*>( &m_colorAttachament[m_frame] ); }
-    vkImageHandle_t*    ImageDepthStencil( void ) const { return const_cast<vkImageHandle_t*>( &m_depthAttachament[m_frame] ); }
+    void                Bind( const crCommandbuffer* in_command, const uint64_t in_frame );
+    void                Unbind( const crCommandbuffer* in_command );
+    void                Clear( const crCommandbuffer* in_command );
+    void                BlitColorAttachament( const crCommandbuffer* in_command, const blitInfo_t &in_blitInfo );
+    void                BlitDepthStencilAttachament( const crCommandbuffer* in_command, const blitInfo_t &in_blitInfo );
+    crImage*            ImageColor( void ) const { return const_cast<crImage*>( &m_colorAttachament[m_frame] ); }
+    crImage*            ImageDepthStencil( void ) const { return const_cast<crImage*>( &m_depthAttachament[m_frame] ); }
 
 private:
-    uint32_t        m_frame;
-    createInfo_t    m_properties;
-    VkDeviceMemory  m_unifiedMemory;
-    vkImageHandle_t m_colorAttachament[SMP_FRAMES];
-    vkImageHandle_t m_depthAttachament[SMP_FRAMES];
+    uint32_t                        m_frame;
+    createInfo_t                    m_properties;
+    VkDeviceMemory                  m_unifiedMemory;
+    crArray<crImage, SMP_FRAMES>    m_colorAttachament;
+    crArray<crImage, SMP_FRAMES>    m_depthAttachament;
 };
 
 #endif //!__FRAMEBUFFER_HPP__
