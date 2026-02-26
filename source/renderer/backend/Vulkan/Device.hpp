@@ -102,6 +102,10 @@ public:
     /// @return 
     const bool                      SupportedDepthStencilFormat( VkFormat *depthStencilFormat) const;
 
+    const uint32_t                  MinMemoryMapAlignment( void ) const;
+    const uint32_t                  MinTexelBufferOffsetAlignment( void ) const;
+    const uint32_t                  MinStorageAlignment( void ) const;
+    
     /// @brief 
     /// @param in_format 
     /// @param tiling 
