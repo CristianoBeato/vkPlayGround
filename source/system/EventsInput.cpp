@@ -45,18 +45,22 @@ void crEventsInput::ShutDown(void)
 {
 }
 
-void crEventsInput::Pool(void)
+bool crEventsInput::Pool(void)
 {
     SDL_Event event{};
     while ( SDL_PollEvent( &event ) )
     {
         switch ( event.type )
         {
+            /// quit event
+            case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
             case SDL_EVENT_QUIT:
-                break;
+                return false;
         
         default:
             break;
         }
     }
+
+    return true;
 }

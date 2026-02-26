@@ -31,7 +31,7 @@ public:
     ~crEventsInput( void ); 
     void    StartUp( void );
     void    ShutDown( void );
-    void    Pool( void );
+    bool    Pool( void );
 
 private:
 

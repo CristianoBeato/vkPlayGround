@@ -78,7 +78,8 @@ void crAppMain::Run(void)
     while ( true )
     {
         // handle events
-        events->Pool();
+        if( !events->Pool() )
+            break;
 
         // sumit engine logic
         framework->DoFrame();
