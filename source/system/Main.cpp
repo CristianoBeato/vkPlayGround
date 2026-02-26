@@ -28,6 +28,10 @@ crAppMain::crAppMain( void )
     // Initialize SDL
     if( !SDL_Init( SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_GAMEPAD | SDL_INIT_AUDIO ) )
         throw crException( "Error on SDL_Init:%s\n", SDL_GetError() );
+    
+    // initialize engine framework system
+    auto framework = crFramework::Get();
+    framework->StartUp();
 
     // initialize video system
     auto video = crVideo::Get();
@@ -44,6 +48,7 @@ crAppMain::crAppMain( void )
     // initialize renderer
     auto renderer = crRenderSystem::Get();
     renderer->StartUp();
+
 }
 
 crAppMain::~crAppMain( void )
@@ -60,16 +65,23 @@ crAppMain::~crAppMain( void )
     auto events = crEventsInput::Get();
     events->ShutDown();
 
+    auto framework = crFramework::Get();
+    framework->ShutDown();
+
     SDL_Quit();
 }
 
 void crAppMain::Run(void)
 {
     auto events = crEventsInput::Get();
+    auto framework = crFramework::Get();
     while ( true )
     {
         // handle events
         events->Pool();
+
+        // sumit engine logic
+        framework->DoFrame();
     }
 }
 
