@@ -193,7 +193,7 @@ void crFramebuffer::Create( const createInfo_t &in_createInfo )
             // create color image handle 
             result = vkCreateImage( *device, &colorImageCI, k_allocationCallbacks, &m_colorAttachament[i].m_image );
             if ( result != VK_SUCCESS ) 
-                printf( "crFramebuffer::Create::vkCreateImage ERROR: %s\n", VulkanErrorString( result ).c_str() );
+                crConsole::Error( "crFramebuffer::Create::vkCreateImage ERROR: %s\n", VulkanErrorString( result ).c_str() );
 
             // get image memory requeriments 
             vkGetImageMemoryRequirements( *device, m_colorAttachament[i], &memRequirements );
@@ -218,7 +218,7 @@ void crFramebuffer::Create( const createInfo_t &in_createInfo )
             // create depth stencil image handle 
             result = vkCreateImage( *device, &depthStencilImageCI, k_allocationCallbacks, &m_depthAttachament[i].m_image );
             if ( result != VK_SUCCESS ) 
-                printf( "vkSwapchain::PrepareImages::vkCreateImage ERROR: %s\n", VulkanErrorString( result ).c_str() );
+                printf( "crFramebuffer::Create::vkCreateImage ERROR: %s\n", VulkanErrorString( result ).c_str() );
 
             // get image memory requeriments 
             vkGetImageMemoryRequirements( *device, m_depthAttachament[i], &memRequirements );
@@ -242,7 +242,7 @@ void crFramebuffer::Create( const createInfo_t &in_createInfo )
     // Keep only one VkDeviceMemory in your class: VkDeviceMemory m_unifiedMemory;
     result = vkAllocateMemory(*device, &allocInfo, k_allocationCallbacks, &m_unifiedMemory );
     if( result != VK_SUCCESS )
-        printf( "crFramebuffer::Create::vkAllocateMemory ERROR: %s\n", VulkanErrorString( result ).c_str() );
+        crConsole::Error( "crFramebuffer::Create::vkAllocateMemory ERROR: %s\n", VulkanErrorString( result ).c_str() );
 
     for ( uint32_t i = 0; i < SMP_FRAMES; i++)
     {
@@ -260,13 +260,13 @@ void crFramebuffer::Create( const createInfo_t &in_createInfo )
             // bind image to the handle 
             result = vkBindImageMemory( *device, m_colorAttachament[i], m_unifiedMemory, colorMemoryOffset[i] );
             if( result != VK_SUCCESS )
-                printf( "crFramebuffer::Create::vkBindImageMemory ERROR: %s\n", VulkanErrorString( result ).c_str() );
+                crConsole::Error( "crFramebuffer::Create::vkBindImageMemory ERROR: %s\n", VulkanErrorString( result ).c_str() );
 
             // create image view
             colorImageViewCI.image = m_colorAttachament[i];
             result = vkCreateImageView( *device, &colorImageViewCI, k_allocationCallbacks, &m_colorAttachament[i].m_view );
             if( result != VK_SUCCESS )
-                printf( "crFramebuffer::Create::vkCreateImageView ERROR: %s\n", VulkanErrorString( result ).c_str() );
+                crConsole::Error( "crFramebuffer::Create::vkCreateImageView ERROR: %s\n", VulkanErrorString( result ).c_str() );
         }
 
         /*
@@ -284,13 +284,13 @@ void crFramebuffer::Create( const createInfo_t &in_createInfo )
             // bind image to the handle 
             result = vkBindImageMemory( *device, m_depthAttachament[i], m_unifiedMemory, depthMemoryOffset[i] );
             if( result != VK_SUCCESS )
-                printf( "vkSwapchain::PrepareImages::vkBindImageMemory ERROR: %s\n", VulkanErrorString( result ).c_str() );
+                crConsole::Error( "crFramebuffer::Create::vkBindImageMemory ERROR: %s\n", VulkanErrorString( result ).c_str() );
 
             // create image view
             depthStencilImageViewCI.image = m_depthAttachament[i];
             result = vkCreateImageView( *device, &depthStencilImageViewCI, k_allocationCallbacks, &m_depthAttachament[i].m_view );
             if( result != VK_SUCCESS )
-                printf( "vkSwapchain::PrepareImages::vkCreateImageView ERROR: %s\n", VulkanErrorString( result ).c_str() );
+                crConsole::Error( "crFramebuffer::Create::vkCreateImageView ERROR: %s\n", VulkanErrorString( result ).c_str() );
         }
     }
 }
@@ -304,7 +304,11 @@ void crFramebuffer::Destroy(void)
         m_colorAttachament[i].Destroy();
     }
 
-    vkFreeMemory( *device, m_unifiedMemory, k_allocationCallbacks );
+    if ( m_unifiedMemory )
+    {
+        vkFreeMemory( *device, m_unifiedMemory, k_allocationCallbacks );
+        m_unifiedMemory = nullptr;
+    }
 }
 
 void crFramebuffer::Bind( const crCommandbuffer* in_command, const uint64_t in_frame )
