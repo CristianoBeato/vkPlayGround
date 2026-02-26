@@ -34,17 +34,27 @@ struct alignas( 16 ) material_t
 class crMaterial
 {
 public:
+    enum flags_t
+    {
+        MTR_OPAQUE = 1 << 0,        // material don't have transparency
+        MTR_EMISSIVE = 1 << 1,      // material have emissive texture
+    };
+
     crMaterial( void );
     ~crMaterial( void );
 
     /// @brief material don't have transparency
-    bool    Opaque( void ) const;
+    bool    Opaque( void ) const { return m_flags & MTR_OPAQUE; }
 
     /// @brief material perform a additive pass, 
-    bool    Emissive( void ) const;
+    bool    Emissive( void ) const { return m_flags & MTR_EMISSIVE; }
+
+    float   EmissiveIntensity( void ) const;
+
+    uint32_t    Flags( void ) const { return m_flags; }
 
 private:
-
+    uint32_t    m_flags;
 };
 
 #endif //!__MATERIAL_HPP__
