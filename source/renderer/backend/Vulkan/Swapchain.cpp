@@ -148,7 +148,7 @@ bool crSwapchain::Create( const uint32_t in_width, const uint32_t in_height, boo
     }
 
     // we are updating, recreating a new
-    if ( old != nullptr )
+    if ( in_recreate )
         vkDestroySwapchainKHR( m_device->Device(), old, k_allocationCallbacks );
     
     // Get the available image count 
@@ -168,6 +168,11 @@ bool crSwapchain::Create( const uint32_t in_width, const uint32_t in_height, boo
     // create the swap chain views
     for ( i = 0; i < numImages; i++) 
     {
+         // if we are re creatin a frame buffer or the swap chain
+        if ( in_recreate )
+            vkDestroyImageView( *m_device, m_presentImages[i].View(), k_allocationCallbacks );
+        
+        m_presentImages[i] = crImage(); // prevent gargbage
         m_presentImages[i].Create( m_imagesArray[i], format.format, VK_IMAGE_VIEW_TYPE_2D );
     }
 

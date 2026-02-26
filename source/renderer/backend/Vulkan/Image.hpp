@@ -37,7 +37,16 @@ public:
     crImage( void );
     ~crImage( void );
 
+    /// @brief Create a new image 
+    /// @param in_dimension image proportions, base size, layers and mip count
+    /// @param in_format pixel storage format 
+    /// @param in_viewType image target
     void        Create( const dimension_t in_dimension, const VkFormat in_format, const VkImageViewType in_viewType );
+
+    /// @brief 
+    /// @param in_image 
+    /// @param in_format 
+    /// @param in_viewType 
     void        Create( const VkImage in_image, const VkFormat in_format, const VkImageViewType in_viewType );
     void        Destroy( void );
     void        State( const VkCommandBuffer in_commandBuffer, const VkImageLayout in_newLayout, const VkPipelineStageFlags2 in_stageMask, const VkAccessFlags2 in_accessMask );
@@ -63,6 +72,7 @@ protected:
     VkFormat                m_format;
     VkImage                 m_image;
     VkImageView             m_view;
+    VkDeviceMemory          m_memory;
     crRenderDevicep         m_device;
 };
 

@@ -66,6 +66,7 @@ crImage::crImage( void ) :
     m_access( VK_ACCESS_NONE ),
     m_image( nullptr ),
     m_view( nullptr ),
+    m_memory( nullptr ),
     m_device( nullptr )
 {
 }
@@ -87,12 +88,6 @@ void crImage::Create( const VkImage in_image, const VkFormat in_format, const Vk
     m_type = in_viewType;
     m_levelCount = 1;
     m_layerCount = 1;
-
-    if ( m_view != nullptr )
-    {
-        vkDestroyImageView( *m_device, m_view, k_allocationCallbacks );
-        m_view = nullptr;
-    }
 
     bool hasDepth = IsDepthFormat( m_format );
     bool hasStencil = IsStencilFormat( m_format );
@@ -140,6 +135,12 @@ void crImage::Destroy(void)
         m_image = nullptr;
     }
 
+    if ( m_memory != nullptr )
+    {
+        vkFreeMemory( *m_device, m_memory, k_allocationCallbacks );
+        m_memory = nullptr;
+    }
+    
     m_device = nullptr;
 }
 
