@@ -22,4 +22,44 @@
 #ifndef __IMAGE_HPP__
 #define __IMAGE_HPP__
 
+class crImage
+{
+public:
+    struct dimension_t
+    {
+        uint16_t    layers;
+        uint16_t    levels;
+        uint32_t    width;
+        uint32_t    height;
+        uint32_t    depth;
+    };
+
+    crImage( void );
+    ~crImage( void );
+
+    void        Create( const dimension_t in_dimension, const VkFormat in_format, const VkImageViewType in_viewType );
+    void        Create( const VkImage in_image, const VkFormat in_format, const VkImageViewType in_viewType );
+    void        Destroy( void );
+    void        State( const VkCommandBuffer in_commandBuffer, const VkImageLayout in_newLayout, const VkPipelineStageFlags2 in_stageMask, const VkAccessFlags2 in_accessMask );
+
+    inline VkFormat     Format( void ) const { return m_format; }
+    inline VkImage      Image( void ) const { return m_image; }
+    inline VkImageView  View( void ) const { return m_view; }
+    inline operator VkImage( void ) const { return m_image; }
+    inline operator VkImageView( void ) const { return m_view; }
+
+private:
+    uint32_t                m_levelCount;
+    uint32_t                m_layerCount;
+    VkImageViewType         m_type;
+    VkFormat                m_format;
+    VkImageAspectFlags      m_aspectMask;
+    VkImageLayout           m_layout;
+    VkPipelineStageFlags2   m_stage;
+    VkAccessFlags2          m_access;
+    VkImage                 m_image;
+    VkImageView             m_view;
+    crRenderDevicep         m_device;
+};
+
 #endif //!__IMAGE_HPP__
