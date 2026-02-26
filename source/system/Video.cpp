@@ -43,7 +43,9 @@ crVideo::~crVideo( void )
 
 void crVideo::StartUp(void)
 {
-    SDL_WindowFlags windowProps = SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_INPUT_FOCUS;
+    /// create a resizable hiden window
+    /// we show window wen renderer has been created
+    SDL_WindowFlags windowProps = SDL_WINDOW_VULKAN | SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_INPUT_FOCUS;
 
     // Initialize Vulkan Libary
     if ( !SDL_Vulkan_LoadLibrary( nullptr ) )
