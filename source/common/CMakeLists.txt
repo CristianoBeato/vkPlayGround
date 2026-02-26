@@ -23,6 +23,7 @@
 ##################################################################
 
 set( COMMON_SOURCES
+		${CMAKE_CURRENT_SOURCE_DIR}/Array.hpp
 		${CMAKE_CURRENT_SOURCE_DIR}/Exception.hpp
 		${CMAKE_CURRENT_SOURCE_DIR}/HalfFloat.hpp
 		${CMAKE_CURRENT_SOURCE_DIR}/Heap.cpp
