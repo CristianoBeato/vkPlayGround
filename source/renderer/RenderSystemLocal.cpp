@@ -27,8 +27,7 @@ crRenderSystem *crRenderSystem::Get(void)
     return &local;
 }
 
-crRenderSystemLocal::crRenderSystemLocal( void ) : 
-    m_context( nullptr )
+crRenderSystemLocal::crRenderSystemLocal( void )
 {
 }
 
@@ -80,8 +79,8 @@ void crRenderSystemLocal::Run(void)
 
 void crRenderSystemLocal::InitRendersystem(void)
 {
-    m_context = new vkContext();
-    m_context->StarUp();
+    auto context = crContext::Get();
+    context->StarUp();
     
     auto backend = crBackend::Get();
     backend->StartUp();
@@ -94,12 +93,8 @@ void crRenderSystemLocal::ReleaseRenderSystem(void)
     auto backend = crBackend::Get();
     backend->ShutDown();
 
-    if ( m_context != nullptr )
-    {
-        m_context->Shutdown();
-        delete m_context;
-        m_context = nullptr;
-    }
+    auto context = crContext::Get();
+    context->Shutdown();
     
     m_renderInitialized = false;
 }

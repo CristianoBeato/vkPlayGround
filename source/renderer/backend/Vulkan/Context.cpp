@@ -53,28 +53,38 @@ const VkAllocationCallbacks* k_allocationCallbacks = nullptr;
 
 /*
 ==============
-vkContext::vkContext
+crContext::Get
 ==============
 */
-vkContext::vkContext( void ) : 
-    m_hasDebugUtils( false ),
-    m_portabilityEnumerationAvailable( false ),
-    m_instance( nullptr ),
-    m_debugCallback( nullptr ),
-    m_surface( nullptr )
+crContext *crContext::Get(void)
+{
+    static crContext gContext = crContext();
+    return &gContext;
+}
+
+/*
+==============
+crContext::crContext
+==============
+*/
+crContext::crContext(void) : m_hasDebugUtils(false),
+                             m_portabilityEnumerationAvailable(false),
+                             m_instance(nullptr),
+                             m_debugCallback(nullptr),
+                             m_surface(nullptr)
 {
 }
 
-vkContext::~vkContext(void)
+crContext::~crContext(void)
 {
 }
 
 /*
 ==============
-vkContext::Init
+crContext::Init
 ==============
 */
-bool vkContext::StarUp( void )
+bool crContext::StarUp( void )
 {    
     VkResult                            result = VK_SUCCESS;
     uint32_t                            instanceExtensionCount = 0;
@@ -280,10 +290,10 @@ bool vkContext::StarUp( void )
 
 /*
 ==============
-vkContext::Shutdown
+crContext::Shutdown
 ==============
 */
-void vkContext::Shutdown( void )
+void crContext::Shutdown( void )
 {
     if ( m_debugCallback != nullptr )
     {
@@ -306,10 +316,10 @@ void vkContext::Shutdown( void )
 
 /*
 ==============
-vkContext::ExtensionAvailable
+crContext::ExtensionAvailable
 ==============
 */
-bool vkContext::ExtensionAvailable(const crString &in_ext) const
+bool crContext::ExtensionAvailable(const crString &in_ext) const
 {
     for ( uint32_t i = 0; i < m_availableInstanceExtensions.Count(); i++)
     {
@@ -324,10 +334,10 @@ bool vkContext::ExtensionAvailable(const crString &in_ext) const
 
 /*
 ==============
-vkContext::LayersAvailable
+crContext::LayersAvailable
 ==============
 */
-bool vkContext::LayersAvailable(const crString &in_layer) const
+bool crContext::LayersAvailable(const crString &in_layer) const
 {
     for ( uint32_t i = 0; i < m_supportedInstanceLayers.Count(); i++)
     {

@@ -36,8 +36,7 @@ crCommandbuffer::~crCommandbuffer( void )
 bool crCommandbuffer::Create(void)
 {
     VkResult result = VK_SUCCESS;
-    crRenderSystemLocal* renderer =  dynamic_cast<crRenderSystemLocal*>( crRenderSystem::Get() );
-    m_device = renderer->GetDevice();
+    m_device = crContext::Get()->Device();
     m_graphicQueue = m_device->GraphicQueue();
 
     // allocate command buffers
@@ -181,7 +180,7 @@ void crCommandbuffer::Submit( const VkSemaphore in_wait )
     submitInfo.pCommandBufferInfos = &commandBufferSubmit;
     submitInfo.signalSemaphoreInfoCount = 1;
     submitInfo.pSignalSemaphoreInfos = &signal;
-    result = vkQueueSubmit2( m_graphicQueue->Queue(), 1, &submitInfo, nullptr );
+    result = vkQueueSubmit2( m_graphicQueue->Queue(), 1, &submitInfo, m_frameFences[m_bufferID] );
     if( result != VK_SUCCESS )
         crConsole::Error( "crCommandbuffer::Submit::vkQueueSubmit2 FAILED!\n" );
 }

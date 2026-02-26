@@ -24,11 +24,13 @@
 
 extern const VkAllocationCallbacks* k_allocationCallbacks;
 
-class vkContext
+class crContext
 {
 public:
-    vkContext( void );
-    ~vkContext( void );
+    static crContext*   Get( void ); 
+
+    crContext( void );
+    ~crContext( void );
 
     bool                StarUp( void );
     void                Shutdown( void );

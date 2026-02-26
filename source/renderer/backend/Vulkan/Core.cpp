@@ -280,7 +280,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback( VkDebugUtilsMessageSeverityFlagBit
     return VK_FALSE;
 }
 
-void vkContext::InitInstanceProcs( void )
+void crContext::InitInstanceProcs( void )
 {
     /// get tne vkGetInstanceProcAddr from SDL_Vulkan_LoadLibrary, called before window creation 
     vkGetInstanceProcAddr = reinterpret_cast<PFN_vkGetInstanceProcAddr>( SDL_Vulkan_GetVkGetInstanceProcAddr() );
@@ -295,10 +295,9 @@ void vkContext::InitInstanceProcs( void )
 
     GET_VK_PROC( vkCreateInstance, nullptr );
     assert( vkCreateInstance != nullptr );
-
 }
 
-void vkContext::LoadVulkanProcs( void )
+void crContext::LoadVulkanProcs( void )
 {
     GET_VK_PROC( vkCreateDebugUtilsMessengerEXT, m_instance );
     GET_VK_PROC( vkDestroyDebugUtilsMessengerEXT, m_instance );

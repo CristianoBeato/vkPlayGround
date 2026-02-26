@@ -41,21 +41,16 @@ public:
     virtual crSharedPointer<crRenderWorld>  AllocRenderWorld( void );
     virtual void                            FreeRenderWorld( crSharedPointer<crRenderWorld> &in_renderWorl );
 
-    vkContext*          GetContext( void ) const { return m_context; }
-    crRenderDevice*     GetDevice( void ) const { return m_context->Device(); }
-
 protected:
     virtual void Run( void ); /// render thread loop
 
 private:
     volatile bool   m_running;
     bool            m_renderInitialized;
-    vkContext*      m_context;
-
-    void    InitRendersystem( void );
-    void    ReleaseRenderSystem( void );
-    void    BeginFrame( void );
-    void    EndFrame( void );
+    void            InitRendersystem( void );
+    void            ReleaseRenderSystem( void );
+    void            BeginFrame( void );
+    void            EndFrame( void );
 };
 
 
