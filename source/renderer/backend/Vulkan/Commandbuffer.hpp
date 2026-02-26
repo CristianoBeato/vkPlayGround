@@ -28,15 +28,21 @@ public:
     crCommandbuffer( void );
     ~crCommandbuffer( void );
     bool                Create( void );
-    VkCommandBuffer     CommandBuffer( void ) const { return m_commandBuffers[m_frame]; }
+    void                Destroy( void );
+    void                Begin( const uint64_t in_frame );
+    void                Submit( const VkSemaphore in_wait );
+    VkCommandBuffer     CommandBuffer( void ) const { return m_commandBuffers[m_bufferID]; }
+    VkSemaphore         SubmitFinishe( void ) const { return m_renderFinished[m_bufferID]; }
+    operator VkCommandBuffer( void ) const { return m_commandBuffers[m_bufferID]; }
 
 private:
-    uint32_t            m_frame;
-    uint64_t            m_frameCount;
-    crRenderDevicep     m_device;
-    crDeviceQueuep      m_graphicQueue;
-    VkSemaphore         m_frameSemaphore;
-    VkCommandBuffer     m_commandBuffers[SMP_FRAMES];
+    uint32_t                                m_bufferID;
+    crRenderDevicep                         m_device;
+    crDeviceQueuep                          m_graphicQueue;
+    crArray<VkCommandBuffer, SMP_FRAMES>    m_commandBuffers;
+    crArray<VkSemaphore, SMP_FRAMES>        m_renderFinished;
+    crArray<VkFence, SMP_FRAMES>            m_frameFences;
+
 };
 
 #endif //!__COMMAND_BUFFER_HPP__

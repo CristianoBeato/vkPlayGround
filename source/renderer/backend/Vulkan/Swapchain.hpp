@@ -28,34 +28,25 @@ public:
     crSwapchain( void );
     ~crSwapchain( void );
 
-    bool                    Create( const uint32_t in_width, const uint32_t in_height );
+    bool                    Create( const uint32_t in_width, const uint32_t in_height, bool in_recreate );
     void                    Destroy( void );
-    void                    BeginFrame( void );
-    void                    SwapBuffers( void );
-    inline uint32_t         Frame( void ) const { return m_frame; }
-    inline VkCommandBuffer  CommandBuffer( void ) const { return m_commandBuffers[m_frame]; }
-    inline vkImageHandle_t* GetImage( void ) const { return const_cast<vkImageHandle_t*>( &m_presentImages[m_currentImage] ); }
-    
-private:
-    uint32_t                m_frame;
-    uint32_t                m_width;
-    uint32_t                m_height;
-    uint32_t                m_currentImage;
-    crDeviceQueuep          m_presentQueue;
-    crDeviceQueuep          m_graphicQueue;
-    crRenderDevicep         m_device;
-    VkSwapchainKHR          m_swapchain;
-    VkCommandBuffer         m_commandBuffers[SMP_FRAMES];
-    VkSemaphore             m_imageAvailable[SMP_FRAMES];
-    VkSemaphore             m_renderFinished[SMP_FRAMES];
-    VkFence                 m_frameFences[SMP_FRAMES];
-    crList<VkImage>         m_imagesArray;
-    crList<vkImageHandle_t> m_presentImages;
+    void                    Acquire( const uint64_t in_frame );
+    void                    Present( const VkSemaphore in_renderFinish );
+    inline crImage*         Image( void ) const { return const_cast<crImage*>( &m_presentImages[m_currentImage] ); }
+    inline VkSemaphore      ImageAvailable( void ) const { return m_imageAvailable[m_bufferID]; }
 
-    bool    CreateSwapChain( const VkSurfaceKHR in_surface, const VkSurfaceFormatKHR in_format, const VkPresentModeKHR in_presentMode );
-    bool    PrepareImages( const bool in_recreate, const VkFormat in_format );
-    bool    CreateFences( void );
-    bool    CreateCommandBuffers( void );
+private:
+    uint32_t                            m_bufferID; 
+    uint32_t                            m_width;
+    uint32_t                            m_height;
+    uint32_t                            m_currentImage;
+    crDeviceQueuep                      m_presentQueue;
+    crDeviceQueuep                      m_graphicQueue;
+    crRenderDevicep                     m_device;
+    VkSwapchainKHR                      m_swapchain;
+    crArray<VkSemaphore, SMP_FRAMES>    m_imageAvailable;
+    crList<VkImage>                     m_imagesArray;
+    crList<crImage>                     m_presentImages;
 };
 
 #endif //!__SWAPCHAIN_HPP__
