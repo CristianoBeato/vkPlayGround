@@ -78,8 +78,8 @@ void crFramebuffer::Create( const createInfo_t &in_createInfo )
     VkMemoryRequirements    memRequirements{};
     VkMemoryAllocateInfo    memoryAllocate{};
     crRenderSystemLocal*    renderer =  dynamic_cast<crRenderSystemLocal*>( crRenderSystem::Get() );
-    auto context = renderer->GetContext();
-    auto device = renderer->GetDevice();
+
+    auto device = crContext::Get()->Device();
     auto graphic = device->GraphicQueue();
     auto transfer = device->TransferQueue();
 
@@ -297,10 +297,7 @@ void crFramebuffer::Create( const createInfo_t &in_createInfo )
 
 void crFramebuffer::Destroy(void)
 {
-    crRenderSystemLocal* renderer =  dynamic_cast<crRenderSystemLocal*>( crRenderSystem::Get() );
-    auto context = renderer->GetContext();
-    auto device = renderer->GetDevice();
-
+    auto device = crContext::Get()->Device();
     for ( uint32_t i = 0; i < SMP_FRAMES; i++)
     {
         m_depthAttachament[i].Destroy();

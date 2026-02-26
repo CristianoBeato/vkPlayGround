@@ -73,7 +73,6 @@ protected:
     VkImage                 m_image;
     VkImageView             m_view;
     VkDeviceMemory          m_memory;
-    crRenderDevicep         m_device;
 };
 
 #endif //!__IMAGE_HPP__

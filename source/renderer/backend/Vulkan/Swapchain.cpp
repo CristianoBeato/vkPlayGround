@@ -80,8 +80,8 @@ bool crSwapchain::Create( const uint32_t in_width, const uint32_t in_height, boo
     VkSwapchainKHR          old = m_swapchain;
     crRenderSystemLocal*    renderer =  dynamic_cast<crRenderSystemLocal*>( crRenderSystem::Get() );
 
-    auto context = renderer->GetContext();
-    m_device = renderer->GetDevice();
+    auto context = crContext::Get();
+    m_device = context->Device();
     m_width = in_width;
     m_height = in_height;
 

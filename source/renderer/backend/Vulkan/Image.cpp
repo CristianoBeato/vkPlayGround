@@ -66,8 +66,7 @@ crImage::crImage( void ) :
     m_access( VK_ACCESS_NONE ),
     m_image( nullptr ),
     m_view( nullptr ),
-    m_memory( nullptr ),
-    m_device( nullptr )
+    m_memory( nullptr )
 {
 }
 
@@ -78,9 +77,7 @@ crImage::~crImage( void )
 void crImage::Create( const VkImage in_image, const VkFormat in_format, const VkImageViewType in_viewType )
 {
     VkResult    result = VK_SUCCESS;
-
-    crRenderSystemLocal*    renderer =  dynamic_cast<crRenderSystemLocal*>( crRenderSystem::Get() );
-    m_device = renderer->GetDevice();
+    auto device = crContext::Get()->Device();
 
     /// image is create externally
     m_image = in_image;
@@ -116,32 +113,31 @@ void crImage::Create( const VkImage in_image, const VkFormat in_format, const Vk
     createInfo.subresourceRange.layerCount = m_layerCount;
     createInfo.image = m_image;    
     
-    result = vkCreateImageView( m_device->Device(), &createInfo, k_allocationCallbacks, &m_view ); 
+    result = vkCreateImageView( *device, &createInfo, k_allocationCallbacks, &m_view ); 
     if ( result != VK_SUCCESS ) 
         crConsole::Error( "crImage::Create:\n%s\n", VulkanErrorString( result ).c_str() );
 }
 
 void crImage::Destroy(void)
 {
+    auto device = crContext::Get()->Device();
     if ( m_view != nullptr )
     {
-        vkDestroyImageView( *m_device, m_view, k_allocationCallbacks );
+        vkDestroyImageView( *device, m_view, k_allocationCallbacks );
         m_view = nullptr;
     }
 
     if( m_image != nullptr )
     {
-        vkDestroyImage( *m_device, m_image, k_allocationCallbacks );
+        vkDestroyImage( *device, m_image, k_allocationCallbacks );
         m_image = nullptr;
     }
 
     if ( m_memory != nullptr )
     {
-        vkFreeMemory( *m_device, m_memory, k_allocationCallbacks );
+        vkFreeMemory( *device, m_memory, k_allocationCallbacks );
         m_memory = nullptr;
     }
-    
-    m_device = nullptr;
 }
 
 void crImage::State(const VkCommandBuffer in_commandBuffer, const VkImageLayout in_newLayout, const VkPipelineStageFlags2 in_stageMask, const VkAccessFlags2 in_accessMask)
