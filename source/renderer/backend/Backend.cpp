@@ -60,21 +60,18 @@ void crBackend::ShutDown(void)
 {
     if ( m_defaultFB != nullptr )
     {
-        m_defaultFB->Destroy();
         delete m_defaultFB;
         m_defaultFB = nullptr;
     }
     
     if ( m_swapchain != nullptr )
     {
-        m_swapchain->Destroy();
         delete m_swapchain;
         m_swapchain = nullptr;
     }
 
     if ( m_graphicCMD != nullptr )
     {
-        m_graphicCMD->Destroy();
         delete m_graphicCMD;
         m_graphicCMD = nullptr;
     }

@@ -204,20 +204,31 @@ void crSwapchain::Destroy(void)
     uint32_t i = 0;
     for ( i = 0; i < SMP_FRAMES; i++)
     {
-        vkDestroySemaphore( m_device->Device(), m_imageAvailable[i], k_allocationCallbacks );
+        // release semaphores
+        if ( m_imageAvailable[i] != nullptr )
+        {
+            vkDestroySemaphore( *m_device, m_imageAvailable[i], k_allocationCallbacks );
+            m_imageAvailable[i] = nullptr;
+        }
     }
         
     for ( i = 0; i < m_presentImages.Count(); i++ )
     {
         // release color image view 
-        vkDestroyImageView( m_device->Device(), m_presentImages[i].View(), k_allocationCallbacks );
+        if ( m_presentImages[i].View() != nullptr )
+        {
+            vkDestroyImageView( *m_device, m_presentImages[i].View(), k_allocationCallbacks );
+            m_presentImages[i] = crImage();
+        }
     }
 
     if ( m_swapchain != nullptr )
     {
-        vkDestroySwapchainKHR( m_device->Device(), m_swapchain, k_allocationCallbacks );
+        vkDestroySwapchainKHR( *m_device, m_swapchain, k_allocationCallbacks );
         m_swapchain = nullptr;
     }
+
+    m_device = nullptr;
 }
 
 void crSwapchain::Acquire( const uint64_t in_frame )

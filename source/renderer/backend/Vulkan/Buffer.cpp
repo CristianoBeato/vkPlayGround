@@ -22,6 +22,8 @@
 #include "Buffer.hpp" 
 
 crSubBuffer::crSubBuffer( void ) : 
+    m_stage( VK_PIPELINE_STAGE_2_NONE ),
+    m_access( VK_ACCESS_2_NONE ),
     m_size( 0 ),
     m_offset( 0 ),
     m_buffer( nullptr )
@@ -30,6 +32,11 @@ crSubBuffer::crSubBuffer( void ) :
 
 crSubBuffer::~crSubBuffer( void )
 {
+    m_stage = VK_PIPELINE_STAGE_2_NONE;
+    m_access = VK_ACCESS_2_NONE;
+    m_size = 0;
+    m_offset = 0;
+    m_buffer = nullptr;
 }
 
 void crSubBuffer::State(const VkCommandBuffer in_commandBuffer, const VkPipelineStageFlags2 in_stageMask, const VkAccessFlags2 in_accessMask)
@@ -69,12 +76,36 @@ void crSubBuffer::State(const VkCommandBuffer in_commandBuffer, const VkPipeline
     m_access = in_accessMask;
 }
 
-crBuffer::crBuffer( void )
+crBuffer::crBuffer( void ) : 
+    m_stage( VK_PIPELINE_STAGE_2_NONE ),
+    m_access( VK_ACCESS_2_NONE ),
+    m_buffer( nullptr ),
+    m_memory(  nullptr )
 {
 }
 
 crBuffer::~crBuffer( void )
 {
+    Destroy();
+}
+
+void crBuffer::Destroy(void)
+{
+    auto device = crContext::Get()->Device();
+    if ( m_memory != nullptr )
+    {
+        vkFreeMemory( *device, m_memory, k_allocationCallbacks );
+        m_memory = nullptr;
+    }
+    
+    if ( m_buffer != nullptr )
+    {
+        vkDestroyBuffer( *device, m_buffer, k_allocationCallbacks );
+        m_buffer = nullptr;
+    }
+
+    m_stage = VK_PIPELINE_STAGE_2_NONE;
+    m_access = VK_ACCESS_2_NONE;
 }
 
 void crBuffer::State(const VkCommandBuffer in_commandBuffer, const VkPipelineStageFlags2 in_stageMask, const VkAccessFlags2 in_accessMask)

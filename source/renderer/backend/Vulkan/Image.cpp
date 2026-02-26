@@ -72,6 +72,7 @@ crImage::crImage( void ) :
 
 crImage::~crImage( void )
 {
+    Destroy();
 }
 
 void crImage::Create( const VkImage in_image, const VkFormat in_format, const VkImageViewType in_viewType )

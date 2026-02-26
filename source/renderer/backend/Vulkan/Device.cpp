@@ -435,13 +435,11 @@ void crRenderDevice::ShutDown(void)
         m_graphic = nullptr;
     }
 
-
     if( m_present != nullptr )
     {
         delete m_present;
         m_present = nullptr;
     }
-
 
     if ( m_logic != nullptr )
     {
