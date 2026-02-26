@@ -35,6 +35,7 @@ inline constexpr size_t k_MAX_ERR_STRING_LEN = 1024;
 #include "Heap.hpp"
 #include "Pointers.hpp"
 #include "String.hpp"
+#include "Array.hpp"
 #include "List.hpp"
 #include "Vectors.hpp"
 #include "Quaternion.hpp"
