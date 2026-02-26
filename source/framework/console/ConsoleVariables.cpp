@@ -30,17 +30,17 @@ crCvarManager::~crCvarManager( void )
 {
 }
 
-crCVar::crCVar( const crString in_name, const crString in_defalt, const uint32_t in_flags, const crString in_decription  ) : 
+crCVar::crCVar( const char* in_name, const char* in_defalt, const uint32_t in_flags, const char* in_decription  ) : 
     m_name( in_name ),
     m_flags( in_flags ),
     m_description( in_decription )
 {
     if ( ( m_flags & CVAR_BOOL ) == CVAR_BOOL )
-        SetBool( std::atoi( in_defalt.c_str() ) == 0 ? false : true );
+        SetBool( std::atoi( in_defalt ) == 0 ? false : true );
     else if( ( m_flags & CVAR_INTEGER ) == CVAR_INTEGER )
-        SetInteger( std::atoi( in_defalt.c_str() ) );
+        SetInteger( std::atoi( in_defalt ) );
     else if( ( m_flags & CVAR_FLOAT ) == CVAR_FLOAT )
-        SetFloat( std::atof( in_defalt.c_str() ) );
+        SetFloat( std::atof( in_defalt ) );
     else if( ( m_flags & CVAR_STRING ) == CVAR_STRING )
         SetString( in_defalt );
 }
@@ -64,7 +64,7 @@ void crCVar::SetFloat( const float in_value )
     m_value = in_value;
 }
 
-void crCVar::SetString( const crString in_value )
+void crCVar::SetString( const char* in_value )
 {
     m_value = in_value;
 }
@@ -90,5 +90,9 @@ const float crCVar::GetFloat(void) const
 const char *crCVar::GetString(void) const
 {
     assert( ( m_flags & CVAR_STRING ) == CVAR_STRING );
+#if 0
     return std::get<crString>( m_value ).c_str();
+#else
+    return std::get<const char*>( m_value );
+#endif
 }

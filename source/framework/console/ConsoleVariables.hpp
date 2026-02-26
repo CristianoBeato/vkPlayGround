@@ -48,13 +48,13 @@ enum cvarFlags_t
 class crCVar
 {    
 public:
-    crCVar( const crString in_name, const crString in_defalt, const uint32_t in_flags, const crString in_decription );
+    crCVar( const char* in_name, const char* in_defalt, const uint32_t in_flags, const char* in_decription );
     ~crCVar( void );
 
     void            SetBool( const bool in_value );
     void            SetInteger( const int in_value );
     void            SetFloat( const float in_value );
-    void            SetString( const crString in_value );
+    void            SetString( const char* in_value );
     const bool      GetBool( void ) const;
     const int       GetInteger( void ) const;
     const float     GetFloat( void ) const;
@@ -62,9 +62,9 @@ public:
 
 private:
     uint32_t                                    m_flags;
-    crString                                    m_name;
-    crString                                    m_description;
-    std::variant<bool, int, float, crString>    m_value;
+    const char*                                 m_name;
+    const char*                                 m_description;
+    std::variant<bool, int, float, const char*> m_value;
 };
 
 
