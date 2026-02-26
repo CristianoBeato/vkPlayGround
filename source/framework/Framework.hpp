@@ -25,4 +25,21 @@
 #include "console/Console.hpp"
 #include "console/ConsoleVariables.hpp"
 
+class crFramework
+{
+public:
+    static crFramework* Get( void );
+    crFramework( void );
+    ~crFramework( void );
+
+    void        StartUp( void );
+    void        ShutDown( void );
+    void        DoFrame( void );
+    uint64_t    FrameCount( void ) const { return m_frame; }
+private:
+    uint64_t    m_frame;
+};
+
+
+
 #endif //!__FRAMEWORK_HPP__

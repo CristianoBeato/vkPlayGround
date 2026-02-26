@@ -66,4 +66,4 @@ bool crString::operator!=(const crString &in_string) const
     return !Compare( in_string );
 }
 
-#endif __STRING_HPP__
+#endif //!__STRING_HPP__

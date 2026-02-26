@@ -20,3 +20,33 @@
 */
 
 #include "Framework.hpp"
+
+crFramework *crFramework::Get(void)
+{
+    static crFramework gFramework = crFramework();
+    return &gFramework;
+}
+
+crFramework::crFramework(void)
+{
+}
+
+crFramework::~crFramework( void )
+{
+}
+
+void crFramework::StartUp(void)
+{
+    auto console = crConsole::Get();
+    console->StartUp();
+}
+
+void crFramework::ShutDown(void)
+{
+    auto console = crConsole::Get();
+    console->ShutDown();
+}
+
+void crFramework::DoFrame(void)
+{
+}
