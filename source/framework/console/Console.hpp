@@ -26,14 +26,29 @@ class crConsole
 {
 public:
     static crConsole* Get( void );
-
+    
     crConsole( void );
     ~crConsole( void );
-    
+
+    void    StartUp( void );
+    void    ShutDown( void );
+
+    /// @brief Print debug info messages, that can be ignored via cVar
     static void Verbose( const char* in_format, ... );
+
+    /// @brief Print geral message information
     static void Print( const char* in_format, ... );
+
+    /// @brief Print warning info  
     static void Warning( const char* in_format, ... );
+
+    /// @brief Error message handling 
     static void Error( const char* in_format, ... );
+
+protected:
+    void    AppendPrint( const char* in_msg, const size_t in_legenth );
+    void    AppendWarning( const char* in_warn, const size_t in_legenth );
+    void    AppendError( const char* in_error, const size_t in_legenth );
 
 private:
     crList<char*>   m_prints;   // store all messages
