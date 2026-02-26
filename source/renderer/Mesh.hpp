@@ -40,8 +40,7 @@ public:
     virtual type_t  Type( void ) const { return MESH_STATIC; }
  
 private:
-    crMaterial*     m_material;
-    
+    crMaterial*     m_material; // mesh material
 };
 
 

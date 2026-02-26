@@ -34,7 +34,6 @@ public:
     {
         va_list args;
         va_start( args, in_format );
-        // O segredo é o reinterpret_cast para que a vsnprintf aceite o buffer de char8_t
         std::vsnprintf( m_error, k_MAX_ERR_STRING_LEN, in_format, args);
         va_end(args);
     }
