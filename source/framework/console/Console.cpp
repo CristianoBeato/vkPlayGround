@@ -20,11 +20,67 @@
 */
 
 #include "Console.hpp"
+#include <iostream>
 
-crConsole::crConsole( void )
+constexpr uint32_t MAX_STRING_LENGTH = 4086;
+static const char RED_STRING[] = { "\033[31m" };
+static const char YELOW_STRING[] = { "\033[33m" };
+static const char RESET_STRIMG[] = { "\033[0m" };
+
+crConsole *crConsole::Get(void)
+{
+    static crConsole gConsole = crConsole();
+    return &gConsole;
+}
+
+crConsole::crConsole(void)
 {
 }
 
 crConsole::~crConsole( void )
 {
+}
+
+void crConsole::Verbose(const char *in_format, ...)
+{
+    char message[MAX_STRING_LENGTH]{};
+    va_list args;
+    va_start( args, in_format );
+    std::vsnprintf( message, k_MAX_ERR_STRING_LEN, in_format, args);
+    va_end( args );
+
+    std::cout << message;
+}
+
+void crConsole::Print(const char *in_format, ...)
+{
+    char message[MAX_STRING_LENGTH]{};
+    va_list args;
+    va_start( args, in_format );
+    std::vsnprintf( message, k_MAX_ERR_STRING_LEN, in_format, args);
+    va_end( args );
+
+    std::cout << message;
+}
+
+void crConsole::Warning( const char *in_format, ... )
+{
+    char warn[MAX_STRING_LENGTH]{};
+    va_list args;
+    va_start( args, in_format );
+    std::vsnprintf( warn, k_MAX_ERR_STRING_LEN, in_format, args);
+    va_end( args );
+
+    std::cout << YELOW_STRING << warn << RESET_STRIMG;
+}
+
+void crConsole::Error( const char *in_format, ... )
+{
+    char error[MAX_STRING_LENGTH]{};
+    va_list args;
+    va_start( args, in_format );
+    std::vsnprintf( error, k_MAX_ERR_STRING_LEN, in_format, args);
+    va_end( args );
+
+    std::cerr << RED_STRING << error << RESET_STRIMG;
 }

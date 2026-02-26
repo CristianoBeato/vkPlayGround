@@ -24,11 +24,21 @@
 
 class crConsole
 {
-private:
-    /* data */
 public:
-    crConsole(/* args */);
-    ~crConsole();
+    static crConsole* Get( void );
+
+    crConsole( void );
+    ~crConsole( void );
+    
+    static void Verbose( const char* in_format, ... );
+    static void Print( const char* in_format, ... );
+    static void Warning( const char* in_format, ... );
+    static void Error( const char* in_format, ... );
+
+private:
+    crList<char*>   m_prints;   // store all messages
+    crList<char*>   m_warnings; // store all warnings
+    crList<char*>   m_errors;
 };
 
 #endif //!__CONSOLE_HPP__
