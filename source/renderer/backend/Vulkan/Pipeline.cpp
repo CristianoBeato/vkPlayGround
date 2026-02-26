@@ -56,8 +56,7 @@ bool crPipeline::Create()
     {
         { VERTEX_BINDING_POSI, sizeof( VertPos_t ), VK_VERTEX_INPUT_RATE_VERTEX },
         { VERTEX_BINDING_NORM, sizeof( VertSkin_t ), VK_VERTEX_INPUT_RATE_VERTEX },
-        { VERTEX_BINDING_SKIN, sizeof( VertSkin_t ), VK_VERTEX_INPUT_RATE_VERTEX },
-        { VERTEX_BINDING_MATE, sizeof( VertMat_t ), VK_VERTEX_INPUT_RATE_VERTEX }
+        { VERTEX_BINDING_SKIN, sizeof( VertSkin_t ), VK_VERTEX_INPUT_RATE_VERTEX }
     };
 
     ///
@@ -70,8 +69,7 @@ bool crPipeline::Create()
         { VERTEX_ATTRIBUTE_NORM, VERTEX_BINDING_NORM, VK_FORMAT_R8G8B8A8_UNORM,     0 },
         { VERTEX_ATTRIBUTE_TANG, VERTEX_BINDING_NORM, VK_FORMAT_R8G8B8A8_UNORM,     sizeof( uint8_t ) * 4 },
         { VERTEX_ATTRIBUTE_STAR, VERTEX_BINDING_SKIN, VK_FORMAT_R32_SINT,           0 },
-        { VERTEX_ATTRIBUTE_COUN, VERTEX_BINDING_SKIN, VK_FORMAT_R32_SINT,           sizeof( int32_t ) },
-        { VERTEX_ATTRIBUTE_MATE, VERTEX_BINDING_MATE, VK_FORMAT_R32_UINT,           0 }
+        { VERTEX_ATTRIBUTE_COUN, VERTEX_BINDING_SKIN, VK_FORMAT_R32_SINT,           sizeof( int32_t ) }
     };
 
     /// 

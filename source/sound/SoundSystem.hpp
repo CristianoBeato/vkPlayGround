@@ -80,8 +80,8 @@ class crSoundSystem
 {
 public:
     static crSoundSystem*  Get( void );
-    crSoundSystem( void );
-    ~crSoundSystem( void );
+    crSoundSystem( void ) {};
+    ~crSoundSystem( void ) {};
 
     /// @brief Load up audio device output
     virtual void    StartUp( void ) = 0;
