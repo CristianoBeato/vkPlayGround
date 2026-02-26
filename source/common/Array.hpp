@@ -31,6 +31,7 @@ public:
     typedef const __type__* const_pointer;
      
     crArray( void );
+    crArray( const int in_val );
     ~crArray( void );
 
     inline uint32_t         Count( void ) const { return __count__; }
@@ -49,6 +50,12 @@ template< typename __type__, uint32_t __count__>
 crArray<__type__, __count__>::crArray( void )
 {
     std::memset( m_elements, 0x00, sizeof(__type__) * __count__ );
+}
+
+template <typename __type__, uint32_t __count__>
+inline crArray<__type__, __count__>::crArray( const int in_val )
+{
+    std::memset( m_elements, in_val, sizeof(__type__) * __count__ );
 }
 
 template< typename __type__, uint32_t __count__>
