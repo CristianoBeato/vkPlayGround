@@ -34,20 +34,21 @@ public:
 
     void    StartUp( void );
     void    ShutDown( void );
-    void    BeginFrame( void );
+    void    SetBuffer( void );
     void    SwapBuffers( void );
     void    DrawView( void );
     crSwapchain*    Swapchain( void ) const { return m_swapchain; }
 
-    private:
+private:
+    uint64_t            m_frame;
     crView*             m_viewChain;
     crSwapchain*        m_swapchain;
+    crCommandbuffer*    m_graphicCMD;
     crFramebuffer*      m_geometrFB;
     crFramebuffer*      m_defaultFB;
     crPipeline*         m_staticMeshAdditive;
     crPipeline*         m_dyanmicMeshAdditive;
     
-
     void    DrawSurface( const crSurface* in_surface );
     void    LighPass( void );
 

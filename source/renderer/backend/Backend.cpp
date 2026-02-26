@@ -21,7 +21,14 @@
 
 #include "Backend.hpp"
 
-crBackend::crBackend( void ) : m_swapchain( nullptr )
+crBackend::crBackend( void ) :
+    m_frame( 0 ),
+    m_graphicCMD( nullptr ),
+    m_geometrFB( nullptr ),
+    m_defaultFB( nullptr ),
+    m_swapchain( nullptr ),
+    m_staticMeshAdditive( nullptr ),
+    m_dyanmicMeshAdditive( nullptr )
 {
 }
 
@@ -35,10 +42,14 @@ crBackend *crBackend::Get(void)
     return &gBackend;
 }
 
-void crBackend::StartUp(void)
+void crBackend::StartUp( void )
 {
+    m_graphicCMD = new crCommandbuffer();
+    if ( !m_graphicCMD->Create() )
+        throw crException( "Failed to initialize Graphic Command Buffer" );
+
     m_swapchain = new crSwapchain();
-    if( !m_swapchain->Create( 800, 600 ) )
+    if( !m_swapchain->Create( 800, 600, false ) )
         throw crException( "Failed to initialize SwapChain" );
 
     m_defaultFB = new crFramebuffer();
@@ -54,18 +65,39 @@ void crBackend::ShutDown(void)
         m_defaultFB = nullptr;
     }
     
-
     if ( m_swapchain != nullptr )
     {
         m_swapchain->Destroy();
         delete m_swapchain;
         m_swapchain = nullptr;
     }
+
+    if ( m_graphicCMD != nullptr )
+    {
+        m_graphicCMD->Destroy();
+        delete m_graphicCMD;
+        m_graphicCMD = nullptr;
+    }
 }
 
-void crBackend::BeginFrame(void)
+void crBackend::SetBuffer(void)
 {
-    m_swapchain->BeginFrame();
+    /// begin record
+    m_graphicCMD->Begin( m_frame );
+    m_swapchain->Acquire( m_frame );
+
+    auto presentImages = m_swapchain->Image(); 
+
+#if 0
+    /// the image is changed outside of the scope
+    m_presentImages[m_currentImage].layout = VK_IMAGE_LAYOUT_UNDEFINED;
+    m_presentImages[m_currentImage].stageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+    m_presentImages[m_currentImage].accessMask = 0;
+    VkImageStateTransition( GetImage(), CommandBuffer(), VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_2_NONE );
+#else
+    presentImages->State( *m_graphicCMD, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_2_NONE );
+#endif
+
     m_defaultFB->Bind();
 }
 
@@ -76,11 +108,13 @@ void crBackend::SwapBuffers(void)
     /// release frame buffer
     m_defaultFB->Unbind();
 
+    auto presentImages = m_swapchain->Image(); 
+
     /// clea presnet image
     VkRenderingAttachmentInfo colorAttachment{};
     colorAttachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO; 
     colorAttachment.pNext = nullptr; 
-    colorAttachment.imageView = m_swapchain->GetImage()->view;
+    colorAttachment.imageView = m_swapchain->Image()->View();
     colorAttachment.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
     colorAttachment.resolveMode = VK_RESOLVE_MODE_NONE; 
     colorAttachment.resolveImageView = nullptr;
@@ -105,16 +139,28 @@ void crBackend::SwapBuffers(void)
     renderingInfo.pColorAttachments = &colorAttachment;
     renderingInfo.pDepthAttachment = nullptr;
     renderingInfo.pStencilAttachment = nullptr;
-    vkCmdBeginRendering( m_swapchain->CommandBuffer(), &renderingInfo );
+    vkCmdBeginRendering( *m_graphicCMD, &renderingInfo );
 
     ///
     ///
     /// End frame rendering
-    vkCmdEndRendering( m_swapchain->CommandBuffer() );
+    vkCmdEndRendering( *m_graphicCMD );
 
-    m_defaultFB->BlitColorAttachament( { 0, 0, 0, 10, 10, 0, 800, 600, 1, 790, 590, 1, m_swapchain->GetImage() } );
+    m_defaultFB->BlitColorAttachament( { 0, 0, 0, 10, 10, 0, 800, 600, 1, 790, 590, 1, presentImages } );
 
-    m_swapchain->SwapBuffers();
+    ///
+    /// prepare image to be presented
+    presentImages->State( *m_graphicCMD, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_2_NONE );
+
+    ///
+    /// If image is available to render, begin execute commands 
+    m_graphicCMD->Submit( m_swapchain->ImageAvailable() );
+
+    ///
+    /// Wen render is done, present to screen
+    m_swapchain->Present( m_graphicCMD->SubmitFinishe() );
+
+    m_frame++;
 }
 
 void crBackend::DrawView(void)
@@ -130,48 +176,64 @@ void crBackend::DrawView(void)
 
 void crBackend::DrawSurface( const crSurface *in_surface )
 {
-    auto cmd = m_swapchain->CommandBuffer();
     assert( in_surface != nullptr );
     uint32_t        elements;
     VkDeviceSize    offsets[VERTEX_BINDING_COUNT]{};
     VkDeviceSize    sizes[VERTEX_BINDING_COUNT]{};
     VkDeviceSize    strides[VERTEX_BINDING_COUNT]{};
-    VkBuffer        vertexesBuffers[VERTEX_BINDING_COUNT]{ nullptr, nullptr };
-    cache_t*        indexCache = in_surface->IndexesCache();
-    cache_t*        postionCache = in_surface->VertexPosition();
-    cache_t*        normalCache = in_surface->VertexNormals();
-    cache_t*        normalCache = in_surface->VertexNormals();
-    cache_t*        normalCache = in_surface->VertexNormals();
-    
+    VkBuffer        buffers[VERTEX_BINDING_COUNT]{};
+    crSubBuffer*    indexCache = in_surface->IndexesCache();
+    crSubBuffer*    postionCache = in_surface->VertexPosition();
+    crSubBuffer*    normalCache = in_surface->VertexNormals();
+    crSubBuffer*    weightCache = in_surface->VertexWeights();
 
     /// bind index buffer
-    vkCmdBindIndexBuffer( cmd, indexCache->buffer->buffer, indexCache->offset, VK_INDEX_TYPE_UINT16 );
+    vkCmdBindIndexBuffer( *m_graphicCMD, indexCache->Handle(), indexCache->Offset(), VK_INDEX_TYPE_UINT16 );
  
     /// Vertex Position binding 0
-    offsets[VERTEX_BINDING_POSI] = postionCache->offset;
-    sizes[VERTEX_BINDING_POSI] = postionCache->size;
+    offsets[VERTEX_BINDING_POSI] = postionCache->Offset();
+    sizes[VERTEX_BINDING_POSI] = postionCache->Size();
     strides[VERTEX_BINDING_POSI] = sizeof( VertPos_t );
+    buffers[VERTEX_BINDING_POSI] = postionCache->Handle();
 
     /// Vertex Normal binding 1
-    offsets[VERTEX_BINDING_NORM] = normalCache->offset;
-    sizes[VERTEX_BINDING_NORM] = normalCache->size;
-    strides[VERTEX_BINDING_NORM] = sizeof( VertNor_t );
-
-    /// Vertex Skinning binding 2
-    offsets[VERTEX_BINDING_SKIN] = normalCache->offset;
-    sizes[VERTEX_BINDING_SKIN] = normalCache->size;
-    strides[VERTEX_BINDING_SKIN] = sizeof( VertSkin_t );
-
-    /// Vertex Materil ID binding 4 
-    offsets[VERTEX_BINDING_SKIN] = normalCache->offset;
-    sizes[VERTEX_BINDING_SKIN] = normalCache->size;
-    strides[VERTEX_BINDING_SKIN] = sizeof( VertMat_t );
+    if ( normalCache != nullptr ) /// we have a vertex cache binding
+    {
+        /// Vertex Normal binding 1
+        buffers[VERTEX_BINDING_NORM] = normalCache->Handle();
+        offsets[VERTEX_BINDING_NORM] = normalCache->Offset();
+        sizes[VERTEX_BINDING_NORM] = normalCache->Size();
+        strides[VERTEX_BINDING_NORM] = sizeof( VertNor_t );
+    }
+    else
+    {
+        /// bind vertex buffer as null position in vertex buffer
+        buffers[VERTEX_BINDING_NORM] = postionCache->Handle();
+        offsets[VERTEX_BINDING_NORM] = 0;
+        sizes[VERTEX_BINDING_NORM] = postionCache->Size();
+        strides[VERTEX_BINDING_NORM] = sizeof( VertNor_t );
+    }
+    
+    if( weightCache != nullptr )
+    {
+        buffers[VERTEX_BINDING_SKIN] = normalCache->Handle();
+        offsets[VERTEX_BINDING_SKIN] = normalCache->Offset();
+        sizes[VERTEX_BINDING_SKIN] = normalCache->Size();
+        strides[VERTEX_BINDING_SKIN] = sizeof( VertSkin_t );
+    }
+    else
+    {   
+        buffers[VERTEX_BINDING_SKIN] = postionCache->Handle();
+        offsets[VERTEX_BINDING_SKIN] = 0;
+        sizes[VERTEX_BINDING_SKIN] = postionCache->Size();
+        strides[VERTEX_BINDING_SKIN] = sizeof( VertSkin_t );
+    }
 
     ///
-    vkCmdBindVertexBuffers2( cmd, 0, 2, vertexesBuffers, offsets, sizes, strides );
+    vkCmdBindVertexBuffers2( *m_graphicCMD, 0, VERTEX_BINDING_COUNT, buffers, offsets, sizes, strides );
 
     /// submit draw call
-    vkCmdDrawIndexed( m_swapchain->CommandBuffer(), in_surface->Indexes(), 1, 0, in_surface->BaseVertex(), 0 );
+    vkCmdDrawIndexed( *m_graphicCMD, in_surface->Indexes(), 1, 0, in_surface->BaseVertex(), 0 );
 }
 
 void crBackend::LighPass(void)
