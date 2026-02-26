@@ -634,6 +634,21 @@ const bool crRenderDevice::SupportedDepthStencilFormat(VkFormat *depthStencilFor
 	return false;
 }
 
+const uint32_t crRenderDevice::MinMemoryMapAlignment(void) const
+{
+    return m_propertiesv10.properties.limits.minMemoryMapAlignment;
+}
+
+const uint32_t crRenderDevice::MinTexelBufferOffsetAlignment(void) const
+{
+    return m_propertiesv10.properties.limits.minTexelBufferOffsetAlignment;
+}
+
+const uint32_t crRenderDevice::MinStorageAlignment(void) const
+{
+    return m_propertiesv10.properties.limits.minStorageBufferOffsetAlignment;
+}
+
 /*
 ==============
 crRenderDevice::FormatIsFilterable

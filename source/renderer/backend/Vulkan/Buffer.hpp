@@ -22,6 +22,47 @@
 #ifndef __BUFFER_HPP__
 #define __BUFFER_HPP__
 
+inline constexpr size_t MIN_BUFFER_SIZE = 64;
+
+/// @brief base buffer class
+class crBuffer
+{
+public:
+    crBuffer( void );
+    ~crBuffer( void );
+    virtual bool    Create( const size_t in_size, const VkBufferUsageFlags in_usage, const VkMemoryPropertyFlags in_memoryProperty );
+    virtual void    Destroy( void );
+    void*           Map( void );
+    void            Unmap( void );
+    void            State( const VkCommandBuffer in_commandBuffer, const VkPipelineStageFlags2 in_stageMask, const VkAccessFlags2 in_accessMask );
+    
+    /// access the buffer handler
+    inline VkBuffer Buffer( void ) const { return m_buffer; }
+
+private:
+    VkBufferUsageFlags      m_usage;
+    VkPipelineStageFlags2   m_stage;
+    VkAccessFlags2          m_access;
+    VkBuffer                m_buffer;
+    VkDeviceMemory          m_memory;
+};
+
+struct block_t
+{
+    bool        free = true;
+    size_t      size = 0;
+    uintptr_t   offset = 0;
+
+    /// Binary Search Tree (Sorted by Size) 
+    block_t*    parent = nullptr;
+    block_t*    left = nullptr;
+    block_t*    right = nullptr;
+
+    /// Doubly Linked List (Physical Order in Buffer)
+    block_t*    prevPhys = nullptr;
+    block_t*    nextPhys = nullptr;
+};
+
 /// @brief a sub buffer represent a region of a buffer
 class crSubBuffer
 {
@@ -33,35 +74,42 @@ public:
     uintptr_t   Offset( void ) const { return m_offset; }
     VkBuffer    Handle( void ) const { return m_buffer; }
 
+protected:
+    friend class crBufferAllocator;
+    block_t*                Block( void ) { return m_block; }
+
 private:
-    VkPipelineStageFlags2   m_stage;
-    VkAccessFlags2          m_access;
+    block_t*                m_block;    //
+    VkPipelineStageFlags2   m_stage;    //
+    VkAccessFlags2          m_access;   //
     size_t                  m_size;     // size of the buffer
-    uintptr_t               m_offset;   // offset in the buffer
+    uintptr_t               m_offset;   // offset in the buffer ( aligned )
     VkBuffer                m_buffer;   // handle
 };
 
-/// @brief 
-class crBuffer
+class crBufferAllocator : public crBuffer
 {
 public:
-    crBuffer( void );
-    ~crBuffer( void );
-    void            Create( void );
-    void            Destroy( void );
-    crSubBuffer*    Alloc( const size_t in_size );
-    void            Free( crSubBuffer* in_buff );
+    crBufferAllocator( void );
+    ~crBufferAllocator( void );
+    virtual bool    Create( const size_t in_size, const VkBufferUsageFlags in_usage, const VkMemoryPropertyFlags in_memoryProperty ) override;
+    virtual void    Destroy( void ) override;
+    ///
+    crSubBuffer*    Alloc( const size_t in_size, const size_t in_alignment );
 
-    void    State( const VkCommandBuffer in_commandBuffer, const VkPipelineStageFlags2 in_stageMask, const VkAccessFlags2 in_accessMask );
-    
-    /// access the buffer handler
-    inline VkBuffer Buffer( void ) const { return m_buffer; }
-
+    ///
+    void            Free( struct crSubBuffer* in_buffer );
 private:
-    VkPipelineStageFlags2   m_stage;
-    VkAccessFlags2          m_access;
-    VkBuffer                m_buffer;
-    VkDeviceMemory          m_memory;
+    block_t*    m_treeRoot;
+
+    ///Insert into the tree based on size.
+    void InsertToTree( block_t* in_node );
+
+    ///
+    void RemoveFromTree( block_t* in_node );
+
+    /// 
+    block_t* FindBestFit( const size_t in_requiredSize, const size_t in_alignment );
 };
 
 #endif //!__BUFFER_HPP__

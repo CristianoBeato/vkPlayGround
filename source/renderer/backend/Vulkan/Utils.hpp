@@ -51,4 +51,31 @@ inline bool ResultCheck( const VkResult in_result, const char* in_fnName )
  	}											    \
 }
 
+struct uniqueQueue_t
+{
+    uint32_t    count = 0;
+    uint32_t    families[4]{ UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX }; // graphic, compute, transfer, present
+
+    inline VkSharingMode SharingMode( void ) const
+    { 
+        return count > 1 ? VK_SHARING_MODE_CONCURRENT : VK_SHARING_MODE_EXCLUSIVE; 
+    } 
+
+    inline void    Append( const uint32_t in_familyIndex )
+    {
+        // If the index is invalid (VULKAN_UNDEFINED_FAMILY) or exceeds the limit
+        if ( in_familyIndex == uint32_t(-1) || count >= 4 ) 
+            return;
+
+        for ( uint32_t i = 0; i < count; i++)
+        {
+            // found, not insert
+            if( families[i] == in_familyIndex )
+                return;
+        }
+        
+        families[count++] = in_familyIndex;
+    }
+};
+
 #endif //!__UTILS_HPP__
