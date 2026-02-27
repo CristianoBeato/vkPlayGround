@@ -248,17 +248,41 @@ void crBackend::OpaqueGeometryPass(void)
         {
             crMaterial* material = geometry->Material();
             crMesh*     mesh = geometry->Mesh();
+
             /// ignore non opaque material
             if ( !material->Opaque() )
                 continue;
 
-            
+            /// bind material pipeline
+            vkCmdBindPipeline( m_graphicCMD->CommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, *material->Pipe() );
+
+            /// render mesh surface
+            DrawSurface( mesh->Surface() );
         }
     }
 }
 
 void crBackend::TransparenGeometryPass(void)
 {
+    /// render non opaque geometry ( must be sorted from far to near )
+    for ( crView* view = m_viewChain; view != nullptr; view = view->Next() )
+    {
+        for ( crGeometry* geometry = view->Geometry(); geometry != nullptr; geometry = geometry->Next() )
+        {
+            crMaterial* material = geometry->Material();
+            crMesh*     mesh = geometry->Mesh();
+
+            /// ignore non opaque material
+            if ( !material->Opaque() )
+                continue;
+
+            /// bind material pipeline
+            vkCmdBindPipeline( m_graphicCMD->CommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, *material->Pipe() );
+
+            /// render mesh surface
+            DrawSurface( mesh->Surface() );
+        }
+    }
 }
 
 void crBackend::FillGeometryBuffer(void)
