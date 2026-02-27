@@ -215,6 +215,7 @@ extern VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback( VkDebugUtilsMessageSeverity
 #include "Image.hpp"
 #include "Framebuffer.hpp"
 #include "Swapchain.hpp"
+#include "Program.hpp"
 #include "Pipeline.hpp"
 
 #endif //!__VK_CORE_HPP__
