@@ -21,7 +21,6 @@
 #ifndef __LIB_HPP__
 #define __LIB_HPP__
 
-
 inline constexpr size_t k_MAX_ERR_STRING_LEN = 1024;
 
 #if 0
@@ -41,5 +40,38 @@ inline constexpr size_t k_MAX_ERR_STRING_LEN = 1024;
 #include "Quaternion.hpp"
 #include "Matrices.hpp"
 #include "HalfFloat.hpp"
+
+/// @brief Check if a integer is 2^
+/// @tparam _t a integer type
+/// @param x value to check 
+/// @return true if value is power of two
+template< typename _t >
+constexpr bool _isPowerOfTwo( const _t x ) noexcept 
+{
+    return x > 0 && ( x & ( x - 1 ) ) == 0;
+}
+
+/// @brief align up a value 
+/// @tparam _t integer type
+/// @param size the size to be aligned
+/// @param alignment the multiplyer alignment 
+/// @return aligned value
+template< typename _t>
+inline _t _align( const _t size, const _t alignment ) noexcept 
+{
+    static_assert( std::is_integral<_t>::value, "Alignment requires integer types" );
+    assert( ( alignment > 0) && ( ( alignment & ( alignment - 1 ) ) == 0 ) && "Alignment must be power of 2" );
+    return ( size + alignment - 1 ) & ~( alignment - 1 );
+}
+
+///
+template<typename _t >
+inline _t* _align( _t* ptr, const uintptr_t alignment ) noexcept 
+{
+    assert( ( alignment > 0) && ( ( alignment & ( alignment - 1 ) ) == 0 ) && "Alignment must be power of 2" );
+    uintptr_t addr = reinterpret_cast<uintptr_t>( ptr );
+    uintptr_t aligned = ( addr + alignment - 1 ) & ~( alignment - 1 );
+    return reinterpret_cast<_t*>( aligned );
+}
 
 #endif //!__LIB_HPP__
