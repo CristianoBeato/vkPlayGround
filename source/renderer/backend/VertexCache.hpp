@@ -37,9 +37,13 @@ public:
 
     crVertexCache( void );
     ~crVertexCache( void );
+    void    StartUp( void );
+    void    ShutDown( void );
 
 private:
-
+    crBufferAllocator*  m_vertexBuffer;
+    crBufferAllocator*  m_indexBuffer;
+    crBufferRing*       m_stagingBuffer;
 };
 
 #endif //!__VERTEX_CACHE_HPP__
