@@ -19,25 +19,20 @@
 ===============================================================================================
 */
 
-#ifndef __RENDERER_COMMON_HPP__
-#define __RENDERER_COMMON_HPP__
+#ifndef __TEXTURE_HPP__
+#define __TEXTURE_HPP__
 
-#include "RenderSystem.hpp"
+class crTexture
+{
+public:
+    crTexture( void );
+    ~crTexture( void );
+    
+    void    Alloc( void );
+    void    Load( void );
 
-#include "Bounds.hpp"
-#include "Vertexes.hpp"
-#include "backend/VertexCache.hpp"
-#include "material/Material.hpp"
-#include "Surface.hpp"
-#include "Mesh.hpp"
-#include "textures/Texture.hpp"
-#include "textures/TextureManager.hpp"
-#include "models/Model.hpp"
-#include "models/ModelManager.hpp"
-#include "world/Light.hpp"
-#include "world/Geometry.hpp"
-#include "world/View.hpp"
-#include "backend/Backend.hpp"
-#include "RenderSystemLocal.hpp"
+private:
 
-#endif //!__RENDERER_COMMON_HPP__
+};
+
+#endif //!__TEXTURE_HPP__

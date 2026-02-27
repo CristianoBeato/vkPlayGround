@@ -19,25 +19,22 @@
 ===============================================================================================
 */
 
-#ifndef __RENDERER_COMMON_HPP__
-#define __RENDERER_COMMON_HPP__
+#ifndef __MODEL_MANAGER_HPP__
+#define __MODEL_MANAGER_HPP__
 
-#include "RenderSystem.hpp"
+class crModel;
+class crModelManager
+{
+public:
+    static crModelManager* Get( void );
+    crModelManager( void );
+    ~crModelManager( void );
+    void    BeginLevelLoad( void );
+    void    EndLevelLoad( void );
+    void    Touch( crModel* in_model );
+    
+private:
 
-#include "Bounds.hpp"
-#include "Vertexes.hpp"
-#include "backend/VertexCache.hpp"
-#include "material/Material.hpp"
-#include "Surface.hpp"
-#include "Mesh.hpp"
-#include "textures/Texture.hpp"
-#include "textures/TextureManager.hpp"
-#include "models/Model.hpp"
-#include "models/ModelManager.hpp"
-#include "world/Light.hpp"
-#include "world/Geometry.hpp"
-#include "world/View.hpp"
-#include "backend/Backend.hpp"
-#include "RenderSystemLocal.hpp"
+};
 
-#endif //!__RENDERER_COMMON_HPP__
+#endif //!__MODEL_MANAGER_HPP__
