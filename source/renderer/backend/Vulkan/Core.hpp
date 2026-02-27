@@ -154,18 +154,17 @@ extern PFN_vkCmdDispatch                                vkCmdDispatch;
 extern PFN_vkCmdDispatchIndirect                        vkCmdDispatchIndirect;
 extern PFN_vkCmdPipelineBarrier2                        vkCmdPipelineBarrier2;
 
+// pipeline cache
+extern PFN_vkCreatePipelineCache                        vkCreatePipelineCache;
+extern PFN_vkDestroyPipelineCache                       vkDestroyPipelineCache;
+extern PFN_vkGetPipelineCacheData                       vkGetPipelineCacheData;
+extern PFN_vkMergePipelineCaches                        vkMergePipelineCaches;
+
 // Pipeline
 extern PFN_vkCmdBindPipeline                            vkCmdBindPipeline;
 extern PFN_vkCmdSetViewport                             vkCmdSetViewport;
 extern PFN_vkCmdSetScissor                              vkCmdSetScissor;
 extern PFN_vkCmdSetLineWidth                            vkCmdSetLineWidth;
-extern PFN_vkCmdSetDepthBias                            vkCmdSetDepthBias;
-extern PFN_vkCmdSetBlendConstants                       vkCmdSetBlendConstants;
-extern PFN_vkCmdSetDepthBounds                          vkCmdSetDepthBounds;
-extern PFN_vkCmdSetCullMode                             vkCmdSetCullMode;
-extern PFN_vkCmdSetStencilCompareMask                   vkCmdSetStencilCompareMask;
-extern PFN_vkCmdSetStencilWriteMask                     vkCmdSetStencilWriteMask;
-extern PFN_vkCmdSetStencilReference                     vkCmdSetStencilReference;
 
 //
 extern PFN_vkCreateDescriptorSetLayout                  vkCreateDescriptorSetLayout;

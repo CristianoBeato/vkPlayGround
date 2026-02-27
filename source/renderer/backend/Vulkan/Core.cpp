@@ -157,18 +157,17 @@ PFN_vkCmdDispatch                                vkCmdDispatch = nullptr;
 PFN_vkCmdDispatchIndirect                        vkCmdDispatchIndirect = nullptr;
 PFN_vkCmdPipelineBarrier2                        vkCmdPipelineBarrier2 = nullptr;
 
+// pipeline cache
+PFN_vkCreatePipelineCache                        vkCreatePipelineCache = nullptr;
+PFN_vkDestroyPipelineCache                       vkDestroyPipelineCache = nullptr;
+PFN_vkGetPipelineCacheData                       vkGetPipelineCacheData = nullptr;
+PFN_vkMergePipelineCaches                        vkMergePipelineCaches = nullptr;
+
 //
 PFN_vkCmdBindPipeline                            vkCmdBindPipeline = nullptr;
 PFN_vkCmdSetViewport                             vkCmdSetViewport = nullptr;
 PFN_vkCmdSetScissor                              vkCmdSetScissor = nullptr;
 PFN_vkCmdSetLineWidth                            vkCmdSetLineWidth = nullptr;
-PFN_vkCmdSetDepthBias                            vkCmdSetDepthBias = nullptr;
-PFN_vkCmdSetBlendConstants                       vkCmdSetBlendConstants = nullptr;
-PFN_vkCmdSetDepthBounds                          vkCmdSetDepthBounds = nullptr;
-PFN_vkCmdSetCullMode                             vkCmdSetCullMode = nullptr;
-PFN_vkCmdSetStencilCompareMask                   vkCmdSetStencilCompareMask = nullptr;
-PFN_vkCmdSetStencilWriteMask                     vkCmdSetStencilWriteMask = nullptr;
-PFN_vkCmdSetStencilReference                     vkCmdSetStencilReference = nullptr;
 
 //
 PFN_vkCreateDescriptorSetLayout                  vkCreateDescriptorSetLayout = nullptr;
@@ -405,13 +404,6 @@ void crContext::LoadVulkanProcs( void )
     GET_VK_PROC( vkCmdSetViewport, m_instance );
     GET_VK_PROC( vkCmdSetScissor, m_instance );
     GET_VK_PROC( vkCmdSetLineWidth, m_instance );
-    GET_VK_PROC( vkCmdSetDepthBias, m_instance );
-    GET_VK_PROC( vkCmdSetBlendConstants, m_instance );
-    GET_VK_PROC( vkCmdSetDepthBounds, m_instance );
-    GET_VK_PROC( vkCmdSetCullMode, m_instance );
-    GET_VK_PROC( vkCmdSetStencilCompareMask, m_instance );
-    GET_VK_PROC( vkCmdSetStencilWriteMask, m_instance );
-    GET_VK_PROC( vkCmdSetStencilReference, m_instance );
 
     //
     GET_VK_PROC( vkCreateDescriptorSetLayout, m_instance );
