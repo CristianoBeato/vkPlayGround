@@ -25,6 +25,7 @@
 #include "Threads.hpp"
 #include "Video.hpp"
 #include "EventsInput.hpp"
+#include "FileSystem.hpp"
 #include "Main.hpp"
 
 #endif //!__SYSYEMS_HPP__
