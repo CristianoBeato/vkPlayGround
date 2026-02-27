@@ -23,16 +23,19 @@
 ##################################################################
 
 set( SYSTEM_SOURCES
-	${CMAKE_CURRENT_SOURCE_DIR}/Includes.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/Platform.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/Main.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/Main.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/Video.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/Video.hpp
+	
 	${CMAKE_CURRENT_SOURCE_DIR}/EventsInput.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/EventsInput.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/FileSystem.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/FileSystem.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Includes.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Main.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Main.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Platform.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Threads.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Threads.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Video.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Video.hpp
 )
 
 add_executable( vkPlayGround ${SYSTEM_SOURCES} )
