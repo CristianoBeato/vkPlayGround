@@ -133,25 +133,37 @@ enum pipeline_state_e : uint64_t
 
     PLS_STENCIL_OP_BITS					= PLS_STENCIL_OP_FAIL_BITS | PLS_STENCIL_OP_ZFAIL_BITS | PLS_STENCIL_OP_PASS_BITS,
 
+    PLS_CULLFACE_BACK                   = 1ull << 60, 
+    PLS_CULLFACE_FRONT                  = 1ull << 61, 
+    PLS_CULLFACE_TWO                    = 1ull << 62,
+    
     PLS_OVERRIDE						= 1ull << 63		// override the render prog state
 };
 
 #define GLS_STENCIL_MAKE_REF( x ) ( ( (uint64)(x) << GLS_STENCIL_FUNC_REF_SHIFT ) & GLS_STENCIL_FUNC_REF_BITS )
 #define GLS_STENCIL_MAKE_MASK( x ) ( ( (uint64)(x) << GLS_STENCIL_FUNC_MASK_SHIFT ) & GLS_STENCIL_FUNC_MASK_BITS )
 
+// Limpa os bits da máscara e define o novo valor na posição correta
+#define SET_PLS_VALUE( state, mask, shift, value ) ( state ) = ( ( state ) & ~( mask ) ) | ( ( ( uint64_t )( value ) << (shift)) & (mask))
+
+// Extrai o valor de um campo específico
+#define GET_PLS_VALUE( state, mask, shift ) ( ( ( state ) & ( mask ) ) >> ( shift ) )
+
 class crPipeline
 {
 public:
     crPipeline( void );
     ~crPipeline( void );
-    bool    Create( );
+    bool    Create( const uint64_t in_flags, const uint32_t in_vertexProgramID, const uint32_t in_fragmentProgramID );
     void    Destroy( void );
 
+    /// @brief Retrieve pipeline manager
+    operator VkPipeline( void ) const { return m_pipeline; }
 private:
     VkPipeline  m_pipeline;
     uint64_t    m_flags;
-    uint16_t    m_vertexShader;
-    uint16_t    m_fragmentShader;
+    uint32_t    m_vertexShader;
+    uint32_t    m_fragmentShader;
 };
 
 #endif //!__PIPELINE_HPP__

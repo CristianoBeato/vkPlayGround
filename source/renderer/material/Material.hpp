@@ -43,6 +43,9 @@ public:
     crMaterial( void );
     ~crMaterial( void );
 
+    /// @brief Retrieve material pipeline
+    crPipeline* Pipe( void ) const { return m_materialPipe; }
+
     /// @brief material don't have transparency
     bool    Opaque( void ) const { return m_flags & MTR_OPAQUE; }
 
@@ -55,6 +58,7 @@ public:
 
 private:
     uint32_t    m_flags;
+    crPipeline* m_materialPipe;
 };
 
 #endif //!__MATERIAL_HPP__

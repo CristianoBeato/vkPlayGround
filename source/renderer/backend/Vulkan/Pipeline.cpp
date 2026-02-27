@@ -30,13 +30,19 @@ crPipeline::~crPipeline( void )
 {
 }
 
-bool crPipeline::Create()
+bool crPipeline::Create( const uint64_t in_flags, const uint32_t in_vertexProgramID, const uint32_t in_fragmentProgramID )
 {
+    auto device = crContext::Get()->Device();
+    auto cache = crPipelineManager::Get()->Cache();
     VkDynamicState dynamicStates[] =
     {
         VK_DYNAMIC_STATE_VIEWPORT,
         VK_DYNAMIC_STATE_SCISSOR
     };
+
+    m_flags = in_flags;
+    m_vertexShader = in_vertexProgramID;
+    m_fragmentShader = in_fragmentProgramID;
 
     /// Dynamic state
     /// While most of the pipeline state needs to be baked into the pipeline state, a
@@ -109,7 +115,6 @@ bool crPipeline::Create()
     ///
     ///
     ///
-#if 0
     VkPipelineRasterizationStateCreateInfo rasterizationState{};
     rasterizationState.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     rasterizationState.pNext = nullptr;
@@ -117,13 +122,23 @@ bool crPipeline::Create()
     rasterizationState.depthClampEnable = VK_FALSE;
     rasterizationState.rasterizerDiscardEnable = VK_FALSE;
     rasterizationState.polygonMode = ( m_flags & PLS_POLYMODE_LINE ) == PLS_POLYMODE_LINE ? VK_POLYGON_MODE_LINE : VK_POLYGON_MODE_FILL;
-    rasterizationState.cullMode = ;
-    rasterizationState.frontFace = ;
+    rasterizationState.cullMode = VK_CULL_MODE_NONE;
+    rasterizationState.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterizationState.depthBiasEnable = ;
     rasterizationState.depthBiasConstantFactor = ;
     rasterizationState.depthBiasClamp = ;
     rasterizationState.depthBiasSlopeFactor = ;
     rasterizationState.lineWidth = 1.0f;
-#endif
+
+    if (  m_flags & PLS_CULLFACE_BACK )
+        rasterizationState.cullMode = VK_CULL_MODE_BACK_BIT;
+    else if(  m_flags & PLS_CULLFACE_FRONT )
+        rasterizationState.cullMode = VK_CULL_MODE_FRONT_BIT;
+    else if(  m_flags & PLS_CULLFACE_TWO )
+        rasterizationState.cullMode = VK_CULL_MODE_FRONT_AND_BACK;
+
+    VkGraphicsPipelineCreateInfo pipelineCI{};
+
+    auto result = vkCreateGraphicsPipelines( *device, cache, 1, &pipelineCI, m_pipeline )
     return true;
 }

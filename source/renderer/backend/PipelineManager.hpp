@@ -48,12 +48,24 @@ public:
     void    StartUp( void );
     void    ShutDown( void );
     void    Reload( void );
-    void    BindPipeline( void)
+
+    /// @brief Retrieve a required pipeline
+    /// @param in_flags 
+    /// @param in_vertexShader
+    /// @param in_fragmentShader
+    /// @return a pipeline whit required flagas and shaders 
+    crPipeline* Pipelines( const uint64_t in_flags, const uint32_t in_vertexShader, const uint32_t in_fragmentShader );
+
+protected:
+    friend class crPipeline;
+    VkPipelineCache     Cache( void ) const { return m_cache; }
 
 private:
-    bool    LoadProgram( void );
+    VkPipelineCache     m_cache;
     
-    
+    bool    LoadCache( void );
+    bool    LoadPrograms( void );
+    bool    SaveCache( void );
 };
 
 #endif //!__PIPELINE_MANAGER_HPP__

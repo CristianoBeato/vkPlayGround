@@ -40,6 +40,8 @@ set( BASE_SOURCES
 set( BACKEND_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/Backend.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/Backend.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/backend/PipelineManager.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/backend/PipelineManager.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/VertexCache.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/VertexCache.hpp
 	)

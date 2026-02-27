@@ -26,6 +26,7 @@
 
 #include "Bounds.hpp"
 #include "Vertexes.hpp"
+#include "backend/PipelineManager.hpp"
 #include "backend/VertexCache.hpp"
 #include "material/Material.hpp"
 #include "Surface.hpp"

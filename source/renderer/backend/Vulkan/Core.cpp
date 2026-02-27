@@ -445,6 +445,12 @@ void crContext::LoadVulkanProcs( void )
     GET_VK_PROC( vkCmdDispatchIndirect, m_instance );
     GET_VK_PROC( vkCmdPipelineBarrier2, m_instance );
 
+    // VkPipelineCache
+    GET_VK_PROC( vkCreatePipelineCache, m_instance );
+    GET_VK_PROC( vkDestroyPipelineCache, m_instance );
+    GET_VK_PROC( vkGetPipelineCacheData, m_instance );
+    GET_VK_PROC( vkMergePipelineCaches, m_instance );
+
     // VkEvent
     GET_VK_PROC( vkCmdSetEvent2, m_instance );
     GET_VK_PROC( vkCmdResetEvent2, m_instance );
