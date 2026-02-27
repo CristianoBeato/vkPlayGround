@@ -649,6 +649,17 @@ const uint32_t crRenderDevice::MinStorageAlignment(void) const
     return m_propertiesv10.properties.limits.minStorageBufferOffsetAlignment;
 }
 
+const device_info_t crRenderDevice::DevInfo( void ) const
+{
+    device_info_t info{};
+    info.deviceID = m_propertiesv10.properties.deviceID;
+    info.vendorID = m_propertiesv10.properties.vendorID;
+    info.driverVersion = m_propertiesv10.properties.driverVersion;
+    info.driverABI = sizeof( void* ); // 64/32
+    std::memcpy( info.uuid, m_propertiesv10.properties.pipelineCacheUUID, sizeof( uint8_t ) * VK_UUID_SIZE );
+    return info;
+}
+
 /*
 ==============
 crRenderDevice::FormatIsFilterable

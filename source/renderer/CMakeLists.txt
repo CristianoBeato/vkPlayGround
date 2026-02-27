@@ -63,6 +63,8 @@ set( BACKEND_VULKAN_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/Vulkan/Image.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/Vulkan/Pipeline.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/Vulkan/Pipeline.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/backend/Vulkan/PipelineCache.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/backend/Vulkan/PipelineCache.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/Vulkan/Program.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/Vulkan/Program.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/Vulkan/Swapchain.cpp
