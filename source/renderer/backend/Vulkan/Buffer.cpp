@@ -21,7 +21,14 @@
 
 #include "Buffer.hpp" 
 
+/*
+===============================================================================================
+crBuffer 
+===============================================================================================
+*/
 crBuffer::crBuffer( void ) : 
+    m_size( 0 ),
+    m_usage( 0 ),
     m_stage( VK_PIPELINE_STAGE_2_NONE ),
     m_access( VK_ACCESS_2_NONE ),
     m_buffer( nullptr ),
@@ -45,14 +52,15 @@ bool crBuffer::Create( const size_t in_size, const VkBufferUsageFlags in_usage, 
     auto transferQ = device->TransferQueue();
     auto computeQ = device->TransferQueue();
     
-    /// If we have a transfer famly, we can use to copy operations
+    /// If we have a transfer family, we can use to copy operations
     if( transferQ )
         queues.Append( transferQ->Family() );
     
-    /// If we have a compute queue, make buffer ready to be used in compute operatiosn
+    /// If we have a compute family, make buffer ready to be used in compute operatiosn
     if ( computeQ )
         queues.Append( computeQ->Family() );
 
+    m_size = in_size;
     m_usage = in_usage;
 
     ///
@@ -62,7 +70,7 @@ bool crBuffer::Create( const size_t in_size, const VkBufferUsageFlags in_usage, 
     bufferCI.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferCI.pNext = nullptr;
     bufferCI.flags = 0;
-    bufferCI.size = in_size;
+    bufferCI.size = m_size;
     bufferCI.usage = m_usage;
     bufferCI.sharingMode = queues.SharingMode();
     bufferCI.queueFamilyIndexCount = queues.count;
@@ -179,12 +187,21 @@ void crBuffer::State(const VkCommandBuffer in_commandBuffer, const VkPipelineSta
     m_access = in_accessMask;
 }
 
+/*
+===============================================================================================
+crSubBuffer 
+===============================================================================================
+*/
 crSubBuffer::crSubBuffer( void ) : 
     m_stage( VK_PIPELINE_STAGE_2_NONE ),
     m_access( VK_ACCESS_2_NONE ),
     m_size( 0 ),
     m_offset( 0 ),
     m_buffer( nullptr )
+{
+}
+
+crSubBuffer::crSubBuffer(const VkBuffer in_buffer, const size_t in_size, const uintptr_t in_offset)
 {
 }
 
@@ -234,24 +251,34 @@ void crSubBuffer::State(const VkCommandBuffer in_commandBuffer, const VkPipeline
     m_access = in_accessMask;
 }
 
+
+/*
+===============================================================================================
+crBufferAllocator 
+===============================================================================================
+*/
 crBufferAllocator::crBufferAllocator( void ) : crBuffer()
 {
 }
 
 crBufferAllocator::~crBufferAllocator( void )
 {
+    Destroy();
 }
 
 bool crBufferAllocator::Create(const size_t in_size, const VkBufferUsageFlags in_usage, const VkMemoryPropertyFlags in_memoryProperty)
 {
-    return false;
+    if ( !crBuffer::Create( in_size, in_usage, in_memoryProperty ) )
+        return false;
+
+    return true;
 }
 
 void crBufferAllocator::Destroy(void)
 {
 }
 
-crSubBuffer* *crBufferAllocator::Alloc(const size_t in_size, const size_t in_alignment )
+crSubBuffer* crBufferAllocator::Alloc( const size_t in_size, const size_t in_alignment )
 {
     // Finding the best (best-fit) block
     // We pass the size + alignment to ensure the block can accommodate the padding.
@@ -444,4 +471,74 @@ block_t *crBufferAllocator::FindBestFit( const size_t in_requiredSize, const siz
     }
 
     return best;
+}
+
+/*
+===============================================================================================
+crBufferRing 
+===============================================================================================
+*/
+crBufferRing::crBufferRing( void )
+{
+}
+
+crBufferRing::~crBufferRing( void )
+{
+    Destroy();
+}
+
+bool crBufferRing::Create(const size_t in_size, const VkBufferUsageFlags in_usage, const VkMemoryPropertyFlags in_memoryProperty)
+{
+    auto device = crContext::Get()->Device();
+    if( !crBuffer::Create( in_size, in_usage, in_memoryProperty ) )
+        return false;
+
+    VkSemaphoreTypeCreateInfo timelineCreateInfo{};
+    timelineCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
+    timelineCreateInfo.semaphoreType = VK_SEMAPHORE_TYPE_TIMELINE;
+    timelineCreateInfo.initialValue = 0; 
+
+    VkSemaphoreCreateInfo createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    createInfo.pNext = &timelineCreateInfo;
+    auto result = vkCreateSemaphore( *device, &createInfo, k_allocationCallbacks, &m_operationSemaphore );
+    if ( result != VK_SUCCESS )
+    {
+        /* code */
+    }
+    
+    return true;
+}
+
+void crBufferRing::Destroy(void)
+{
+    auto device = crContext::Get()->Device();
+    if ( m_operationSemaphore != nullptr )
+    {
+        vkDestroySemaphore(*device, m_operationSemaphore, k_allocationCallbacks );
+        m_operationSemaphore = nullptr;
+    }
+    
+    // release buffer
+    crBuffer::Destroy();
+}
+
+crSubBuffer *crBufferRing::Alloc( const size_t in_size, const size_t in_alignment )
+{
+    crSubBuffer* subBuffer = nullptr;
+
+    // Adjust the current offset to the next multiple of 'in_alignment'
+    size_t aligned_offset = _align( m_offset, in_alignment ); 
+    size_t aligned_size = _align( in_size, in_alignment );
+
+    /// Overflow/wrap-around check
+    if ( ( aligned_offset + aligned_size ) > Size() )
+    {
+        m_offset = 0;
+        aligned_offset = _align( m_offset, in_alignment ); 
+    }
+    
+    subBuffer = new crSubBuffer( Buffer(), aligned_size, aligned_offset );
+    
+    return subBuffer;
 }

@@ -39,7 +39,11 @@ public:
     /// access the buffer handler
     inline VkBuffer Buffer( void ) const { return m_buffer; }
 
+    /// @brief Retrive the buffer usable size
+    inline size_t   Size( void ) const {  return m_size; }
+
 private:
+    size_t                  m_size;
     VkBufferUsageFlags      m_usage;
     VkPipelineStageFlags2   m_stage;
     VkAccessFlags2          m_access;
@@ -76,6 +80,8 @@ public:
 
 protected:
     friend class crBufferAllocator;
+    friend class crBufferRing;
+    crSubBuffer( const VkBuffer in_buffer, const size_t in_size, const uintptr_t in_offset );
     block_t*                Block( void ) { return m_block; }
 
 private:
@@ -111,5 +117,21 @@ private:
     /// 
     block_t* FindBestFit( const size_t in_requiredSize, const size_t in_alignment );
 };
+
+class crBufferRing : public crBuffer
+{
+public:
+    crBufferRing( void );
+    ~crBufferRing( void );
+    virtual bool    Create( const size_t in_size, const VkBufferUsageFlags in_usage, const VkMemoryPropertyFlags in_memoryProperty ) override;
+    virtual void    Destroy( void ) override;
+    crSubBuffer*    Alloc( const size_t in_size, const size_t in_alignment );
+
+private:
+    uintptr_t       m_offset;
+    uint64_t        m_operationCount;
+    VkSemaphore     m_operationSemaphore;
+};
+
 
 #endif //!__BUFFER_HPP__
