@@ -37,9 +37,13 @@ public:
     ~crMesh( void );
 
     /// @brief Type of the mesh  
-    virtual type_t  Type( void ) const { return MESH_STATIC; }
+    inline type_t       Type( void ) const { return MESH_STATIC; }
  
+    /// @brief The draw mesh surface
+    inline crSurface*   Surface( void ) const { return m_surface; }
+
 private:
+    crSurface*      m_surface;
     crMaterial*     m_material; // mesh material
 };
 
