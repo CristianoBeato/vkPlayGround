@@ -180,6 +180,7 @@ PFN_vkResetDescriptorPool                        vkResetDescriptorPool = nullptr
 PFN_vkAllocateDescriptorSets                     vkAllocateDescriptorSets = nullptr;
 PFN_vkFreeDescriptorSets                         vkFreeDescriptorSets = nullptr;
 PFN_vkUpdateDescriptorSets                       vkUpdateDescriptorSets = nullptr;
+PFN_vkCmdBindDescriptorSets2                     vkCmdBindDescriptorSets2 = nullptr;
 
 // VkEvent
 PFN_vkCmdSetEvent2                               vkCmdSetEvent2 = nullptr;
@@ -416,6 +417,7 @@ void crContext::LoadVulkanProcs( void )
     GET_VK_PROC( vkAllocateDescriptorSets, m_instance );
     GET_VK_PROC( vkFreeDescriptorSets, m_instance );
     GET_VK_PROC( vkUpdateDescriptorSets, m_instance );
+    GET_VK_PROC( vkCmdBindDescriptorSets, m_instance );
 
     // VkRenderPass
     GET_VK_PROC( vkCreateRenderPass, m_instance );

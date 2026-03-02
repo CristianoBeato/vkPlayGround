@@ -48,6 +48,8 @@ void crUniformManager::StartUp( void )
 {
     crList<VkDescriptorBindingFlags>        bindingFlags;
     crList<VkDescriptorSetLayoutBinding>    storageBindings;
+    crList<VkDescriptorBufferInfo>          descriptorBufferInfo; 
+    crList<VkWriteDescriptorSet>            writeDescriptorSet;
 
     // get minimum alignament of Vulkan storage buffers 
     auto device = crContext::Get()->Device();
@@ -77,6 +79,7 @@ void crUniformManager::StartUp( void )
     /// 
     bindingFlags.Resize( k_DESCRIPTOR_BINDIN_COUNT );
     storageBindings.Resize( k_DESCRIPTOR_BINDIN_COUNT );
+    writeDescriptorSet.Resize( k_DESCRIPTOR_BINDIN_COUNT );
 
     /// bindless texture samples
     bindingFlags[k_BINDLESS_SAMPLERS_BINDING] = VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT | VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT; //
@@ -85,6 +88,8 @@ void crUniformManager::StartUp( void )
     storageBindings[k_BINDLESS_SAMPLERS_BINDING].descriptorCount = k_MAX_SAMPLERS_BINDING;
     storageBindings[k_BINDLESS_SAMPLERS_BINDING].stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT; // we can use samples for vertex displace
     storageBindings[k_BINDLESS_SAMPLERS_BINDING].pImmutableSamplers = nullptr;
+
+    descriptorBufferInfo[k_BINDLESS_SAMPLERS_BINDING];
 
     /// Mesh uniforms 
     bindingFlags[k_MESH_UNIFORM_BINDING] = 0;
@@ -112,7 +117,11 @@ void crUniformManager::StartUp( void )
 
     /// create the pipeline layout
     m_layout = new crPipelineLayout();
-    m_layout->Create( storageBindings, bindingFlags );
+    if( !m_layout->Create( storageBindings, bindingFlags, k_MAX_SAMPLERS_BINDING ) )
+        throw crException( "Failed to create the uniform buffers pipeline layout\n" );
+
+    /// buffer bindings
+    m_layout->SetBuffers( writeDescriptorSet );
 }
 
 void crUniformManager::ShutDown( void )

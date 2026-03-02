@@ -177,6 +177,7 @@ extern PFN_vkResetDescriptorPool                        vkResetDescriptorPool;
 extern PFN_vkAllocateDescriptorSets                     vkAllocateDescriptorSets;
 extern PFN_vkFreeDescriptorSets                         vkFreeDescriptorSets;
 extern PFN_vkUpdateDescriptorSets                       vkUpdateDescriptorSets;
+extern PFN_vkCmdBindDescriptorSets                      vkCmdBindDescriptorSets;
 
 // VkEvent
 extern PFN_vkCmdSetEvent2                               vkCmdSetEvent2;

@@ -28,8 +28,10 @@ public:
     crPipelineLayout( void );
     ~crPipelineLayout( void );
 
-    bool    Create( const crList<VkDescriptorSetLayoutBinding> &in_storageBindings, const crList<VkDescriptorBindingFlags> &in_bindingFlags );
+    bool    Create( const crList<VkDescriptorSetLayoutBinding> &in_storageBindings, const crList<VkDescriptorBindingFlags> &in_bindingFlags, const uint32_t in_maxBindingSamples );
     void    Destroy( void );
+    void    SetBuffers( const crList<VkWriteDescriptorSet > in_buffers );
+    void    Bind( const VkCommandBuffer in_commandBuffer );
 
     operator VkPipelineLayout( void ) const { return m_layout; }
 
