@@ -21,6 +21,8 @@
 
 #include "ModelBDM.hpp"
 
+const uint32_t BDM_MAGIC = 0x4D4442BE;
+
 crModelBDM::crModelBDM( void )
 {
 }

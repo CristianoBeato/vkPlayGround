@@ -81,7 +81,10 @@ void crRenderSystemLocal::InitRendersystem(void)
 {
     auto context = crContext::Get();
     context->StarUp();
-    
+
+    auto modelManager = crModelManager::Get();
+    modelManager->StartUp();
+
     auto vertexCache = crVertexCache::Get();
     vertexCache->StartUp();
     
@@ -98,6 +101,9 @@ void crRenderSystemLocal::ReleaseRenderSystem(void)
     
     auto vertexCache = crVertexCache::Get();
     vertexCache->ShutDown();
+
+    auto modelManager = crModelManager::Get();
+    modelManager->ShutDown();
 
     auto context = crContext::Get();
     context->Shutdown();

@@ -31,13 +31,17 @@ public:
     static crModelManager* Get( void );
     crModelManager( void );
     ~crModelManager( void );
+    
+    void    StartUp( void );
+    void    ShutDown( void );
+
     crModel*    Model( const crString in_model );
     void        BeginLevelLoad( void );
     void        EndLevelLoad( void );
     void        Touch( crModel* in_model );
     
 private:
-
+    crBufferRing*   m_geometryStaging;
 };
 
 #endif //!__MODEL_MANAGER_HPP__

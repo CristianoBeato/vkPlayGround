@@ -22,11 +22,13 @@
 #ifndef __MODEL_BSM_HPP__
 #define __MODEL_BSM_HPP__
 
+
+
 /// @brief Load ou internal model
 /// Beato Static Mesh
 class crModelBSM : 
-    public crModel
-    public crResources
+    public crModel,
+    public crResource
 {
 public:
     crModelBSM( void );

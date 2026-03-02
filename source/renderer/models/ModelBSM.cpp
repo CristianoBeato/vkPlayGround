@@ -21,6 +21,8 @@
 
 #include "ModelBSM.hpp"
 
+const uint32_t BSM_MAGIC = 0x4D5342BE; // "BSM" + 0xBE
+
 crModelBSM::crModelBSM( void )
 {
 }
