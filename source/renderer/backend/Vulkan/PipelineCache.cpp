@@ -22,7 +22,7 @@
 #include "PipelineCache.hpp"
 #include "Core.hpp"
 
-constexpr uint32_t k_PIPELINE_CACHE_FILE_MAGIC = 'PCF/0';
+constexpr uint32_t k_PIPELINE_CACHE_FILE_MAGIC = 0x43462F30; // PCF/0;
 constexpr uint32_t k_PIPELINE_CACHE_FILE_VERSION = 10; // 1.0
 constexpr uint32_t k_PIPELINE_CAHCE_FILE_SEED = 0x1337;
 
