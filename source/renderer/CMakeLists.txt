@@ -42,6 +42,8 @@ set( BACKEND_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/Backend.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/PipelineManager.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/PipelineManager.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/backend/UniformManager.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/backend/UniformManager.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/VertexCache.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/VertexCache.hpp
 	)
@@ -65,6 +67,8 @@ set( BACKEND_VULKAN_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/Vulkan/Pipeline.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/Vulkan/PipelineCache.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/Vulkan/PipelineCache.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/backend/Vulkan/PipelineLayout.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/backend/Vulkan/PipelineLayout.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/Vulkan/Program.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/Vulkan/Program.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/backend/Vulkan/Swapchain.cpp

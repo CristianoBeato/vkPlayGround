@@ -21,6 +21,8 @@
 
 #include "UniformManager.hpp"
 
+constexpr uint32_t k_DESCRIPTOR_BINDIN_COUNT = 4;
+
 crUniformManager* crUniformManager::Get( void )
 {
     static crUniformManager gUniformManager = crUniformManager();
@@ -37,8 +39,25 @@ crUniformManager::~crUniformManager( void )
 
 void crUniformManager::StartUp( void )
 {
+    crList<VkDescriptorBindingFlags>        bindingFlags;
+    crList<VkDescriptorSetLayoutBinding>    storageBindings;
+
+    // TODO: create the shader storage buffers
+
+    /// 
+    bindingFlags.Resize( k_DESCRIPTOR_BINDIN_COUNT );
+    storageBindings.Resize( k_DESCRIPTOR_BINDIN_COUNT );
+
+    m_layout = new crPipelineLayout();
+    m_layout->Create( storageBindings, bindingFlags );
 }
 
 void crUniformManager::ShutDown( void )
 {
+    if ( m_layout != nullptr )
+    {
+        delete m_layout;
+        m_layout = nullptr;
+    }
+    
 }
