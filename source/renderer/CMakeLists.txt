@@ -30,6 +30,8 @@ set( BASE_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/renderer_common.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Surface.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Surface.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Resources.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Resources.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/RenderSystem.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/RenderSystemLocal.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/RenderSystemLocal.hpp
@@ -79,6 +81,10 @@ set( MATERIAL_SOURCES
 set( MODEL_SOURCES 
 	${CMAKE_CURRENT_SOURCE_DIR}/models/Model.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/models/Model.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/models/ModelBDM.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/models/ModelBDM.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/models/ModelBSM.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/models/ModelBSM.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/models/ModelManager.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/models/ModelManager.hpp
 	)

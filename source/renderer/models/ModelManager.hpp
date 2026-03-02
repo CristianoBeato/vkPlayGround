@@ -22,16 +22,19 @@
 #ifndef __MODEL_MANAGER_HPP__
 #define __MODEL_MANAGER_HPP__
 
-class crModel;
+#include "ModelBSM.hpp"
+#include "ModelBDM.hpp"
+
 class crModelManager
 {
 public:
     static crModelManager* Get( void );
     crModelManager( void );
     ~crModelManager( void );
-    void    BeginLevelLoad( void );
-    void    EndLevelLoad( void );
-    void    Touch( crModel* in_model );
+    crModel*    Model( const crString in_model );
+    void        BeginLevelLoad( void );
+    void        EndLevelLoad( void );
+    void        Touch( crModel* in_model );
     
 private:
 

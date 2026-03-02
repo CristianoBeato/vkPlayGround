@@ -19,12 +19,12 @@
 ===============================================================================================
 */
 
-#include "Resources.hpp"
+#include "ModelBDM.hpp"
 
-crResource::crResource( void )
+crModelBDM::crModelBDM( void )
 {
 }
 
-crResource::~crResource( void )
+crModelBDM::~crModelBDM( void )
 {
 }

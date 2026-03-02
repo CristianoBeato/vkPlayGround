@@ -22,11 +22,11 @@
 #ifndef __RESOURCES_HPP__
 #define __RESOURCES_HPP__
 
-class crResources
+class crResource
 {
 public:
-    crResources( void );
-    ~crResources( void );
+    crResource( void );
+    ~crResource( void );
 
     virtual bool    Create( const uint32_t in_flags, const crString in_name, const crString in_sourceFile ) = 0;
     virtual void    Destroy( void ) = 0;

@@ -19,12 +19,27 @@
 ===============================================================================================
 */
 
-#include "Resources.hpp"
+#ifndef __MODEL_BDM_HPP__
+#define __MODEL_BDM_HPP__
 
-crResource::crResource( void )
+/// @brief load our internal model format 
+/// Beato Dynamic Meshs ( for skined meshes )
+class crModelBDM : 
+    public crModel,
+    public crResource
 {
-}
+public:
+    crModelBDM( void );
+    ~crModelBDM( void );
 
-crResource::~crResource( void )
-{
-}
+    virtual bool    Create( const uint32_t in_flags, const crString in_name, const crString in_sourceFile ) override;
+    virtual void    Destroy( void ) override;
+    virtual bool    Load( void ) override;
+
+private:
+
+};
+
+
+
+#endif //!__MODEL_BDM_HPP__

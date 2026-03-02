@@ -19,12 +19,25 @@
 ===============================================================================================
 */
 
-#include "Resources.hpp"
+#ifndef __MODEL_BSM_HPP__
+#define __MODEL_BSM_HPP__
 
-crResource::crResource( void )
+/// @brief Load ou internal model
+/// Beato Static Mesh
+class crModelBSM : 
+    public crModel
+    public crResources
 {
-}
+public:
+    crModelBSM( void );
+    ~crModelBSM( void );
 
-crResource::~crResource( void )
-{
-}
+    virtual bool    Create( const uint32_t in_flags, const crString in_name, const crString in_sourceFile ) override;
+    virtual void    Destroy( void ) override;
+    virtual bool    Load( void ) override;
+
+private:
+
+};
+
+#endif //!__MODEL_BSM_HPP__
