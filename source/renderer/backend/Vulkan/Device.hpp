@@ -60,6 +60,15 @@ private:
     VkDevice                m_device;       // parent device
 };
 
+struct device_info_t
+{
+    uint32_t vendorID = 0;
+    uint32_t deviceID = 0;
+    uint32_t driverVersion = 0;
+    uint32_t driverABI = 0;
+    uint8_t uuid[VK_UUID_SIZE];
+};
+
 typedef class crRenderDevice* crRenderDevicep;
 
 class crRenderDevice
@@ -106,6 +115,9 @@ public:
     const uint32_t                  MinTexelBufferOffsetAlignment( void ) const;
     const uint32_t                  MinStorageAlignment( void ) const;
     
+    ///
+    const device_info_t             DevInfo( void ) const;
+
     /// @brief 
     /// @param in_format 
     /// @param tiling 

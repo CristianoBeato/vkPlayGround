@@ -55,17 +55,20 @@ public:
     /// @param in_fragmentShader
     /// @return a pipeline whit required flagas and shaders 
     crPipeline* Pipelines( const uint64_t in_flags, const uint32_t in_vertexShader, const uint32_t in_fragmentShader );
-
+    
 protected:
     friend class crPipeline;
-    VkPipelineCache     Cache( void ) const { return m_cache; }
+    crPipelineCache*    Cache( void ) const { return m_cache; }
+    crProgram*          GetProgram( const uint32_t in_progID );
+    uint32_t            GetNewIndex( void );   
 
 private:
-    VkPipelineCache     m_cache;
-    
-    bool    LoadCache( void );
-    bool    LoadPrograms( void );
-    bool    SaveCache( void );
+    bool                m_cacheLoaded;
+    bool                m_cacheModified;
+    uint32_t            m_pipelineCount;
+    crPipelineCache*    m_cache; 
+    crList<crProgram*>  m_programs;
+    bool        LoadPrograms( void );
 };
 
 #endif //!__PIPELINE_MANAGER_HPP__

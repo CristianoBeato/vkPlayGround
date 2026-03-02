@@ -25,6 +25,8 @@ cmake_minimum_required(VERSION 3.13)
 ##
 project( vkPlayGround )
 
+option( COMPILE_SHADERS FALSE )
+
 ##
 ## Uses STD c++ 20
 ##
@@ -70,3 +72,31 @@ add_subdirectory( system )
 ## game logic system
 ##
 add_subdirectory( game )
+
+if( COMPILE_SHADERS )
+    find_package(Vulkan REQUIRED COMPONENTS glslc)
+
+    set( SHADER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/assets/shaders/glsl )
+    set( SHADER_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/assets/shaders/spirv )
+    file( MAKE_DIRECTORY ${SHADER_BINARY_DIR} )
+
+    #list shaders to compile
+    set( SHADER_FILES  
+        ${SHADER_SOURCE_DIR}/color.vert
+        ${SHADER_SOURCE_DIR}/color.frag )
+
+    set( SPV_OUTPUTS "" )
+
+    set( VERTES_SHADER_DEFINITION -DVERTEX_SHADER )
+    set( VERTES_SHADER_DEFINITION -DFRAGMENT_SHADER )
+
+    foreach( SHADER_PATH ${SHADER_FILES} )
+        get_filename_component( SHADER_NAME ${SHADER_PATH} NAME )
+        get_filename_component( FILE_EXT ${SHADER_FILE} EXT )
+        set( OUTPUT_FILE ${SHADER_BIN_DIR}/${FILE_NAME}.spv)
+        add_custom_command( OUTPUT ${OUTPUT_FILE} COMMAND Vulkan::glslc ${SHADER_FILE} -o ${OUTPUT_FILE} DEPENDS ${SHADER_FILE} COMMENT "Vulkan Shader: Compiling ${FILE_NAME} to SPIR-V" )
+    endforeach()
+
+    add_custom_target(CompileShaders DEPENDS ${SPV_OUTPUTS})
+
+endif( COMPILE_SHADERS )

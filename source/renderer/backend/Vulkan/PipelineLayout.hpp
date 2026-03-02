@@ -19,29 +19,25 @@
 ===============================================================================================
 */
 
-#ifndef __RENDERER_COMMON_HPP__
-#define __RENDERER_COMMON_HPP__
+#ifndef __PIPELINE_LAYOUT_HPP__
+#define __PIPELINE_LAYOUT_HPP__
 
-#include "RenderSystem.hpp"
+class crPipelineLayout
+{
+public:
+    crPipelineLayout( void );
+    ~crPipelineLayout( void );
 
-#include "Bounds.hpp"
-#include "Vertexes.hpp"
-#include "backend/Vulkan/Core.hpp"
-#include "backend/PipelineManager.hpp"
-#include "backend/UniformManager.hpp"
-#include "backend/VertexCache.hpp"
-#include "material/Material.hpp"
-#include "Surface.hpp"
-#include "Mesh.hpp"
-#include "Resources.hpp"
-#include "textures/Texture.hpp"
-#include "textures/TextureManager.hpp"
-#include "models/Model.hpp"
-#include "models/ModelManager.hpp"
-#include "world/Light.hpp"
-#include "world/Geometry.hpp"
-#include "world/View.hpp"
-#include "backend/Backend.hpp"
-#include "RenderSystemLocal.hpp"
+    bool    Create( const crList<VkDescriptorSetLayoutBinding> &in_storageBindings, const crList<VkDescriptorBindingFlags> &in_bindingFlags );
+    void    Destroy( void );
 
-#endif //!__RENDERER_COMMON_HPP__
+    operator VkPipelineLayout( void ) const { return m_layout; }
+
+private:
+    VkDescriptorSet			m_descriptorSet;
+    VkDescriptorSetLayout	m_descriptorLayout;
+    VkDescriptorPool		m_descriptorPool;
+    VkPipelineLayout        m_layout;
+};
+
+#endif //!__PIPELINE_LAYOUT_HPP__
