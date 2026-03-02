@@ -34,8 +34,8 @@ public:
     operator VkPipelineLayout( void ) const { return m_layout; }
 
 private:
-    VkDescriptorSet			m_bindlessSet;
-    VkDescriptorSetLayout	m_descriptor;
+    VkDescriptorSet			m_descriptorSet;
+    VkDescriptorSetLayout	m_descriptorLayout;
     VkDescriptorPool		m_descriptorPool;
     VkPipelineLayout        m_layout;
 };

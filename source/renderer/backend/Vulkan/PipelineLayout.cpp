@@ -138,10 +138,16 @@ void crPipelineLayout::Destroy(void)
 {
     auto device = crContext::Get()->Device();
 
-    if( m_bindlessSet != nullptr )
+    if( m_descriptorSet != nullptr )
     {
-        vkFreeDescriptorSets( *device, m_descriptorPool, 2, &m_bindlessSet );
-        m_bindlessSet = nullptr;
+        vkFreeDescriptorSets( *device, m_descriptorPool, 2, &m_descriptorSet );
+        m_descriptorSet = nullptr;
+    }
+
+    if( m_descriptorLayout != nullptr )
+    {
+        vkDestroyDescriptorSetLayout( *device, m_descriptorLayout, k_allocationCallbacks );
+        m_descriptorSet = nullptr;
     }
 
     if( m_descriptorPool != nullptr )
