@@ -56,9 +56,10 @@ public:
     /// @return a pipeline whit required flagas and shaders 
     crPipeline* Pipelines( const uint64_t in_flags, const uint32_t in_vertexShader, const uint32_t in_fragmentShader );
     
-    protected:
+protected:
     friend class crPipeline;
     crPipelineCache*    Cache( void ) const { return m_cache; }
+    crProgram*          GetProgram( const uint32_t in_progID );
     uint32_t            GetNewIndex( void );   
 
 private:
@@ -66,6 +67,7 @@ private:
     bool                m_cacheModified;
     uint32_t            m_pipelineCount;
     crPipelineCache*    m_cache; 
+    crList<crProgram*>  m_programs;
     bool        LoadPrograms( void );
 };
 

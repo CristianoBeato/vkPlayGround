@@ -21,8 +21,6 @@
 
 #include "PipelineManager.hpp"
 
-#include "SDL3/SDL.h"
-
 /// the cache will be stored in the user space path
 static const char* k_CACHE_PATH = { "generated/cache/pipeline.pcf" };
 
@@ -66,6 +64,11 @@ crPipeline *crPipelineManager::Pipelines(const uint64_t in_flags, const uint32_t
 {
     
     return nullptr;    
+}
+
+crProgram *crPipelineManager::GetProgram(const uint32_t in_progID)
+{
+    return m_programs[in_progID];
 }
 
 uint32_t crPipelineManager::GetNewIndex(void)
