@@ -22,6 +22,11 @@
 #ifndef __UNIFORM_MANAGER_HPP__
 #define __UNIFORM_MANAGER_HPP__
 
+inline constexpr uint32_t k_BINDLESS_SAMPLERS_BINDING   = 00u;
+inline constexpr uint32_t k_MESH_UNIFORM_BINDING        = 01u;
+inline constexpr uint32_t k_MATERIAL_UNIFORM_BINDING    = 02u;
+inline constexpr uint32_t k_LIGTH_UNIFORM_BINDING       = 03u;
+
 /// @brief Mesh uniform
 struct alignas( 16 ) uMesh_t
 {
@@ -112,10 +117,16 @@ protected:
     crPipelineLayout*   Layout( void ) const { return m_layout; }
 
 private:
-    crPipelineLayout*       m_layout;
     crUniform<uMesh_t>      m_mesh;
     crUniform<uMaterial_t>  m_material;
     crUniform<uLight_t>     m_ligth;
+    crPipelineLayout*       m_layout;
+    crBuffer*               m_meshSSBO;     // mesh shader storage buffer
+    crBuffer*               m_materialSSBO; // material shader storage buffer
+    crBuffer*               m_lightSSBO;    // light shader storage buffer
+    uMesh_t*                m_meshUniformMap;
+    uMaterial_t*            m_materialUniformMap;
+    uLight_t*               m_lightUniformMap;
 };
 
 #endif //!__UNIFORM_MANAGER_HPP__
