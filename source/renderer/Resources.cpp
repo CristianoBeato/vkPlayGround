@@ -19,27 +19,12 @@
 ===============================================================================================
 */
 
-#ifndef __RENDERER_COMMON_HPP__
-#define __RENDERER_COMMON_HPP__
-
-#include "RenderSystem.hpp"
-
-#include "Bounds.hpp"
-#include "Vertexes.hpp"
-#include "backend/PipelineManager.hpp"
-#include "backend/VertexCache.hpp"
-#include "material/Material.hpp"
-#include "Surface.hpp"
-#include "Mesh.hpp"
 #include "Resources.hpp"
-#include "textures/Texture.hpp"
-#include "textures/TextureManager.hpp"
-#include "models/Model.hpp"
-#include "models/ModelManager.hpp"
-#include "world/Light.hpp"
-#include "world/Geometry.hpp"
-#include "world/View.hpp"
-#include "backend/Backend.hpp"
-#include "RenderSystemLocal.hpp"
 
-#endif //!__RENDERER_COMMON_HPP__
+crResources::crResources( void )
+{
+}
+
+crResources::~crResources( void )
+{
+}
