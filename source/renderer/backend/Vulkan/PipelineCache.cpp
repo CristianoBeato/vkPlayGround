@@ -56,7 +56,7 @@ bool crPipelineCache::OpenCache( const crString &in_path )
     m_loaded = false;
 
     /// Try read cache file from save dir
-    cacheFile = fs->Open( "generated/cache/pipeline.pcf", crFileSystem::FS_OPEN_READ | crFileSystem::FS_OPEN_SAVE_PATH ); 
+    cacheFile = fs->Open( in_path, crFileSystem::FS_OPEN_READ | crFileSystem::FS_OPEN_SAVE_PATH ); 
     if ( cacheFile != nullptr )
     {
         /// retrieve cache header
@@ -168,7 +168,7 @@ bool crPipelineCache::SaveCache( const crString &in_path )
     header.dataHash =  SDL_murmur3_32( cacheData, cacheSize, k_PIPELINE_CAHCE_FILE_SEED );
 
     /// Try create cache file in the save directory
-    cacheFile = fs->Open( "generated/cache/pipeline.pcf", crFileSystem::FS_OPEN_WRITE | crFileSystem::FS_OPEN_SAVE_PATH ); 
+    cacheFile = fs->Open( in_path, crFileSystem::FS_OPEN_WRITE | crFileSystem::FS_OPEN_SAVE_PATH ); 
     if ( !cacheFile )
     {
         MemFree( cacheData );
