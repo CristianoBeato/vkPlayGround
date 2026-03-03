@@ -23,6 +23,14 @@
 #include <SDL3/SDL_iostream.h>
 #include <SDL3/SDL_filesystem.h>
 
+static crString savePath = crString();
+static crString basepath = crString();
+
+/*
+===============================================================================================
+crFile 
+===============================================================================================
+*/
 crFile::crFile( void )
 {
 }
@@ -121,6 +129,136 @@ uintptr_t crFile::WriteFloat( const float *in_values, const uint32_t in_count )
     return Write( in_values, sizeof( float ), in_count );
 }
 
+/*
+===============================================================================================
+crFileLocal
+===============================================================================================
+*/
+class crFileLocal : public crFile
+{
+public:
+    crFileLocal( const crString in_path, const uint32_t in_mode  );
+    ~crFileLocal( void );
+
+    bool                IsOpen( void ) const { return m_fstream != nullptr; }
+    virtual uintptr_t   Read( void*  in_data, const size_t in_size, const uint32_t in_count );
+    virtual uintptr_t   Write( const void* in_data, const size_t in_size, const uint32_t in_count );
+    virtual uintptr_t   Seek( const uintptr_t in_offset, const whence_e in_whence );
+    virtual uintptr_t   Tell( void ) const;
+    virtual size_t      Size( void ) const;
+    virtual void        Flush( void ) const;
+
+private:
+    SDL_IOStream*   m_fstream;
+};
+
+crFileLocal::crFileLocal( const crString in_path, const uint32_t in_mode ) : m_fstream( nullptr )
+{
+    const char* mode = nullptr;
+    if ( ( in_mode & crFileSystem::FS_OPEN_READ ) && ( in_mode & crFileSystem::FS_OPEN_WRITE ) )
+    {
+        if( in_mode & crFileSystem::FS_OPEN_BINARY )
+            mode = "ab+";
+        else
+            mode = "a+";
+    }
+    else if ( in_mode & crFileSystem::FS_OPEN_READ )
+    {
+        if( in_mode & crFileSystem::FS_OPEN_BINARY )
+            mode = "rb";
+        else
+            mode = "r";
+    }
+    else if ( in_mode & crFileSystem::FS_OPEN_WRITE )
+    {
+        if( in_mode & crFileSystem::FS_OPEN_BINARY )
+            mode = "wb";
+        else
+            mode = "w";
+    }
+    
+    m_fstream = SDL_IOFromFile( in_path.c_str(), mode );
+    if ( !m_fstream )
+        crConsole::Warning( "Error: %s\n", SDL_GetError() );
+}
+
+crFileLocal::~crFileLocal( void )
+{
+    if ( m_fstream != nullptr )
+    {
+        SDL_CloseIO( m_fstream );
+        m_fstream = nullptr;
+    }
+}
+
+uintptr_t crFileLocal::Read( void *in_data, const size_t in_size, const uint32_t in_count )
+{
+    size_t readed = 0;
+    auto outStream = static_cast<byte*>( in_data );
+    for ( uint32_t i = 0; i < in_count; i++)
+    {
+        auto read = SDL_ReadIO( m_fstream, outStream, in_size );
+        outStream += read;
+        readed += read;
+    }
+    
+    auto offset = SDL_TellIO( m_fstream );
+    return ( offset < 0 ) ? 0 : offset;
+}
+
+uintptr_t crFileLocal::Write(const void *in_data, const size_t in_size, const uint32_t in_count)
+{
+    size_t writed = 0;
+    auto inStream = static_cast<const byte*>( in_data );
+
+    for ( uint32_t i = 0; i < in_count; i++)
+    {
+        auto write = SDL_WriteIO( m_fstream, inStream, in_size );
+        inStream += write;
+        writed += write;
+    }
+    
+
+    auto offset = SDL_TellIO( m_fstream );
+    return ( offset < 0 ) ? 0 : offset;
+}
+
+/// the value of crFile::whence_e match 1:1 of SDL_IOWhence
+/// but we think is more secure use a static table
+static const SDL_IOWhence k_SEEK_WHENCE_TABLE[3] =
+{
+    SDL_IO_SEEK_SET,
+    SDL_IO_SEEK_CUR,
+    SDL_IO_SEEK_END
+};
+
+uintptr_t crFileLocal::Seek( const uintptr_t in_offset, const whence_e in_whence )
+{
+    auto offset = SDL_SeekIO( m_fstream, in_offset, k_SEEK_WHENCE_TABLE[in_whence] );
+    return ( offset < 0 ) ? 0 : offset;
+}
+
+uintptr_t crFileLocal::Tell(void) const
+{
+    auto offset = SDL_TellIO( m_fstream );
+    return ( offset < 0 ) ? 0 : offset;
+}
+
+size_t crFileLocal::Size(void) const
+{
+    return SDL_GetIOSize( m_fstream );
+}
+
+void crFileLocal::Flush(void) const
+{
+    SDL_FlushIO( m_fstream );
+}
+
+/*
+===============================================================================================
+crFileSystem 
+===============================================================================================
+*/
 crFileSystem *crFileSystem::Get(void)
 {
     static crFileSystem gFileSystem = crFileSystem();
@@ -135,30 +273,93 @@ crFileSystem::~crFileSystem( void )
 {
 }
 
-crFile *crFileSystem::Open(const crString in_path, const uint32_t in_flags)
+void crFileSystem::StartUp(void)
 {
-    return nullptr;
+    crConsole::Print( "|---Initializing FileSystem---|\n");
+    /// configure paths
+    auto base = BasePath();
+    crConsole::Print( "Base Path: \"%s\"\n", base.c_str() );
+    auto save = SavePath();
+    crConsole::Print( "Save Path: \"%s\"\n", save.c_str() );
 }
 
-crString crFileSystem::BasePath(void)
+void crFileSystem::ShutDown(void)
 {
-    static crString basepath = crString();
+}
+
+crFile *crFileSystem::Open( const crString in_path, const uint32_t in_flags )
+{
+    crString location;
+    crFile* newFile = nullptr;
+
+    /// Open file from save or base dir
+    if ( in_flags & FS_OPEN_SAVE_PATH )
+        location = SavePath() + in_path;
+    else
+        location = BasePath() + in_path;
+    
+    newFile = new crFileLocal( location, in_flags );
+    if ( !dynamic_cast<crFileLocal*>( newFile )->IsOpen() )
+    {
+        delete newFile;
+        newFile = nullptr;
+    }
+    
+    return newFile;
+}
+
+void crFileSystem::Close(crFile *in_file)
+{
+    delete in_file;
+}
+
+bool crFileSystem::PathExist(const crString in_path, const bool in_savepath) const
+{
+    SDL_PathInfo info{};
+    crString fullPath;
+    if ( in_savepath )
+        fullPath = SavePath() + in_path;
+    else
+        fullPath = BasePath() + in_path;
+    
+    return SDL_GetPathInfo( fullPath.c_str(), &info );
+}
+
+void crFileSystem::CreatePath( const crString in_path, const bool in_savepath )
+{
+    crString newpath;
+    if ( in_savepath )
+        newpath = SavePath() + in_path;
+    else
+        newpath = BasePath() + in_path;
+
+    if( !SDL_CreateDirectory( newpath.c_str() ) )
+        throw crException( SDL_GetError() );
+}
+
+crString crFileSystem::BasePath(void) const
+{
     if( basepath.Empty() )
     {
         auto path = SDL_GetBasePath();
         basepath = crString( path ); 
+#if __PLATFORM_WINDOWS__    /// we ignore windows \\ path separator
+        basepath.Replace( '\\', '/' );
+#endif
     }
 
     return basepath;
 }
 
-crString crFileSystem::SavePath(void)
+crString crFileSystem::SavePath(void) const
 {
-    static crString savePath = crString();
-    if ( !savePath.Empty() )
+    if ( savePath.Empty() )
     {
         auto path = SDL_GetPrefPath( "vkPlayground", "GameTest" );
         savePath = crString( path );
+#if __PLATFORM_WINDOWS__    /// we ignore windows \\ path separator
+        savePath.Replace( '\\', '/' );
+#endif
     }
     
     return savePath;

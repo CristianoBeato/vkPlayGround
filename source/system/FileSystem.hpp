@@ -29,6 +29,17 @@ public:
     crFile( void );
     ~crFile( void );
 
+    enum whence_e : uint8_t
+    {
+        /// @brief Seek from the beginning of data
+        FL_SEEK_SET = 0,
+        /// @brief Seek relative to current read point
+        FL_SEEK_CUR,
+        /// @brief Seek relative to the end of data
+        FL_SEEK_END
+    };
+
+
     /// read signed integers 
     uintptr_t   ReadInt8( int8_t* out_values, const uint32_t in_count );
     uintptr_t   ReadInt16( int16_t* out_values, const uint32_t in_count );
@@ -61,8 +72,10 @@ public:
 
     virtual uintptr_t   Read( void*  in_data, const size_t in_size, const uint32_t in_count ) = 0;
     virtual uintptr_t   Write( const void* in_data, const size_t in_size, const uint32_t in_count ) = 0;
+    virtual uintptr_t   Seek( const uintptr_t in_offset, const whence_e in_whence ) = 0;
     virtual uintptr_t   Tell( void ) const = 0;
     virtual size_t      Size( void ) const = 0;
+    virtual void        Flush( void ) const = 0;
 
     // Disable class copy
     crFile( const crFile & ) = delete;
@@ -80,22 +93,29 @@ public:
         /// @brief Open file for write operations
         FS_OPEN_WRITE = 1 << 1,
 
+        /// @brief Open in binary mode
+        FS_OPEN_BINARY = 1 << 2,
+
         /// @brief Open file from save path
-        FS_OPEN_SAVE_PATH = 1 << 2,
+        FS_OPEN_SAVE_PATH = 1 << 3,
 
         /// @brief Open file as a memory blob and read from
-        FS_OPEN_MAPED = 1 << 2
+        FS_OPEN_MAPED = 1 << 4
     };
 
     static crFileSystem* Get( void );
     crFileSystem( void );
     ~crFileSystem( void );
-
+    void    StartUp( void );
+    void    ShutDown( void );
+    
     crFile*  Open( const crString in_path, const uint32_t in_flags );
     void    Close( crFile* in_file );
+    bool    PathExist( const crString in_path, const bool in_savepath ) const;
+    void    CreatePath( const crString in_path, const bool in_savepath );
 
-    crString    BasePath( void );
-    crString    SavePath( void );
+    crString    BasePath( void ) const;
+    crString    SavePath( void ) const;
 };
 
 #endif //!__FILE_SYSTEM_HPP__
