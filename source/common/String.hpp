@@ -81,12 +81,12 @@ size_t crString::Lengenth(void) const
 
 bool crString::Compare(const crString &in_string) const
 {
-    return std::strncmp( m_string, in_string.m_string, m_lengenth ) == 0;
+    return std::strncmp( m_string, in_string.m_string, m_allocated ) == 0;
 }
 
 bool crString::Comparei(const crString &in_string) const
 {
-    return SDL_strncasecmp( m_string, in_string.m_string, m_lengenth ) == 0;
+    return SDL_strncasecmp( m_string, in_string.m_string, m_allocated ) == 0;
 }
 
 bool crString::operator==(const crString &in_string) const
@@ -102,7 +102,7 @@ bool crString::operator!=(const crString &in_string) const
 inline crString crString::operator=(const crString &in_string)
 {
     Alloc( in_string.Lengenth() );
-    std::strncpy( m_string, in_string.m_string, m_lengenth );
+    std::strncpy( m_string, in_string.m_string, m_allocated );
     return *this;
 }
 
@@ -115,7 +115,7 @@ inline crString crString::operator+(const crString &in_string) const
     
     /// join strings
     std::strncpy( newString.m_string, m_string, Lengenth() );
-    std::strncpy( newString.m_string + Lengenth(), in_string.m_string, in_string.m_lengenth );
+    std::strncpy( newString.m_string + Lengenth(), in_string.m_string, in_string.m_allocated );
 
     return newString;
 }
