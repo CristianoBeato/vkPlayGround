@@ -20,37 +20,13 @@
 */
 
 #include <SDL3/SDL_stdinc.h>
+#include <SDL3/SDL_atomic.h>
 #include "Heap.hpp"
 
-void *MemAlloc(const size_t in_size)
+crHeap::crHeap( void )
 {
-    return SDL_malloc( in_size );
 }
 
-void *MemAllocAligned(const size_t in_size, const size_t in_align)
+crHeap::~crHeap( void )
 {
-    return SDL_aligned_alloc( in_align, in_size );
-}
-
-void *MemCleardAlloc(const size_t in_size)
-{
-    /// alloc data pointer
-    void* bytes = SDL_malloc( in_size );
-    std::memset( bytes, 0x00, in_size ); 
-    return bytes;
-}
-
-void * MemRealloc(void * in_old, const size_t in_newSize)
-{
-    return SDL_realloc( in_old, in_newSize );
-}
-
-void MemFree(void *in_source)
-{
-    SDL_free( in_source );
-}
-
-void MemFreeAligned(void *in_source)
-{
-    SDL_aligned_free( in_source );
 }
