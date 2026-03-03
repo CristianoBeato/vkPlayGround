@@ -26,6 +26,26 @@
 static crString savePath = crString();
 static crString basepath = crString();
 
+static crString GetLocalDir( const crString &global, const crString &full_path ) 
+{
+    crString output;
+    // Verifica se o full_path começa com o global_path
+    if ( std::strncmp( global, full_path, global.Lengenth() ) == 0) 
+    {
+        // Aponta para o início da parte local
+        const char* local_part = full_path.c_str() + global.Lengenth();
+        
+        //Copia para o output
+        output = local_part;
+
+        // Remove o nome do arquivo para deixar apenas o diretório
+        output.StripFileName();
+    }
+
+    return output;
+}
+
+
 /*
 ===============================================================================================
 crFile 
@@ -281,6 +301,8 @@ void crFileSystem::StartUp(void)
     crConsole::Print( "Base Path: \"%s\"\n", base.c_str() );
     auto save = SavePath();
     crConsole::Print( "Save Path: \"%s\"\n", save.c_str() );
+
+    BuildDirectoryTree();
 }
 
 void crFileSystem::ShutDown(void)
@@ -363,4 +385,56 @@ crString crFileSystem::SavePath(void) const
     }
     
     return savePath;
+}
+
+void crFileSystem::BuildDirectoryTree(void)
+{
+    /// list base path directories
+    auto base = BasePath();
+    BuildPath( base );
+    
+    auto save = SavePath();
+    BuildPath( save );
+}
+
+void crFileSystem::BuildPath( const crString in_path )
+{
+    int count = 0;
+    uint32_t i = 0;
+    crList<crString> subdirs;
+
+    /// list paths
+    char** path_list = SDL_GlobDirectory( in_path.c_str(), nullptr, SDL_GLOB_CASEINSENSITIVE, &count );
+    for (  i = 0; i < count; i++)
+    {
+        SDL_PathInfo info{};
+        auto path = path_list[i];
+
+        
+
+        //SDL_murmur3_32()
+        if( !SDL_GetPathInfo( path, &info ) )
+        {
+            crConsole::Error( SDL_GetError() );
+            continue;
+        }
+
+        if ( info.type == SDL_PATHTYPE_FILE )
+        {
+            fileInfo_t finfo{};
+            finfo.size = info.size;
+            finfo.modify = info.modify_time;
+            m_files.Append( finfo );
+        }
+        else if( info.type == SDL_PATHTYPE_DIRECTORY )
+        {
+            subdirs.Append( crString( path ) );
+        }
+    }
+    
+
+    for ( i = 0; i < subdirs.Count(); i++)
+    {
+        BuildPath( subdirs[i] );
+    }
 }

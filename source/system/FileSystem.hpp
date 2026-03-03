@@ -116,6 +116,23 @@ public:
 
     crString    BasePath( void ) const;
     crString    SavePath( void ) const;
+
+private:
+    struct fileInfo_t
+    {
+        bool        inZip;      /// file is paked
+        size_t      size;       ///
+        time_t      modify;     /// 
+        crString    localPath;  /// relative path in the engine
+        crString    fullpath;   /// full system path
+    };
+
+    crList<fileInfo_t>  m_files;
+    
+    void    BuildDirectoryTree( void );
+    void    BuildPath( const crString in_path );
+    void    ListFiles( const crString in_path );
+    void    ListDirDirectory( const crString in_path );
 };
 
 #endif //!__FILE_SYSTEM_HPP__
