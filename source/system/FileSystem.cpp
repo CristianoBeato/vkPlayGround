@@ -20,6 +20,8 @@
 */
 
 #include "FileSystem.hpp"
+#include <SDL3/SDL_iostream.h>
+#include <SDL3/SDL_filesystem.h>
 
 crFile::crFile( void )
 {
@@ -131,4 +133,33 @@ crFileSystem::crFileSystem(void)
 
 crFileSystem::~crFileSystem( void )
 {
+}
+
+crFile *crFileSystem::Open(const crString in_path, const uint32_t in_flags)
+{
+    return nullptr;
+}
+
+crString crFileSystem::BasePath(void)
+{
+    static crString basepath = crString();
+    if( basepath.Empty() )
+    {
+        auto path = SDL_GetBasePath();
+        basepath = crString( path ); 
+    }
+
+    return basepath;
+}
+
+crString crFileSystem::SavePath(void)
+{
+    static crString savePath = crString();
+    if ( !savePath.Empty() )
+    {
+        auto path = SDL_GetPrefPath( "vkPlayground", "GameTest" );
+        savePath = crString( path );
+    }
+    
+    return savePath;
 }

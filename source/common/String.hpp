@@ -30,6 +30,8 @@ public:
     crString( const crString* &in_string );
     ~crString( void );
 
+    bool     Empty( void ) const { return ( m_lengenth == 0 ) || m_string[0] == '\0'; }
+
     inline size_t   Lengenth( void ) const { return m_lengenth; }
     inline bool     Compare( const crString& in_string ) const;
     inline bool     Comparei( const crString& in_string ) const;
