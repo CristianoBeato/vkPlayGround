@@ -23,7 +23,13 @@
 
 constexpr size_t k_SURFACE_STAGING_BUFFER_SIZE = 128 * 1024 * 1024;
 
-crModelManager::crModelManager( void ) : m_geometryStaging( nullptr )
+crModelManager *crModelManager::Get(void)
+{
+    static crModelManager gModelManager = crModelManager();
+    return &gModelManager;
+}
+
+crModelManager::crModelManager(void) : m_geometryStaging(nullptr)
 {
 }
 
@@ -35,7 +41,7 @@ void crModelManager::StartUp( void )
 {
     /// Create the meshes staging buffer
     m_geometryStaging = new crBufferRing();
-    if( m_geometryStaging->Create( 
+    if( !m_geometryStaging->Create( 
         k_SURFACE_STAGING_BUFFER_SIZE, 
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT, // We use this buffer to copy to geometry buffer
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT // make the client copy visible to server
