@@ -23,27 +23,27 @@
 
 #define _DEBUG_STRING_COPY 0
 
-crString::crString( void ) : m_lengenth( 0 ), m_string( nullptr )
+crString::crString( void ) : m_allocated( 0 ), m_string( nullptr )
 {
 }
 
-crString::crString( const char *in_string ) : m_lengenth( 0 ), m_string( nullptr )
+crString::crString( const char *in_string ) : m_allocated( 0 ), m_string( nullptr )
 {
     /// get string legenth 
     Alloc( std::strlen( in_string ) );
 
     /// allocate string memory
-    std::strncpy( m_string, in_string, m_lengenth );
+    std::strncpy( m_string, in_string, m_allocated - 1 );
 
 #if _DEBUG_STRING_COPY
     assert( std::memcmp( m_string, in_string, m_lengenth ) == 0 );
 #endif 
 }
 
-crString::crString( const crString &in_string ) : m_lengenth( 0 ), m_string( nullptr )
+crString::crString( const crString &in_string ) : m_allocated( 0 ), m_string( nullptr )
 {
    Alloc( in_string.Lengenth() );
-   std::strncpy( m_string, in_string.m_string, m_lengenth );
+   std::strncpy( m_string, in_string.m_string, m_allocated - 1 );
 
 #if _DEBUG_STRING_COPY
     assert( std::memcmp( m_string, in_string.c_str(), m_lengenth ) == 0 );
@@ -57,35 +57,57 @@ crString::~crString( void )
 
 void crString::Replace( const char in_from, const char in_to )
 {
-    for ( size_t i = 0; i < m_lengenth; i++)
+    char* str = m_string;
+    while ( *str != '\0' )
     {
-        /// security break
-        if( m_string[i] == '\0' )
-            break;
-
-        if( m_string[i] == in_from )
-            m_string[i] = in_to;
+        if( *str == in_from )
+            *str = in_to;
+        str++;
     }
 }
 
-void crString::Alloc( const size_t in_lenght )
+void crString::StripFileName( void )
 {
-    if( m_lengenth == 0 )
+    // Search for the last occurrence of '/'
+    char* last_slash = std::strrchr( m_string, '/');
+
+    /// make the rest of string null
+    while ( ( last_slash + 1 ) != nullptr && *( last_slash + 1 ) != '\0' )
+    {
+        *(last_slash + 1) = '\0'; // Keep the trailing slash, or '0' to remove
+    } 
+}
+
+void crString::StripFileExtension(void)
+{
+    // Search for the last occurrence of '.'
+    char* last_dot = std::strrchr( m_string, '.');
+    while ( ( last_dot != nullptr ) && (*last_dot != '\0' ) )
+    {
+        /// make the rest of string null
+        *(last_dot) = '\0';
+    }
+}
+
+void crString::Alloc( const size_t in_size )
+{
+    if( m_allocated == 0 )
     {
         /// set string legenth 
-        m_lengenth = in_lenght;
+        m_allocated = in_size + 1;
     
         /// allocate string memory
-        m_string = MemAlloc<char>( m_lengenth + 1 );
+        m_string = MemAlloc<char>( m_allocated );
         /// fill string whith null teminator
-        std::memset( m_string, '\0', m_lengenth + 1 );
+        std::memset( m_string, '\0', m_allocated );
     }
     else
     {
-        m_string = MemRealloc<char>( m_string, m_lengenth + 1 );
+        m_string = MemRealloc<char>( m_string, m_allocated );
 
         /// fill the rest o the string whith null terminator
-        std::memset( m_string + m_lengenth, '\0', in_lenght - m_lengenth );
+        std::memset( m_string + m_allocated, '\0', in_size - m_allocated );
+        m_allocated = in_size + 1;
     }
 }
 
@@ -97,5 +119,5 @@ void crString::Release(void)
         m_string = nullptr;
     }
 
-    m_lengenth = 0;
+    m_allocated = 0;
 }
