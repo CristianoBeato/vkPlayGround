@@ -78,7 +78,7 @@ bool crBuffer::Create( const size_t in_size, const VkBufferUsageFlags in_usage, 
     result = vkCreateBuffer( *device, &bufferCI, k_allocationCallbacks, &m_buffer );
     if ( result != VK_SUCCESS )
     {
-        crConsole::Error( "crBuffer::Create::vkCreateBuffer %s\n", VulkanErrorString( result ) );
+        crConsole::Error( "crBuffer::Create::vkCreateBuffer %s\n", VulkanErrorString( result ).c_str() );
         return false;
     }
 
@@ -98,14 +98,14 @@ bool crBuffer::Create( const size_t in_size, const VkBufferUsageFlags in_usage, 
     result = vkAllocateMemory( *device, &allocInfo, nullptr, &m_memory );
     if( result != VK_SUCCESS )
     {
-        crConsole::Error( "crBuffer::Create::vkAllocateMemory %s\n", VulkanErrorString( result ) );
+        crConsole::Error( "crBuffer::Create::vkAllocateMemory %s\n", VulkanErrorString( result ).c_str() );
         return false;
     }
 
     result = vkBindBufferMemory( *device, m_buffer, m_memory, 0 );
     if( result != VK_SUCCESS )
     {
-        crConsole::Error( "crBuffer::Create::vkBindBufferMemory %s\n", VulkanErrorString( result ) );
+        crConsole::Error( "crBuffer::Create::vkBindBufferMemory %s\n", VulkanErrorString( result ).c_str() );
         return false;
     }
 
@@ -138,7 +138,7 @@ void *crBuffer::Map(void)
     auto result = vkMapMemory( *device, m_memory, 0, VK_WHOLE_SIZE, 0, &data );
     if( result != VK_SUCCESS )
     {
-        crConsole::Error( "crBuffer::Create::vkBindBufferMemory %s\n", VulkanErrorString( result ) );
+        crConsole::Error( "crBuffer::Create::vkBindBufferMemory %s\n", VulkanErrorString( result ).c_str() );
         return nullptr;
     }
 

@@ -232,7 +232,7 @@ bool crPipeline::Create( const uint64_t in_flags, const uint32_t in_vertexProgra
     auto result = vkCreateGraphicsPipelines( *device, *cache, 1, &pipelineCI, k_allocationCallbacks, &m_pipeline );
     if( result != VK_SUCCESS )
     {
-        crConsole::Error( "crPipeline::Create::vkCreateGraphicsPipelines Failed\n %s\n", VulkanErrorString( result ) );
+        crConsole::Error( "crPipeline::Create::vkCreateGraphicsPipelines Failed\n %s\n", VulkanErrorString( result ).c_str() );
         return false;
     }
 

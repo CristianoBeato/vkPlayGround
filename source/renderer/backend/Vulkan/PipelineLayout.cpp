@@ -56,7 +56,7 @@ bool crPipelineLayout::Create( const crList<VkDescriptorSetLayoutBinding> &in_st
     result = vkCreateDescriptorSetLayout( *device, &descriptorSetLayout, k_allocationCallbacks, &m_descriptorLayout );
     if ( result != VK_SUCCESS )
     {
-        crConsole::Error( "crPipelineLayout::Create:vkCreateDescriptorSetLayout Failed!\n%s\n", VulkanErrorString( result ) );
+        crConsole::Error( "crPipelineLayout::Create:vkCreateDescriptorSetLayout Failed!\n%s\n", VulkanErrorString( result ).c_str() );
         return false;
     }
 
@@ -74,7 +74,7 @@ bool crPipelineLayout::Create( const crList<VkDescriptorSetLayoutBinding> &in_st
     result = vkCreatePipelineLayout( *device, &pipelineLayoutCI, k_allocationCallbacks, &m_layout );
     if( result != VK_SUCCESS )
     {
-        crConsole::Error( "crPipelineLayout::Create:vkCreatePipelineLayout Failed\n%s\n", VulkanErrorString( result ) );
+        crConsole::Error( "crPipelineLayout::Create:vkCreatePipelineLayout Failed\n%s\n", VulkanErrorString( result ).c_str() );
         return false;
     }
 
@@ -99,7 +99,7 @@ bool crPipelineLayout::Create( const crList<VkDescriptorSetLayoutBinding> &in_st
     result = vkCreateDescriptorPool( *device, &descriptorPoolCI, nullptr, &m_descriptorPool );
     if( result != VK_SUCCESS )
     {
-        crConsole::Error( "crPipelineLayout::Create:vkCreateDescriptorPool %s\n", VulkanErrorString( result ) );
+        crConsole::Error( "crPipelineLayout::Create:vkCreateDescriptorPool %s\n", VulkanErrorString( result ).c_str() );
         return false;
     }
 
@@ -123,7 +123,7 @@ bool crPipelineLayout::Create( const crList<VkDescriptorSetLayoutBinding> &in_st
     result = vkAllocateDescriptorSets( *device, &descriptorSet, &m_descriptorSet );
     if( result != VK_SUCCESS )
     {
-        crConsole::Error( "crPipelineLayout::Create::vkAllocateDescriptorSets failed\n %s\n", VulkanErrorString( result ) );
+        crConsole::Error( "crPipelineLayout::Create::vkAllocateDescriptorSets failed\n %s\n", VulkanErrorString( result ).c_str() );
         return false;
     }
 
