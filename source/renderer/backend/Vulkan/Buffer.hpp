@@ -131,6 +131,7 @@ private:
     uintptr_t       m_offset;
     uint64_t        m_operationCount;
     VkSemaphore     m_operationSemaphore;
+    void*           m_map;
 };
 
 

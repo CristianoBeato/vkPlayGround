@@ -493,6 +493,9 @@ bool crBufferRing::Create(const size_t in_size, const VkBufferUsageFlags in_usag
     if( !crBuffer::Create( in_size, in_usage, in_memoryProperty ) )
         return false;
 
+    // Get Buffer Map
+    m_map = crBuffer::Map();
+
     VkSemaphoreTypeCreateInfo timelineCreateInfo{};
     timelineCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
     timelineCreateInfo.semaphoreType = VK_SEMAPHORE_TYPE_TIMELINE;
@@ -504,7 +507,8 @@ bool crBufferRing::Create(const size_t in_size, const VkBufferUsageFlags in_usag
     auto result = vkCreateSemaphore( *device, &createInfo, k_allocationCallbacks, &m_operationSemaphore );
     if ( result != VK_SUCCESS )
     {
-        /* code */
+        crConsole::Error( "crBufferRing::vkCreateSemaphore failed\n%s\n", VulkanErrorString( result ).c_str() );
+        return false;
     }
     
     return true;
@@ -520,6 +524,7 @@ void crBufferRing::Destroy(void)
     }
     
     // release buffer
+    crBuffer::Unmap();
     crBuffer::Destroy();
 }
 
