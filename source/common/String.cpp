@@ -76,14 +76,13 @@ void crString::Alloc( const size_t in_lenght )
         m_lengenth = in_lenght;
     
         /// allocate string memory
-        m_string = static_cast<char*>( MemAlloc( m_lengenth + 1  ) ); //MemAlloc<char>( m_lengenth + 1 );
-
+        m_string = MemAlloc<char>( m_lengenth + 1 );
         /// fill string whith null teminator
         std::memset( m_string, '\0', m_lengenth + 1 );
     }
     else
     {
-        m_string = static_cast<char*>( MemRealloc( m_string, m_lengenth + 1 ) );
+        m_string = MemRealloc<char>( m_string, m_lengenth + 1 );
 
         /// fill the rest o the string whith null terminator
         std::memset( m_string + m_lengenth, '\0', in_lenght - m_lengenth );

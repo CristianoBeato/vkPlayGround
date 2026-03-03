@@ -101,11 +101,17 @@ void crList<__type__>::Reserve(const uint32_t in_num)
     // never scale down
     if ( aligned_num > m_numAllocated )
     {
+#if 0
         if ( m_numAllocated > 0 )
             m_data = static_cast<pointer>( MemRealloc( m_data, sizeof( __type__ ) * aligned_num ) );
         else
             m_data = static_cast<pointer>( MemAlloc( sizeof( __type__ ) * aligned_num ) );
-
+#else
+        if ( m_numAllocated > 0 )
+            m_data = MemRealloc<__type__>( m_data, aligned_num );
+        else
+            m_data = MemAlloc<__type__>( aligned_num );
+#endif
         m_numAllocated = aligned_num;
     }
 }
