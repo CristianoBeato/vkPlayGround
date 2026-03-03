@@ -56,7 +56,7 @@ bool crPipelineCache::OpenCache( const crString &in_path )
     m_loaded = false;
 
     /// Try read cache file from save dir
-    cacheFile = fs->Open( in_path, crFileSystem::FS_OPEN_READ | crFileSystem::FS_OPEN_SAVE_PATH ); 
+    cacheFile = fs->Open( in_path, crFileSystem::FS_OPEN_READ | crFileSystem::FS_OPEN_SAVE_PATH | crFileSystem::FS_OPEN_BINARY ); 
     if ( cacheFile != nullptr )
     {
         /// retrieve cache header
@@ -90,18 +90,28 @@ bool crPipelineCache::OpenCache( const crString &in_path )
                 {
                     MemFree( cacheData );
                     crConsole::Error( "Pipeline cache invalid data hash!\n" );
+                    m_loaded = false;
                 }
             }
             else
+            {
                 crConsole::Warning( "Pipeline Cache Out of date, rebuilt!\n" );
+                m_loaded = false;
+            }
         }
         else
+        {
             crConsole::Warning( "Unconpatible pipeline cache, engine may updated, rebuild!\n" );
-        
+            m_loaded = false;
+        }
+
         fs->Close( cacheFile );
     }
     else
+    {
         crConsole::Warning( "Can't read cache file from disk, pipeline conpilation can be slow\n" );
+        m_loaded = false;
+    }
     
     /// create a cache from source, or allocate for new one
     auto result = vkCreatePipelineCache( *device, &pipelineCacheCI, k_allocationCallbacks, &m_cache );
@@ -168,7 +178,7 @@ bool crPipelineCache::SaveCache( const crString &in_path )
     header.dataHash =  SDL_murmur3_32( cacheData, cacheSize, k_PIPELINE_CAHCE_FILE_SEED );
 
     /// Try create cache file in the save directory
-    cacheFile = fs->Open( in_path, crFileSystem::FS_OPEN_WRITE | crFileSystem::FS_OPEN_SAVE_PATH ); 
+    cacheFile = fs->Open( in_path, crFileSystem::FS_OPEN_WRITE | crFileSystem::FS_OPEN_SAVE_PATH | crFileSystem::FS_OPEN_BINARY ); 
     if ( !cacheFile )
     {
         MemFree( cacheData );

@@ -22,7 +22,8 @@
 #include "PipelineManager.hpp"
 
 /// the cache will be stored in the user space path
-static const char* k_CACHE_PATH = { "generated/cache/pipeline.pcf" };
+static const char* k_CACHE_FILE = { "generated/cache/pipeline.pcf" };
+static const char* k_CACHE_PATH = { "generated/cache/" };
 
 crPipelineManager *crPipelineManager::Get(void)
 {
@@ -30,7 +31,7 @@ crPipelineManager *crPipelineManager::Get(void)
     return &gPipelineManager;
 }
 
-crPipelineManager::crPipelineManager(void) : m_cacheLoaded( false ), m_cacheModified( false )
+crPipelineManager::crPipelineManager(void) : m_cacheModified( false )
 {
 }
 
@@ -41,12 +42,17 @@ crPipelineManager::~crPipelineManager( void )
 void crPipelineManager::StartUp(void)
 {
     m_cache = new crPipelineCache();
-    if( !m_cache->OpenCache( k_CACHE_PATH ) )
-    {
-        m_cacheLoaded = false;
-    }
 
-    m_cacheLoaded = true;
+    auto fs = crFileSystem::Get();
+
+    /// create cache storage path if don't exist
+    if ( !fs->PathExist( k_CACHE_PATH, true ) )
+        fs->CreatePath( k_CACHE_PATH, true );
+    
+
+    if( !m_cache->OpenCache( k_CACHE_FILE ) )
+        crConsole::Error( "Failed to create pipeline cache\n");
+
     m_cacheModified = false;
 }
 
@@ -55,8 +61,8 @@ void crPipelineManager::ShutDown(void)
     if ( m_cache != nullptr )
     {
         /// save pipeline cache before exit, if we have changes
-        if( m_cacheModified || !m_cacheLoaded )
-            m_cache->SaveCache( k_CACHE_PATH );
+        if( m_cacheModified || !m_cache->Loaded() )
+            m_cache->SaveCache( k_CACHE_FILE );
 
         delete m_cache;
         m_cache = nullptr;

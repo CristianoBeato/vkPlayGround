@@ -58,8 +58,8 @@ public:
 
     bool    OpenCache( const crString &in_path );
     bool    SaveCache( const crString &in_path );
-
-    operator VkPipelineCache( void ) const { return m_cache; }
+    inline bool Loaded( void ) const { return m_loaded; }
+    inline operator VkPipelineCache( void ) const { return m_cache; }
 private:
     bool                m_loaded;   // if cache is loaded, we don't save it again
     VkPipelineCache     m_cache;

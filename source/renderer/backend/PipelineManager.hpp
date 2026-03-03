@@ -63,7 +63,6 @@ protected:
     uint32_t            GetNewIndex( void );   
 
 private:
-    bool                m_cacheLoaded;
     bool                m_cacheModified;
     uint32_t            m_pipelineCount;
     crPipelineCache*    m_cache; 
