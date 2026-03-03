@@ -23,10 +23,10 @@
 #define __INCLUDES_HPP__
 
 #include <cstdint>
-#include <cstdio>
+#include <cstdlib>
 #include <cstddef>
 #include <cstdarg>
-#include <cstdlib>
+#include <cstdio>
 #include <cmath>
 #include <cstring>
 

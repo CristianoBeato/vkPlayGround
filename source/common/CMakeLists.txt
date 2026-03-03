@@ -53,8 +53,8 @@ target_include_directories( common PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} )
 # set the precompiled common
 target_precompile_headers( common 
 	PUBLIC 
+		${CMAKE_SOURCE_DIR}/system/Includes.hpp
 		${CMAKE_SOURCE_DIR}/system/Platform.hpp
-        ${CMAKE_SOURCE_DIR}/system/Includes.hpp
 	PRIVATE 
 		${CMAKE_CURRENT_SOURCE_DIR}/Lib.hpp
 	) 

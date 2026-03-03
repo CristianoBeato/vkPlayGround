@@ -50,8 +50,8 @@ target_include_directories( framework PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} )
 # set the precompiled common
 target_precompile_headers( framework 
 	PUBLIC 
+		${CMAKE_SOURCE_DIR}/system/Includes.hpp
 		${CMAKE_SOURCE_DIR}/system/Platform.hpp
-        ${CMAKE_SOURCE_DIR}/system/Includes.hpp
 		${CMAKE_SOURCE_DIR}/common/Lib.hpp
 	PRIVATE 
 		${CMAKE_CURRENT_SOURCE_DIR}/Framework.hpp

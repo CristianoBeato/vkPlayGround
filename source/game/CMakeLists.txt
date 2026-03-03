@@ -40,8 +40,8 @@ target_include_directories( game PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} )
 # set the precompiled common
 target_precompile_headers( game 
 	PUBLIC
+		${CMAKE_SOURCE_DIR}/system/Includes.hpp
 		${CMAKE_SOURCE_DIR}/system/Platform.hpp
-        ${CMAKE_SOURCE_DIR}/system/Includes.hpp
 		${CMAKE_SOURCE_DIR}/common/Lib.hpp
 		${CMAKE_SOURCE_DIR}/system/Systems.hpp
 		${CMAKE_SOURCE_DIR}/framework/Framework.hpp

@@ -22,7 +22,7 @@
 #ifndef __PIPELINE_CACHE_HPP__
 #define __PIPELINE_CACHE_HPP__
 
-#pragma pack(push, 1)
+#pragma pack( push, 1 )
 
 struct cache_header_t
 {
@@ -48,7 +48,7 @@ struct cache_header_t
     uint8_t uuid[VK_UUID_SIZE]; // Device driver info
 };
 
-#pragma pop()
+#pragma pack( pop )
 
 class crPipelineCache
 {
