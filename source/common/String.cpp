@@ -55,6 +55,19 @@ crString::~crString( void )
     Release();
 }
 
+void crString::Replace( const char in_from, const char in_to )
+{
+    for ( size_t i = 0; i < m_lengenth; i++)
+    {
+        /// security break
+        if( m_string[i] == '\0' )
+            break;
+
+        if( m_string[i] == in_from )
+            m_string[i] = in_to;
+    }
+}
+
 void crString::Alloc( const size_t in_lenght )
 {
     if( m_lengenth == 0 )
