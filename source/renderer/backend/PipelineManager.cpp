@@ -24,9 +24,13 @@
 /// the cache will be stored in the user space path
 static const char* k_CACHE_PATH = { "generated/cache/pipeline.pcf" };
 
-crPipelineManager::crPipelineManager( void ) :
-    m_cacheLoaded( false ),
-    m_cacheModified( false )
+crPipelineManager *crPipelineManager::Get(void)
+{
+    static crPipelineManager gPipelineManager = crPipelineManager();
+    return &gPipelineManager;
+}
+
+crPipelineManager::crPipelineManager(void) : m_cacheLoaded( false ), m_cacheModified( false )
 {
 }
 

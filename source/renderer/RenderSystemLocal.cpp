@@ -61,7 +61,7 @@ void crRenderSystemLocal::FreeRenderWorld( crSharedPointer<crRenderWorld> &in_re
     crSharedPointer<crRenderWorld>::Free( in_renderWorl );
 }
 
-void crRenderSystemLocal::Run(void)
+void crRenderSystemLocal::Run( void )
 {
     InitRendersystem();
 
@@ -74,6 +74,7 @@ void crRenderSystemLocal::Run(void)
         BeginFrame();
         EndFrame();
     }
+
     ReleaseRenderSystem();
 }
 
@@ -88,6 +89,9 @@ void crRenderSystemLocal::InitRendersystem(void)
     auto vertexCache = crVertexCache::Get();
     vertexCache->StartUp();
     
+    auto pipelineManager = crPipelineManager::Get();
+    pipelineManager->StartUp();
+
     auto backend = crBackend::Get();
     backend->StartUp();
 
@@ -99,6 +103,9 @@ void crRenderSystemLocal::ReleaseRenderSystem(void)
     auto backend = crBackend::Get();
     backend->ShutDown();
     
+    auto pipelineManager = crPipelineManager::Get();
+    pipelineManager->ShutDown();
+
     auto vertexCache = crVertexCache::Get();
     vertexCache->ShutDown();
 
