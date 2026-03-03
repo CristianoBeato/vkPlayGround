@@ -114,7 +114,7 @@ void crConsole::Warning( const char *in_format, ... )
     std::vsnprintf( warn, k_MAX_ERR_STRING_LEN, in_format, args);
     va_end( args );
 
-    con->Warning( warn, std::strlen( warn ) );
+    con->AppendWarning( warn, std::strlen( warn ) );
     std::cout << YELOW_STRING << warn << RESET_STRIMG;
 }
 
@@ -128,7 +128,7 @@ void crConsole::Error( const char *in_format, ... )
     std::vsnprintf( error, k_MAX_ERR_STRING_LEN, in_format, args);
     va_end( args );
 
-    con->Error( error, std::strlen( error ) );
+    con->AppendError( error, std::strlen( error ) );
     std::cerr << RED_STRING << error << RESET_STRIMG;
 }
 
