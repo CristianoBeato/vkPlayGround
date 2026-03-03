@@ -89,5 +89,6 @@ static_assert( pointer_size == 8, "Invalid pointer size" );
 #endif
 
 typedef unsigned char byte;
+typedef SDL_Time    time_t; // time stamp type
 
 #endif //!__PLATFORM_HPP__
