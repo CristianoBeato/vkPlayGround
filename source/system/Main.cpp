@@ -29,6 +29,10 @@ crAppMain::crAppMain( void )
     if( !SDL_Init( SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_GAMEPAD | SDL_INIT_AUDIO ) )
         throw crException( "Error on SDL_Init:%s\n", SDL_GetError() );
     
+    // Initiazlize file system
+    auto fileSystem = crFileSystem::Get();
+    fileSystem->StartUp();
+
     // initialize engine framework system
     auto framework = crFramework::Get();
     framework->StartUp();
@@ -67,6 +71,9 @@ crAppMain::~crAppMain( void )
 
     auto framework = crFramework::Get();
     framework->ShutDown();
+
+    auto fileSystem = crFileSystem::Get();
+    fileSystem->ShutDown();
 
     SDL_Quit();
 }
