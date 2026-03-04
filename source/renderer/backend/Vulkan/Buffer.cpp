@@ -95,7 +95,7 @@ bool crBuffer::Create( const size_t in_size, const VkBufferUsageFlags in_usage, 
     // We need VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT (to map) and 
     // VK_MEMORY_PROPERTY_HOST_COHERENT_BIT (so we don't need to manually flush)
     allocInfo.memoryTypeIndex = device->FindMemoryType( requirements.memoryTypeBits, in_memoryProperty ); 
-    result = vkAllocateMemory( *device, &allocInfo, nullptr, &m_memory );
+    result = vkAllocateMemory( *device, &allocInfo, k_allocationCallbacks, &m_memory );
     if( result != VK_SUCCESS )
     {
         crConsole::Error( "crBuffer::Create::vkAllocateMemory %s\n", VulkanErrorString( result ).c_str() );

@@ -46,34 +46,18 @@ void crVertexCache::StartUp(void)
     /// our vertex cache buffer
     m_vertexBuffer = new crBufferAllocator();
     if( m_vertexBuffer == nullptr || !m_vertexBuffer->Create( k_VERTEX_BUFFER_SIZE, 
-        VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, 
-        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT ) )
+        VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT  ) )
         throw crException( "crVertexCache ( Failed to create vertex buffer! )" );
 
     /// our index cache buffer 
     m_indexBuffer = new crBufferAllocator();
     if ( m_indexBuffer == nullptr || !m_indexBuffer->Create( k_INDEX_BUFFER_SIZE, 
-        VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, 
-        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT ) )
+        VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT ) )
         throw crException( "crVertexCache ( Failed to create index buffer! )" );
-
-    /// create the source ring buffer for vertex data streaming
-    m_stagingBuffer = new crBufferRing();
-    if( !m_stagingBuffer->Create( k_STAGING_BUFFER_SIZE, 
-        VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT ) )
-        throw crException( "crVertexCache ( Failed to create stagin buffer! )" );
 }
 
 void crVertexCache::ShutDown(void)
-{
-    /// Release staging buffer
-    if ( m_stagingBuffer != nullptr )
-    {
-        delete m_stagingBuffer;
-        m_stagingBuffer = nullptr;
-    }
-    
+{    
     /// Release index buffer 
     if ( m_indexBuffer != nullptr )
     {

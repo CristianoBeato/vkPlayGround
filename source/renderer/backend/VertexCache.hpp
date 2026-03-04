@@ -43,7 +43,6 @@ public:
 private:
     crBufferAllocator*  m_vertexBuffer;
     crBufferAllocator*  m_indexBuffer;
-    crBufferRing*       m_stagingBuffer;
 };
 
 #endif //!__VERTEX_CACHE_HPP__
