@@ -21,9 +21,7 @@
 
 #include "Buffer.hpp" 
 
-// include VMA Here, since, his include of other headers 
-// can lead to naming polution
-#include <vk_mem_alloc.h>
+#include "VMA.hpp"
 
 static const VkBufferUsageFlags k_USAGE_TABLE[] = 
 {
@@ -97,8 +95,7 @@ bool crBuffer::Create( const size_t in_size, const buffer_type_e in_type )
     uniqueQueue_t queues;
     VkMemoryRequirements requirements;
 
-    auto context = crContext::Get();
-    auto device = context->Device();
+    auto device = crContext::Get()->Device();
     auto graphicQ = device->GraphicQueue();
     auto transferQ = device->TransferQueue();
     auto computeQ = device->TransferQueue();
@@ -132,7 +129,7 @@ bool crBuffer::Create( const size_t in_size, const buffer_type_e in_type )
     VmaAllocationCreateInfo allocInfo = {};
     allocInfo.usage = k_MEMORY_USAGE_TABLE[in_type];
     allocInfo.flags = k_ALLOCATION_FLAGS[in_type];    
-    vmaCreateBuffer( context->VMAAllocator(), &bufferCI, &allocInfo, &m_buffer, &m_memory, nullptr);
+    vmaCreateBuffer( device->Allocator(), &bufferCI, &allocInfo, &m_buffer, &m_memory, nullptr);
 #else
     result = vkCreateBuffer( *device, &bufferCI, k_allocationCallbacks, &m_buffer );
     if ( result != VK_SUCCESS )
@@ -179,13 +176,12 @@ bool crBuffer::Create( const size_t in_size, const buffer_type_e in_type )
 
 void crBuffer::Destroy(void)
 {
-    auto context = crContext::Get();
-    auto device = context->Device();
+    auto device = crContext::Get()->Device();
 
 #if USE_VMA_BUFFERS
     if( m_buffer != nullptr )
     {
-        vmaDestroyBuffer( context->VMAAllocator(), m_buffer, m_memory );
+        vmaDestroyBuffer( device->Allocator(), m_buffer, m_memory );
         m_buffer = nullptr;
         m_memory = nullptr;
     }
@@ -210,13 +206,12 @@ void crBuffer::Destroy(void)
 void *crBuffer::Map(void)
 {
     void* data = nullptr;
+    auto device = crContext::Get()->Device();
     
 #if USE_VMA_BUFFERS
-    auto context = crContext::Get();
-    vmaMapMemory( context->VMAAllocator(), m_memory, &data );
+    vmaMapMemory( device->Allocator(), m_memory, &data );
 #else
 
-    auto device = crContext::Get()->Device();
     auto result = vkMapMemory( *device, m_memory, 0, VK_WHOLE_SIZE, 0, &data );
     if( result != VK_SUCCESS )
     {
@@ -230,11 +225,10 @@ void *crBuffer::Map(void)
 
 void crBuffer::Unmap(void)
 {
-#if USE_VMA_BUFFERS
-    auto context = crContext::Get();
-    vmaUnmapMemory( context->VMAAllocator(), m_memory );
-#else
     auto device = crContext::Get()->Device();
+#if USE_VMA_BUFFERS
+    vmaUnmapMemory( device->Allocator(), m_memory );
+#else
     vkUnmapMemory( *device, m_memory );
 #endif // USE_VMA_BUFFERS
 }

@@ -26,9 +26,7 @@
 #define NO_SDL_VULKAN_TYPEDEFS
 #include <SDL3/SDL_vulkan.h>
 
-#if USE_VMA
-#include <vk_mem_alloc.h>
-#endif //USE_VMA
+#include "VMA.hpp"
 
 crCVar vk_deviceID( "vk_deviceID", "-1", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_INTEGER, " -1 select the device with the highest score, +0 select the device by index" );
 
@@ -290,11 +288,6 @@ bool crContext::StarUp( void )
 
     m_currentDevice = device;
 
-#if USE_VMA
-    // initialize VMA
-    SetVMAallocator();
-#endif //USE_VMA
-    
     return true;
 }
 
@@ -305,12 +298,12 @@ crContext::Shutdown
 */
 void crContext::Shutdown( void )
 {
-    if( m_VMAallocator )
+    /// release all devices
+    for ( uint32_t i = 0; i < m_devices.Count(); i++)
     {
-        vmaDestroyAllocator( m_VMAallocator );
-        m_VMAallocator = nullptr;    
+        m_devices[i].ShutDown();
     }
-
+    
     if ( m_debugCallback != nullptr )
     {
         vkDestroyDebugUtilsMessengerEXT( m_instance, m_debugCallback, k_allocationCallbacks );
@@ -458,51 +451,3 @@ void VKAPI_CALL vkInternalFree( void* in_userData, size_t in_size, VkInternalAll
     // vkCtx.allocedMemory -= size; 
     //std::printf("[Vulkan] Internal free of %zu bytes, total %i\n", in_size, 0 );
 }
-
-#if USE_VMA
-void crContext::SetVMAallocator(void)
-{
-    static VmaVulkanFunctions vulkanFunctions{}; 
-    vulkanFunctions.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
-    vulkanFunctions.vkGetDeviceProcAddr = vkGetDeviceProcAddr;
-    vulkanFunctions.vkGetPhysicalDeviceProperties = vkGetPhysicalDeviceProperties;
-    vulkanFunctions.vkGetPhysicalDeviceMemoryProperties = vkGetPhysicalDeviceMemoryProperties;
-    vulkanFunctions.vkAllocateMemory = vkAllocateMemory;
-    vulkanFunctions.vkFreeMemory = vkFreeMemory;
-    vulkanFunctions.vkMapMemory = vkMapMemory;
-    vulkanFunctions.vkUnmapMemory = vkUnmapMemory;
-    vulkanFunctions.vkFlushMappedMemoryRanges = vkFlushMappedMemoryRanges;
-    vulkanFunctions.vkInvalidateMappedMemoryRanges = vkInvalidateMappedMemoryRanges;
-    vulkanFunctions.vkBindBufferMemory = vkBindBufferMemory;
-    vulkanFunctions.vkBindImageMemory = vkBindImageMemory;
-    vulkanFunctions.vkGetBufferMemoryRequirements = vkGetBufferMemoryRequirements;
-    vulkanFunctions.vkGetImageMemoryRequirements = vkGetImageMemoryRequirements;
-    vulkanFunctions.vkCreateBuffer = vkCreateBuffer;
-    vulkanFunctions.vkDestroyBuffer = vkDestroyBuffer;
-    vulkanFunctions.vkCreateImage = vkCreateImage;
-    vulkanFunctions.vkDestroyImage = vkDestroyImage;
-    vulkanFunctions.vkCmdCopyBuffer = vkCmdCopyBuffer;
-    vulkanFunctions.vkGetBufferMemoryRequirements2KHR = vkGetBufferMemoryRequirements2;
-    vulkanFunctions.vkGetImageMemoryRequirements2KHR = vkGetImageMemoryRequirements2;
-    vulkanFunctions.vkBindBufferMemory2KHR = vkBindBufferMemory2;
-    vulkanFunctions.vkBindImageMemory2KHR = vkBindImageMemory2;
-    vulkanFunctions.vkGetPhysicalDeviceMemoryProperties2KHR = vkGetPhysicalDeviceMemoryProperties2;
-    vulkanFunctions.vkGetDeviceBufferMemoryRequirements = vkGetDeviceBufferMemoryRequirements;
-    vulkanFunctions.vkGetDeviceImageMemoryRequirements = vkGetDeviceImageMemoryRequirements;
-
-    auto device = Device();
-    VmaAllocatorCreateInfo allocatorInfo = {};
-    allocatorInfo.vulkanApiVersion = VK_API_VERSION_1_3; // the vulkan version
-    allocatorInfo.physicalDevice = device->PhysicalDevice(); // the phisical device
-    allocatorInfo.device = device->Device(); // the logical device
-    allocatorInfo.instance = Instance(); // the instance
-
-    // Optional: If you use extensions such as VK_KHR_dedicated_allocation,
-    // report to VMA through flags for better performance.
-    allocatorInfo.flags = VMA_ALLOCATOR_CREATE_KHR_DEDICATED_ALLOCATION_BIT; 
-    auto result = vmaCreateAllocator(&allocatorInfo, &m_VMAallocator );
-    if ( result != VK_SUCCESS )
-        crException( "FAILED TO INITAILIZE VMA\%s\n", VulkanErrorString( result ) );
-    
-}
-#endif

@@ -22,19 +22,12 @@
 #ifndef __VK_CORE_HPP__
 #define __VK_CORE_HPP__
 
-#define USE_VMA 1
-#define USE_VMA_BUFFERS 1
-#define USE_VMA_FRAME_BUFFERS 1
-#define USE_VMA_IMAGES 1
-
 /// Vulkan platform definitions
 #define VK_NO_PROTOTYPES
 #define VK_VERSION_1_3
-#define VMA_IMPLEMENTATION
-#define VMA_VULKAN_VERSION 1003000 // VMA Vulkan 1.3specification
-#define VMA_STATIC_VULKAN_FUNCTIONS 0
-#define VMA_DYNAMIC_VULKAN_FUNCTIONS 0
 #include <vulkan/vulkan.h>
+
+#include "VMA.hpp"
 
 extern PFN_vkEnumerateInstanceLayerProperties           vkEnumerateInstanceLayerProperties;
 extern PFN_vkEnumerateInstanceExtensionProperties       vkEnumerateInstanceExtensionProperties;

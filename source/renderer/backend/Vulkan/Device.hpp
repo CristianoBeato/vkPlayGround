@@ -22,6 +22,8 @@
 #ifndef __DEVICE_HPP__
 #define __DEVICE_HPP__
 
+VK_DEFINE_HANDLE( VmaAllocator )
+
 struct queueInfo_t
 {
     bool        present = false;    // is a present queue
@@ -41,22 +43,16 @@ public:
     crDeviceQueue( const uint32_t in_family, const uint32_t in_index );
     ~crDeviceQueue( void );
     bool            Init( const VkDevice in_device );
-    bool            WaitSemaphore( const uint64_t in_value, const uint64_t in_timeout );
-    uint64_t        IncrementTimeline( void );
     uint32_t        Index( void ) const { return m_index; }
     uint32_t        Family( void ) const { return m_index; }
-    uint64_t        Timeline( void ) const { return m_timeline; }
     VkQueue         Queue( void ) const { return m_queue; }
     VkCommandPool   CommandPool( void ) const { return m_commandPool; }
-    VkSemaphore     Semaphore( void ) const { return m_semaphore; }
 
 private:
     uint32_t                m_index;        // index in the family 
     uint32_t                m_family;       // the family index
-    std::atomic_uint64_t    m_timeline;     // events timeline counter
     VkQueue                 m_queue;        // queue hanlde
     VkCommandPool           m_commandPool;  // queue command pool
-    VkSemaphore             m_semaphore;    // queue semaphore
     VkDevice                m_device;       // parent device
 };
 
@@ -153,6 +149,10 @@ public:
     inline operator VkDevice( void ) const { return m_logic; }
     inline operator VkPhysicalDevice( void ) const { return m_physical; }
 
+#if USE_VMA
+    inline VmaAllocator Allocator( void ) const { return m_VMAallocator; }
+#endif
+
 private:
     uint32_t                                        m_id;
 
@@ -176,6 +176,10 @@ private:
     VkPhysicalDevice                                m_physical; // Physical Device handler 
     VkDevice                                        m_logic;    // Logic Device handler
     
+#if USE_VMA
+    VmaAllocator                    m_VMAallocator;
+#endif //USE_VMA
+
     // device queues
     crDeviceQueue*                                  m_present;
     crDeviceQueue*                                  m_graphic;
@@ -189,6 +193,10 @@ private:
     crList<queueInfo_t>                             m_queues;
 
     void SelectDeviceQueues( crList<VkDeviceQueueCreateInfo> &in_queueList );
+#if USE_VMA
+    void    SetVMAallocator( void );
+#endif //USE_VMA
+
 };
 
 #endif //!__DEVICE_HPP__

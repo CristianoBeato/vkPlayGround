@@ -50,12 +50,6 @@ crDeviceQueue::~crDeviceQueue
 */
 crDeviceQueue::~crDeviceQueue( void )
 {
-    if ( m_semaphore )
-    {
-        vkDestroySemaphore( m_device, m_semaphore, k_allocationCallbacks );
-        m_semaphore = nullptr;
-    }
-
     if ( m_commandPool != nullptr )
     {
         vkDestroyCommandPool( m_device, m_commandPool, k_allocationCallbacks );
@@ -100,45 +94,8 @@ bool crDeviceQueue::Init( const VkDevice in_device )
     if ( !ResultCheck( result, "vkCreateCommandPool" ) )
         return false;
 
-    VkSemaphoreTypeCreateInfo typeInfo{};
-    typeInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
-    typeInfo.semaphoreType = VK_SEMAPHORE_TYPE_TIMELINE;
-    typeInfo.initialValue = 0;
-
-    VkSemaphoreCreateInfo semInfo{};
-    semInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-    semInfo.pNext = &typeInfo;
-
-    result = vkCreateSemaphore( m_device, &semInfo, k_allocationCallbacks, &m_semaphore );
-    if ( !ResultCheck( result, "vkCreateSemaphore" ) )
-        return false;
-
     return true;
     
-}
-
-bool crDeviceQueue::WaitSemaphore( const uint64_t in_value, const uint64_t in_timeout )
-{
-    VkSemaphoreWaitInfo waitInfo{};
-    waitInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_WAIT_INFO;
-    waitInfo.pNext = nullptr;
-    waitInfo.flags = 0;
-    waitInfo.semaphoreCount = 1;
-    waitInfo.pSemaphores = &m_semaphore;
-    waitInfo.pValues = &in_value;
-
-    auto result = vkWaitSemaphores( m_device, &waitInfo, UINT64_MAX );
-    if ( result == VK_TIMEOUT )
-    {
-        // todo: say somethin
-    }
-
-    return true;
-}
-
-uint64_t crDeviceQueue::IncrementTimeline(void)
-{
-    return m_timeline.fetch_add( 1 );
 }
 
 /*
@@ -405,6 +362,11 @@ bool crRenderDevice::StartUp( const crList<const char*> &in_layers, const crList
     else
         printf( "No transfer queue found, using graphic!\n" );
 
+#if USE_VMA
+    // initialize VMA
+    SetVMAallocator();
+#endif //USE_VMA
+
     printf( " -> succes\n" );
 
     return true;
@@ -417,6 +379,14 @@ crRenderDevice::ShutDown
 */
 void crRenderDevice::ShutDown(void)
 {
+#if USE_VMA
+    if( m_VMAallocator != nullptr )
+    {
+        vmaDestroyAllocator( m_VMAallocator );
+        m_VMAallocator = nullptr;    
+    }
+#endif //USE_VMA
+
     if( m_transfer != nullptr )
     {
         delete m_transfer;
@@ -937,3 +907,52 @@ void crRenderDevice::SelectDeviceQueues( crList<VkDeviceQueueCreateInfo> &in_que
         m_compute = nullptr;
     }
 }
+
+
+#if USE_VMA
+void crRenderDevice::SetVMAallocator(void)
+{
+    static VmaVulkanFunctions vulkanFunctions{}; 
+    vulkanFunctions.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
+    vulkanFunctions.vkGetDeviceProcAddr = vkGetDeviceProcAddr;
+    vulkanFunctions.vkGetPhysicalDeviceProperties = vkGetPhysicalDeviceProperties;
+    vulkanFunctions.vkGetPhysicalDeviceMemoryProperties = vkGetPhysicalDeviceMemoryProperties;
+    vulkanFunctions.vkAllocateMemory = vkAllocateMemory;
+    vulkanFunctions.vkFreeMemory = vkFreeMemory;
+    vulkanFunctions.vkMapMemory = vkMapMemory;
+    vulkanFunctions.vkUnmapMemory = vkUnmapMemory;
+    vulkanFunctions.vkFlushMappedMemoryRanges = vkFlushMappedMemoryRanges;
+    vulkanFunctions.vkInvalidateMappedMemoryRanges = vkInvalidateMappedMemoryRanges;
+    vulkanFunctions.vkBindBufferMemory = vkBindBufferMemory;
+    vulkanFunctions.vkBindImageMemory = vkBindImageMemory;
+    vulkanFunctions.vkGetBufferMemoryRequirements = vkGetBufferMemoryRequirements;
+    vulkanFunctions.vkGetImageMemoryRequirements = vkGetImageMemoryRequirements;
+    vulkanFunctions.vkCreateBuffer = vkCreateBuffer;
+    vulkanFunctions.vkDestroyBuffer = vkDestroyBuffer;
+    vulkanFunctions.vkCreateImage = vkCreateImage;
+    vulkanFunctions.vkDestroyImage = vkDestroyImage;
+    vulkanFunctions.vkCmdCopyBuffer = vkCmdCopyBuffer;
+    vulkanFunctions.vkGetBufferMemoryRequirements2KHR = vkGetBufferMemoryRequirements2;
+    vulkanFunctions.vkGetImageMemoryRequirements2KHR = vkGetImageMemoryRequirements2;
+    vulkanFunctions.vkBindBufferMemory2KHR = vkBindBufferMemory2;
+    vulkanFunctions.vkBindImageMemory2KHR = vkBindImageMemory2;
+    vulkanFunctions.vkGetPhysicalDeviceMemoryProperties2KHR = vkGetPhysicalDeviceMemoryProperties2;
+    vulkanFunctions.vkGetDeviceBufferMemoryRequirements = vkGetDeviceBufferMemoryRequirements;
+    vulkanFunctions.vkGetDeviceImageMemoryRequirements = vkGetDeviceImageMemoryRequirements;
+
+    auto context = crContext::Get();
+    VmaAllocatorCreateInfo allocatorInfo = {};
+    allocatorInfo.vulkanApiVersion = VK_API_VERSION_1_3; // the vulkan version
+    allocatorInfo.physicalDevice = m_physical; // the phisical device
+    allocatorInfo.device = m_logic; // the logical device
+    allocatorInfo.instance = context->Instance(); // the instance
+
+    // Optional: If you use extensions such as VK_KHR_dedicated_allocation,
+    // report to VMA through flags for better performance.
+    allocatorInfo.flags = VMA_ALLOCATOR_CREATE_KHR_DEDICATED_ALLOCATION_BIT; 
+    auto result = vmaCreateAllocator(&allocatorInfo, &m_VMAallocator );
+    if ( result != VK_SUCCESS )
+        crException( "FAILED TO INITAILIZE VMA\%s\n", VulkanErrorString( result ).c_str() );
+    
+}
+#endif

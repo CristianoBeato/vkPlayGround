@@ -22,6 +22,7 @@
 #include "Image.hpp"
 #include "Core.hpp"
 
+#include "VMA.hpp"
 
 static inline bool IsDepthFormat( const VkFormat format ) 
 {
