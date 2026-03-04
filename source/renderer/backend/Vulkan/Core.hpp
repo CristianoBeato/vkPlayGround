@@ -25,6 +25,9 @@
 #define VK_NO_PROTOTYPES
 #include <vulkan/vulkan.h>
 
+#define VMA_IMPLEMENTATION
+#include <vk_mem_alloc.h>
+
 extern PFN_vkEnumerateInstanceLayerProperties           vkEnumerateInstanceLayerProperties;
 extern PFN_vkEnumerateInstanceExtensionProperties       vkEnumerateInstanceExtensionProperties;
 
@@ -204,6 +207,10 @@ extern PFN_vkCmdEndRendering                            vkCmdEndRendering;
 // VK_EXT_debug_utils
 extern PFN_vkCreateDebugUtilsMessengerEXT               vkCreateDebugUtilsMessengerEXT;
 extern PFN_vkDestroyDebugUtilsMessengerEXT              vkDestroyDebugUtilsMessengerEXT;
+
+// VK_KHR_get_memory_requirements2
+extern PFN_vkGetImageMemoryRequirements2                vkGetImageMemoryRequirements2;
+extern PFN_vkGetBufferMemoryRequirements2               vkGetBufferMemoryRequirements2;
 
 extern VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT in_severity, VkDebugUtilsMessageTypeFlagsEXT in_types, const VkDebugUtilsMessengerCallbackDataEXT* in_data, void *in_user );
 

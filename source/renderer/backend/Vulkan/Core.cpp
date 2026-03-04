@@ -208,6 +208,10 @@ PFN_vkCmdEndRendering                           vkCmdEndRendering = nullptr;
 PFN_vkCreateDebugUtilsMessengerEXT               vkCreateDebugUtilsMessengerEXT = nullptr;
 PFN_vkDestroyDebugUtilsMessengerEXT              vkDestroyDebugUtilsMessengerEXT = nullptr;
 
+//VK_KHR_get_memory_requirements2
+PFN_vkGetImageMemoryRequirements2               vkGetImageMemoryRequirements2 = nullptr;
+PFN_vkGetBufferMemoryRequirements2              vkGetBufferMemoryRequirements2 = nullptr;
+
 template< typename _type_ >
 inline static void GetVkProc( _type_ &in_proc, const char* in_pName, VkInstance in_instance )
 {
@@ -477,4 +481,8 @@ void crContext::LoadVulkanProcs( void )
 
     GET_VK_PROC( vkCreateDebugUtilsMessengerEXT,  m_instance );
     GET_VK_PROC( vkDestroyDebugUtilsMessengerEXT,  m_instance );
+
+    //VK_KHR_get_memory_requirements2
+    GET_VK_PROC( vkGetImageMemoryRequirements2, m_instance );
+    GET_VK_PROC( vkGetBufferMemoryRequirements2, m_instance );
 }
