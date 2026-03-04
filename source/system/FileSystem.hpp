@@ -109,7 +109,7 @@ public:
     void    StartUp( void );
     void    ShutDown( void );
     
-    crFile*  Open( const crString in_path, const uint32_t in_flags );
+    crFile* Open( const crString in_path, const uint32_t in_flags );
     void    Close( crFile* in_file );
     bool    PathExist( const crString in_path, const bool in_savepath ) const;
     void    CreatePath( const crString in_path, const bool in_savepath );
@@ -120,11 +120,11 @@ public:
 private:
     struct fileInfo_t
     {
-        bool        inZip;      /// file is paked
-        size_t      size;       ///
-        time_t      modify;     /// 
-        crString    localPath;  /// relative path in the engine
-        crString    fullpath;   /// full system path
+        bool        inZip = false;          /// file is paked
+        size_t      size = 0;               ///
+        time_t      modify = 0;             /// 
+        crString    localPath = crString(); /// relative path in the engine
+        crString    fullpath = crString();  /// full system path
     };
 
     crList<fileInfo_t>  m_files;

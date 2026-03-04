@@ -28,7 +28,7 @@ static crString basepath = crString();
 
 static crString GetLocalDir( const crString &global, const crString &full_path ) 
 {
-    crString output;
+    crString output = crString();
     // Verifica se o full_path começa com o global_path
     if ( std::strncmp( global, full_path, global.Lengenth() ) == 0) 
     {
@@ -39,7 +39,7 @@ static crString GetLocalDir( const crString &global, const crString &full_path )
         output = local_part;
 
         // Remove o nome do arquivo para deixar apenas o diretório
-        output.StripFileName();
+        // output.StripFileName();
     }
 
     return output;
@@ -408,14 +408,25 @@ void crFileSystem::BuildPath( const crString in_path )
     for (  i = 0; i < count; i++)
     {
         SDL_PathInfo info{};
-        auto path = path_list[i];
+        crString local = crString();
+        crString fullpath = crString();
 
-        
+        crString path = crString( path_list[i] );
+        path.Replace( '\\', '/');
 
-        //SDL_murmur3_32()
-        if( !SDL_GetPathInfo( path, &info ) )
+        // SDL_GlobDirectory lists paths only in a relative way, 
+        // so we have to reference the path based on the parent path.
+        fullpath = in_path + path;
+        local = GetLocalDir( BasePath(), fullpath );
+
+        /// TODO: Fix save path path list
+        if ( local.Empty() )
+                continue;
+
+        /// retrieve subdirs properties
+        if( !SDL_GetPathInfo( fullpath, &info ) )
         {
-            crConsole::Error( SDL_GetError() );
+            crConsole::Error( "%s %s\n", fullpath, SDL_GetError() );
             continue;
         }
 
@@ -424,15 +435,16 @@ void crFileSystem::BuildPath( const crString in_path )
             fileInfo_t finfo{};
             finfo.size = info.size;
             finfo.modify = info.modify_time;
+            finfo.fullpath = fullpath;
+            finfo.localPath = local;
             m_files.Append( finfo );
         }
         else if( info.type == SDL_PATHTYPE_DIRECTORY )
         {
-            subdirs.Append( crString( path ) );
+            subdirs.Append( local );
         }
     }
     
-
     for ( i = 0; i < subdirs.Count(); i++)
     {
         BuildPath( subdirs[i] );
