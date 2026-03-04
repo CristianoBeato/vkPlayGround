@@ -27,45 +27,51 @@
 #define NO_SDL_VULKAN_TYPEDEFS
 #include <SDL3/SDL_vulkan.h>
 
-PFN_vkEnumerateInstanceLayerProperties           vkEnumerateInstanceLayerProperties = nullptr;
-PFN_vkEnumerateInstanceExtensionProperties       vkEnumerateInstanceExtensionProperties = nullptr;
+#include "Context.hpp"
+
+PFN_vkEnumerateInstanceLayerProperties          vkEnumerateInstanceLayerProperties = nullptr;
+PFN_vkEnumerateInstanceExtensionProperties      vkEnumerateInstanceExtensionProperties = nullptr;
 
 // VkInstance
-PFN_vkCreateInstance                             vkCreateInstance = nullptr;
-PFN_vkDestroyInstance                            vkDestroyInstance = nullptr;
-PFN_vkGetInstanceProcAddr                        vkGetInstanceProcAddr = nullptr;
-PFN_vkEnumeratePhysicalDevices                   vkEnumeratePhysicalDevices = nullptr;
+PFN_vkCreateInstance                            vkCreateInstance = nullptr;
+PFN_vkDestroyInstance                           vkDestroyInstance = nullptr;
+PFN_vkGetInstanceProcAddr                       vkGetInstanceProcAddr = nullptr;
+PFN_vkEnumeratePhysicalDevices                  vkEnumeratePhysicalDevices = nullptr;
 
-PFN_vkDestroySurfaceKHR                          vkDestroySurfaceKHR = nullptr;
+// VkSurfaceKHR
+PFN_vkDestroySurfaceKHR                         vkDestroySurfaceKHR = nullptr;
 
 // VkPhysicalDevice
-PFN_vkGetPhysicalDeviceMemoryProperties2         vkGetPhysicalDeviceMemoryProperties2 = nullptr;
-PFN_vkGetPhysicalDeviceProperties2               vkGetPhysicalDeviceProperties2 = nullptr;
-PFN_vkGetPhysicalDeviceFeatures2                 vkGetPhysicalDeviceFeatures2 = nullptr;
-PFN_vkEnumerateDeviceExtensionProperties         vkEnumerateDeviceExtensionProperties = nullptr;
-PFN_vkGetPhysicalDeviceQueueFamilyProperties2    vkGetPhysicalDeviceQueueFamilyProperties2 = nullptr;
-PFN_vkGetPhysicalDeviceSurfacePresentModesKHR    vkGetPhysicalDeviceSurfacePresentModesKHR = nullptr;
-PFN_vkGetPhysicalDeviceSurfaceCapabilities2KHR   vkGetPhysicalDeviceSurfaceCapabilities2KHR = nullptr;
-PFN_vkGetPhysicalDeviceSurfaceFormats2KHR        vkGetPhysicalDeviceSurfaceFormats2KHR = nullptr;
-PFN_vkGetPhysicalDeviceSurfaceSupportKHR         vkGetPhysicalDeviceSurfaceSupportKHR = nullptr;
-PFN_vkGetPhysicalDeviceFormatProperties2         vkGetPhysicalDeviceFormatProperties2;
-
+PFN_vkGetPhysicalDeviceMemoryProperties2        vkGetPhysicalDeviceMemoryProperties2 = nullptr;
+PFN_vkGetPhysicalDeviceMemoryProperties         vkGetPhysicalDeviceMemoryProperties = nullptr;
+PFN_vkGetPhysicalDeviceProperties               vkGetPhysicalDeviceProperties = nullptr;
+PFN_vkGetPhysicalDeviceProperties2              vkGetPhysicalDeviceProperties2 = nullptr;
+PFN_vkGetPhysicalDeviceFeatures2                vkGetPhysicalDeviceFeatures2 = nullptr;
+PFN_vkEnumerateDeviceExtensionProperties        vkEnumerateDeviceExtensionProperties = nullptr;
+PFN_vkGetPhysicalDeviceQueueFamilyProperties2   vkGetPhysicalDeviceQueueFamilyProperties2 = nullptr;
+PFN_vkGetPhysicalDeviceSurfacePresentModesKHR   vkGetPhysicalDeviceSurfacePresentModesKHR = nullptr;
+PFN_vkGetPhysicalDeviceSurfaceCapabilities2KHR  vkGetPhysicalDeviceSurfaceCapabilities2KHR = nullptr;
+PFN_vkGetPhysicalDeviceSurfaceFormats2KHR       vkGetPhysicalDeviceSurfaceFormats2KHR = nullptr;
+PFN_vkGetPhysicalDeviceSurfaceSupportKHR        vkGetPhysicalDeviceSurfaceSupportKHR = nullptr;
+PFN_vkGetPhysicalDeviceFormatProperties2        vkGetPhysicalDeviceFormatProperties2 = nullptr;
+PFN_vkGetDeviceBufferMemoryRequirements         vkGetDeviceBufferMemoryRequirements = nullptr;
+PFN_vkGetDeviceImageMemoryRequirements          vkGetDeviceImageMemoryRequirements = nullptr;
 
 // VkDevice
-PFN_vkCreateDevice                               vkCreateDevice = nullptr;
-PFN_vkDestroyDevice                              vkDestroyDevice = nullptr;
-PFN_vkDeviceWaitIdle                             vkDeviceWaitIdle = nullptr;
-PFN_vkGetDeviceProcAddr                          vkGetDeviceProcAddr = nullptr;
+PFN_vkCreateDevice                              vkCreateDevice = nullptr;
+PFN_vkDestroyDevice                             vkDestroyDevice = nullptr;
+PFN_vkDeviceWaitIdle                            vkDeviceWaitIdle = nullptr;
+PFN_vkGetDeviceProcAddr                         vkGetDeviceProcAddr = nullptr;
 
 // VkQueue
-PFN_vkGetDeviceQueue                             vkGetDeviceQueue = nullptr;
-PFN_vkGetDeviceQueue2                            vkGetDeviceQueue2 = nullptr;
-PFN_vkQueuePresentKHR                            vkQueuePresentKHR = nullptr;
-PFN_vkQueueSubmit                                vkQueueSubmit = nullptr;
-PFN_vkQueueSubmit2                               vkQueueSubmit2 = nullptr;
-PFN_vkQueueWaitIdle                              vkQueueWaitIdle = nullptr;
-PFN_vkCreateCommandPool                          vkCreateCommandPool = nullptr;
-PFN_vkDestroyCommandPool                         vkDestroyCommandPool = nullptr;
+PFN_vkGetDeviceQueue                            vkGetDeviceQueue = nullptr;
+PFN_vkGetDeviceQueue2                           vkGetDeviceQueue2 = nullptr;
+PFN_vkQueuePresentKHR                           vkQueuePresentKHR = nullptr;
+PFN_vkQueueSubmit                               vkQueueSubmit = nullptr;
+PFN_vkQueueSubmit2                              vkQueueSubmit2 = nullptr;
+PFN_vkQueueWaitIdle                             vkQueueWaitIdle = nullptr;
+PFN_vkCreateCommandPool                         vkCreateCommandPool = nullptr;
+PFN_vkDestroyCommandPool                        vkDestroyCommandPool = nullptr;
 
 // VkFence
 PFN_vkCreateFence                                vkCreateFence = nullptr;
@@ -92,28 +98,31 @@ PFN_vkGetSwapchainImagesKHR                      vkGetSwapchainImagesKHR = nullp
 PFN_vkAcquireNextImage2KHR                       vkAcquireNextImage2KHR = nullptr;
 
 // VkDeviceMemory
-PFN_vkAllocateMemory                             vkAllocateMemory = nullptr;
-PFN_vkFreeMemory                                 vkFreeMemory = nullptr;
-PFN_vkMapMemory                                  vkMapMemory = nullptr;
-PFN_vkUnmapMemory                                vkUnmapMemory = nullptr;
-PFN_vkFlushMappedMemoryRanges                    vkFlushMappedMemoryRanges = nullptr;
+PFN_vkAllocateMemory                            vkAllocateMemory = nullptr;
+PFN_vkFreeMemory                                vkFreeMemory = nullptr;
+PFN_vkMapMemory                                 vkMapMemory = nullptr;
+PFN_vkUnmapMemory                               vkUnmapMemory = nullptr;
+PFN_vkFlushMappedMemoryRanges                   vkFlushMappedMemoryRanges = nullptr;
+PFN_vkInvalidateMappedMemoryRanges              vkInvalidateMappedMemoryRanges = nullptr;
 
 // VkBuffer
-PFN_vkCreateBuffer                               vkCreateBuffer = nullptr;
-PFN_vkDestroyBuffer                              vkDestroyBuffer = nullptr;
-PFN_vkGetBufferMemoryRequirements                vkGetBufferMemoryRequirements = nullptr;
-PFN_vkBindBufferMemory                           vkBindBufferMemory = nullptr;
-PFN_vkCmdUpdateBuffer                            vkCmdUpdateBuffer = nullptr;
-PFN_vkCmdFillBuffer                              vkCmdFillBuffer = nullptr;
+PFN_vkCreateBuffer                              vkCreateBuffer = nullptr;
+PFN_vkDestroyBuffer                             vkDestroyBuffer = nullptr;
+PFN_vkGetBufferMemoryRequirements               vkGetBufferMemoryRequirements = nullptr;
+PFN_vkBindBufferMemory                          vkBindBufferMemory = nullptr;
+PFN_vkBindBufferMemory2                         vkBindBufferMemory2 = nullptr;
+PFN_vkCmdUpdateBuffer                           vkCmdUpdateBuffer = nullptr;
+PFN_vkCmdFillBuffer                             vkCmdFillBuffer = nullptr;
 
 // VkImage
-PFN_vkCreateImage                                vkCreateImage = nullptr;
-PFN_vkDestroyImage                               vkDestroyImage = nullptr;
-PFN_vkGetImageMemoryRequirements                 vkGetImageMemoryRequirements = nullptr;
-PFN_vkBindImageMemory                            vkBindImageMemory = nullptr;
-PFN_vkCmdClearColorImage                         vkCmdClearColorImage = nullptr;
-PFN_vkCmdClearDepthStencilImage                  vkCmdClearDepthStencilImage = nullptr;
-PFN_vkCmdResolveImage2                           vkCmdResolveImage2 = nullptr;
+PFN_vkCreateImage                               vkCreateImage = nullptr;
+PFN_vkDestroyImage                              vkDestroyImage = nullptr;
+PFN_vkGetImageMemoryRequirements                vkGetImageMemoryRequirements = nullptr;
+PFN_vkBindImageMemory                           vkBindImageMemory = nullptr;
+PFN_vkBindImageMemory2                          vkBindImageMemory2 = nullptr;
+PFN_vkCmdClearColorImage                        vkCmdClearColorImage = nullptr;
+PFN_vkCmdClearDepthStencilImage                 vkCmdClearDepthStencilImage = nullptr;
+PFN_vkCmdResolveImage2                          vkCmdResolveImage2 = nullptr;
 
 // VkImageView
 PFN_vkCreateImageView                            vkCreateImageView = nullptr;
@@ -149,6 +158,7 @@ PFN_vkEndCommandBuffer                          vkEndCommandBuffer = nullptr;
 PFN_vkCmdExecuteCommands                        vkCmdExecuteCommands = nullptr;
 PFN_vkCmdBindIndexBuffer                        vkCmdBindIndexBuffer = nullptr;
 PFN_vkCmdBindVertexBuffers2                     vkCmdBindVertexBuffers2 = nullptr;
+PFN_vkCmdCopyBuffer                             vkCmdCopyBuffer = nullptr; // VMA Use
 PFN_vkCmdDraw                                   vkCmdDraw = nullptr;
 PFN_vkCmdDrawIndexed                            vkCmdDrawIndexed = nullptr;
 PFN_vkCmdDrawIndirect                           vkCmdDrawIndirect = nullptr;
@@ -208,7 +218,7 @@ PFN_vkCmdEndRendering                           vkCmdEndRendering = nullptr;
 PFN_vkCreateDebugUtilsMessengerEXT               vkCreateDebugUtilsMessengerEXT = nullptr;
 PFN_vkDestroyDebugUtilsMessengerEXT              vkDestroyDebugUtilsMessengerEXT = nullptr;
 
-//VK_KHR_get_memory_requirements2
+//VK_KHR_get_memory_requirements2 ( core 1.1 )
 PFN_vkGetImageMemoryRequirements2               vkGetImageMemoryRequirements2 = nullptr;
 PFN_vkGetBufferMemoryRequirements2              vkGetBufferMemoryRequirements2 = nullptr;
 
@@ -312,10 +322,13 @@ void crContext::LoadVulkanProcs( void )
     GET_VK_PROC( vkDestroyInstance, m_instance );
     GET_VK_PROC( vkEnumeratePhysicalDevices, m_instance );
 
+    // VkSurfaceKHR
     GET_VK_PROC( vkDestroySurfaceKHR, m_instance );
 
     // VkPhysicalDevice
     GET_VK_PROC( vkGetPhysicalDeviceMemoryProperties2, m_instance );
+    GET_VK_PROC( vkGetPhysicalDeviceMemoryProperties, m_instance );
+    GET_VK_PROC( vkGetPhysicalDeviceProperties, m_instance );
     GET_VK_PROC( vkGetPhysicalDeviceProperties2, m_instance );
     GET_VK_PROC( vkGetPhysicalDeviceFeatures2, m_instance );
     GET_VK_PROC( vkEnumerateDeviceExtensionProperties, m_instance );
@@ -325,6 +338,8 @@ void crContext::LoadVulkanProcs( void )
     GET_VK_PROC( vkGetPhysicalDeviceSurfaceFormats2KHR, m_instance );
     GET_VK_PROC( vkGetPhysicalDeviceSurfaceSupportKHR, m_instance );
     GET_VK_PROC( vkGetPhysicalDeviceFormatProperties2, m_instance );
+    GET_VK_PROC( vkGetDeviceBufferMemoryRequirements, m_instance );
+    GET_VK_PROC( vkGetDeviceImageMemoryRequirements, m_instance );
 
     // VkDevice
     GET_VK_PROC( vkCreateDevice, m_instance ) ;
@@ -372,12 +387,14 @@ void crContext::LoadVulkanProcs( void )
     GET_VK_PROC( vkMapMemory, m_instance );
     GET_VK_PROC( vkUnmapMemory, m_instance );
     GET_VK_PROC( vkFlushMappedMemoryRanges, m_instance );
+    GET_VK_PROC( vkInvalidateMappedMemoryRanges, m_instance );
 
     // VkBuffer
     GET_VK_PROC( vkCreateBuffer, m_instance );
     GET_VK_PROC( vkDestroyBuffer, m_instance );
     GET_VK_PROC( vkGetBufferMemoryRequirements, m_instance );
     GET_VK_PROC( vkBindBufferMemory, m_instance );
+    GET_VK_PROC( vkBindBufferMemory2, m_instance );
     GET_VK_PROC( vkCmdUpdateBuffer, m_instance );
     GET_VK_PROC( vkCmdFillBuffer, m_instance );
 
@@ -443,6 +460,7 @@ void crContext::LoadVulkanProcs( void )
     GET_VK_PROC( vkCmdExecuteCommands, m_instance );
     GET_VK_PROC( vkCmdBindIndexBuffer, m_instance );
     GET_VK_PROC( vkCmdBindVertexBuffers2, m_instance );
+    GET_VK_PROC( vkCmdCopyBuffer, m_instance );
     GET_VK_PROC( vkCmdDraw, m_instance );
     GET_VK_PROC( vkCmdDrawIndexed, m_instance );
     GET_VK_PROC( vkCmdDrawIndirect, m_instance );
@@ -486,3 +504,4 @@ void crContext::LoadVulkanProcs( void )
     GET_VK_PROC( vkGetImageMemoryRequirements2, m_instance );
     GET_VK_PROC( vkGetBufferMemoryRequirements2, m_instance );
 }
+

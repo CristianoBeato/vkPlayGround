@@ -22,11 +22,19 @@
 #ifndef __VK_CORE_HPP__
 #define __VK_CORE_HPP__
 
-#define VK_NO_PROTOTYPES
-#include <vulkan/vulkan.h>
+#define USE_VMA 1
+#define USE_VMA_BUFFERS 1
+#define USE_VMA_FRAME_BUFFERS 1
+#define USE_VMA_IMAGES 1
 
+/// Vulkan platform definitions
+#define VK_NO_PROTOTYPES
+#define VK_VERSION_1_3
 #define VMA_IMPLEMENTATION
-#include <vk_mem_alloc.h>
+#define VMA_VULKAN_VERSION 1003000 // VMA Vulkan 1.3specification
+#define VMA_STATIC_VULKAN_FUNCTIONS 0
+#define VMA_DYNAMIC_VULKAN_FUNCTIONS 0
+#include <vulkan/vulkan.h>
 
 extern PFN_vkEnumerateInstanceLayerProperties           vkEnumerateInstanceLayerProperties;
 extern PFN_vkEnumerateInstanceExtensionProperties       vkEnumerateInstanceExtensionProperties;
@@ -37,10 +45,13 @@ extern PFN_vkDestroyInstance                            vkDestroyInstance;
 extern PFN_vkGetInstanceProcAddr                        vkGetInstanceProcAddr;
 extern PFN_vkEnumeratePhysicalDevices                   vkEnumeratePhysicalDevices;
 
+// VkSurfaceKHR
 extern PFN_vkDestroySurfaceKHR                          vkDestroySurfaceKHR;
 
 // VkPhysicalDevice
 extern PFN_vkGetPhysicalDeviceMemoryProperties2         vkGetPhysicalDeviceMemoryProperties2;
+extern PFN_vkGetPhysicalDeviceMemoryProperties          vkGetPhysicalDeviceMemoryProperties; // VMA Use
+extern PFN_vkGetPhysicalDeviceProperties                vkGetPhysicalDeviceProperties; // VMA Use
 extern PFN_vkGetPhysicalDeviceProperties2               vkGetPhysicalDeviceProperties2;
 extern PFN_vkGetPhysicalDeviceFeatures2                 vkGetPhysicalDeviceFeatures2;
 extern PFN_vkEnumerateDeviceExtensionProperties         vkEnumerateDeviceExtensionProperties;
@@ -50,6 +61,8 @@ extern PFN_vkGetPhysicalDeviceSurfaceCapabilities2KHR   vkGetPhysicalDeviceSurfa
 extern PFN_vkGetPhysicalDeviceSurfaceFormats2KHR        vkGetPhysicalDeviceSurfaceFormats2KHR;
 extern PFN_vkGetPhysicalDeviceSurfaceSupportKHR         vkGetPhysicalDeviceSurfaceSupportKHR;
 extern PFN_vkGetPhysicalDeviceFormatProperties2         vkGetPhysicalDeviceFormatProperties2;
+extern PFN_vkGetDeviceBufferMemoryRequirements          vkGetDeviceBufferMemoryRequirements;
+extern PFN_vkGetDeviceImageMemoryRequirements           vkGetDeviceImageMemoryRequirements;
 
 // VkDevice
 extern PFN_vkCreateDevice                               vkCreateDevice;
@@ -97,12 +110,14 @@ extern PFN_vkFreeMemory                                 vkFreeMemory;
 extern PFN_vkMapMemory                                  vkMapMemory;
 extern PFN_vkUnmapMemory                                vkUnmapMemory;
 extern PFN_vkFlushMappedMemoryRanges                    vkFlushMappedMemoryRanges;
+extern PFN_vkInvalidateMappedMemoryRanges               vkInvalidateMappedMemoryRanges;
 
 // VkBuffer
 extern PFN_vkCreateBuffer                               vkCreateBuffer;
 extern PFN_vkDestroyBuffer                              vkDestroyBuffer;
 extern PFN_vkGetBufferMemoryRequirements                vkGetBufferMemoryRequirements;
-extern PFN_vkBindBufferMemory                           vkBindBufferMemory;
+extern PFN_vkBindBufferMemory                           vkBindBufferMemory; // VMA Use
+extern PFN_vkBindBufferMemory2                          vkBindBufferMemory2;
 extern PFN_vkCmdUpdateBuffer                            vkCmdUpdateBuffer;
 extern PFN_vkCmdFillBuffer                              vkCmdFillBuffer;
 
@@ -111,6 +126,7 @@ extern PFN_vkCreateImage                                vkCreateImage;
 extern PFN_vkDestroyImage                               vkDestroyImage;
 extern PFN_vkGetImageMemoryRequirements                 vkGetImageMemoryRequirements;
 extern PFN_vkBindImageMemory                            vkBindImageMemory;
+extern PFN_vkBindImageMemory2                           vkBindImageMemory2;
 extern PFN_vkCmdClearColorImage                         vkCmdClearColorImage;
 extern PFN_vkCmdClearDepthStencilImage                  vkCmdClearDepthStencilImage;
 extern PFN_vkCmdResolveImage2                           vkCmdResolveImage2;
@@ -149,6 +165,7 @@ extern PFN_vkEndCommandBuffer                           vkEndCommandBuffer;
 extern PFN_vkCmdExecuteCommands                         vkCmdExecuteCommands;
 extern PFN_vkCmdBindIndexBuffer                         vkCmdBindIndexBuffer;
 extern PFN_vkCmdBindVertexBuffers2                      vkCmdBindVertexBuffers2;
+extern PFN_vkCmdCopyBuffer                              vkCmdCopyBuffer;
 extern PFN_vkCmdDraw                                    vkCmdDraw;
 extern PFN_vkCmdDrawIndexed                             vkCmdDrawIndexed;
 extern PFN_vkCmdDrawIndirect                            vkCmdDrawIndirect;
@@ -208,9 +225,11 @@ extern PFN_vkCmdEndRendering                            vkCmdEndRendering;
 extern PFN_vkCreateDebugUtilsMessengerEXT               vkCreateDebugUtilsMessengerEXT;
 extern PFN_vkDestroyDebugUtilsMessengerEXT              vkDestroyDebugUtilsMessengerEXT;
 
+// VK_KHR_dedicated_allocation
+
 // VK_KHR_get_memory_requirements2
-extern PFN_vkGetImageMemoryRequirements2                vkGetImageMemoryRequirements2;
-extern PFN_vkGetBufferMemoryRequirements2               vkGetBufferMemoryRequirements2;
+extern PFN_vkGetImageMemoryRequirements2                vkGetImageMemoryRequirements2; // used by VMA
+extern PFN_vkGetBufferMemoryRequirements2               vkGetBufferMemoryRequirements2; // used by VMA
 
 extern VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT in_severity, VkDebugUtilsMessageTypeFlagsEXT in_types, const VkDebugUtilsMessengerCallbackDataEXT* in_data, void *in_user );
 

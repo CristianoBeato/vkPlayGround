@@ -63,14 +63,8 @@ void crModelManager::StartUp( void )
 {
     /// Create the meshes staging buffer
     m_geometryStaging = new crBufferRing();
-    if( !m_geometryStaging->Create( 
-        k_SURFACE_STAGING_BUFFER_SIZE, 
-        VK_BUFFER_USAGE_TRANSFER_SRC_BIT, // We use this buffer to copy to geometry buffer
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT // make the client copy visible to server
-    ) )
-    {
+    if( !m_geometryStaging->Create( k_SURFACE_STAGING_BUFFER_SIZE, crBuffer::BUFFER_STAGING_SOURCE ) )
         throw crException( "Failed to create geometry staging buffer\n" );
-    }
 }
 
 void crModelManager::ShutDown( void )

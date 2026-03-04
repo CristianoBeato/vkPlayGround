@@ -24,13 +24,25 @@
 
 inline constexpr size_t MIN_BUFFER_SIZE = 64;
 
+VK_DEFINE_HANDLE( VmaAllocation )
+
 /// @brief base buffer class
 class crBuffer
 {
 public:
+    enum buffer_type_e
+    {
+        BUFFER_TYPE_NONE = 0,
+        BUFFER_STAGING_SOURCE,
+        BUFFER_STAGING_DESTINATION,
+        BUFFER_ELEMENT_ARRAY,
+        BUFFER_VERTEX_ARRAY,
+        BUFFER_SHADER_STORAGE
+    };
+
     crBuffer( void );
     ~crBuffer( void );
-    virtual bool    Create( const size_t in_size, const VkBufferUsageFlags in_usage, const VkMemoryPropertyFlags in_memoryProperty );
+    virtual bool    Create( const size_t in_size, const buffer_type_e in_type );
     virtual void    Destroy( void );
     void*           Map( void );
     void            Unmap( void );
@@ -48,7 +60,11 @@ private:
     VkPipelineStageFlags2   m_stage;
     VkAccessFlags2          m_access;
     VkBuffer                m_buffer;
+#if USE_VMA_BUFFERS
+    VmaAllocation           m_memory;
+#else
     VkDeviceMemory          m_memory;
+#endif
 };
 
 struct block_t
@@ -98,7 +114,7 @@ class crBufferAllocator : public crBuffer
 public:
     crBufferAllocator( void );
     ~crBufferAllocator( void );
-    virtual bool    Create( const size_t in_size, const VkBufferUsageFlags in_usage, const VkMemoryPropertyFlags in_memoryProperty ) override;
+    virtual bool    Create( const size_t in_size, const buffer_type_e in_type ) override;
     virtual void    Destroy( void ) override;
     ///
     crSubBuffer*    Alloc( const size_t in_size, const size_t in_alignment );
@@ -123,7 +139,7 @@ class crBufferRing : public crBuffer
 public:
     crBufferRing( void );
     ~crBufferRing( void );
-    virtual bool    Create( const size_t in_size, const VkBufferUsageFlags in_usage, const VkMemoryPropertyFlags in_memoryProperty ) override;
+    virtual bool    Create( const size_t in_size, const buffer_type_e in_type ) override;
     virtual void    Destroy( void ) override;
     crSubBuffer*    Alloc( const size_t in_size, const size_t in_alignment );
 

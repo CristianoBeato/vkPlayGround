@@ -56,21 +56,21 @@ void crUniformManager::StartUp( void )
     size_t alignment = device->MinStorageAlignment(); 
 
     m_meshSSBO = new crBuffer();
-    if( !m_meshSSBO->Create( _align( k_MESH_UNIFORM_BUFFER_SIZE, alignment ), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT ) )
+    if( !m_meshSSBO->Create( _align( k_MESH_UNIFORM_BUFFER_SIZE, alignment ), crBuffer::BUFFER_SHADER_STORAGE ) )
         throw crException( "Failed to create Mesh Shader Storage Buffer\n" );
 
     // get the persistent map of the mesh uniform buffer
     m_meshUniformMap = static_cast<uMesh_t*>( m_meshSSBO->Map() );
 
     m_materialSSBO = new crBuffer();
-    if( !m_materialSSBO->Create( _align( k_MATERIAL_UNIFORM_BUFFER_SIZE, alignment ), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT ) )
+    if( !m_materialSSBO->Create( _align( k_MATERIAL_UNIFORM_BUFFER_SIZE, alignment ), crBuffer::BUFFER_SHADER_STORAGE ) )
         throw crException( "Failed to create Material Shader Storage Buffer\n" );
 
     // get the persistent map of the material uniform buffer
     m_materialUniformMap = static_cast<uMaterial_t*>( m_materialSSBO->Map() );
 
     m_lightSSBO = new crBuffer();
-    if( !m_lightSSBO->Create( _align( k_LIGTH_UNIFORM_BUFFER_SIZE, alignment ), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT ) )
+    if( !m_lightSSBO->Create( _align( k_LIGTH_UNIFORM_BUFFER_SIZE, alignment ), crBuffer::BUFFER_SHADER_STORAGE ) )
         throw crException( "Failed to create Light Shader Storage Buffer\n" );
 
     // get the persistent map of the material uniform buffer

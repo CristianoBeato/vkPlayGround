@@ -24,6 +24,8 @@
 
 extern const VkAllocationCallbacks* k_allocationCallbacks;
 
+VK_DEFINE_HANDLE(VmaAllocator)
+
 class crContext
 {
 public:
@@ -39,6 +41,10 @@ public:
     VkSurfaceKHR        Surface( void )  const { return m_surface; }
     crRenderDevice *    Device( void ) { return &m_devices[m_currentDevice]; }
 
+#if USE_VMA
+    VmaAllocator        VMAAllocator( void ) const { return m_VMAallocator; }
+#endif
+
 private:
     bool                            m_hasDebugUtils;    // Enable debug layer
     bool                            m_portabilityEnumerationAvailable; //
@@ -51,10 +57,18 @@ private:
     crList<VkPhysicalDevice>        m_availablePhysicalDevices; // list of vulkan compatible devices
 	crList<crRenderDevice>          m_devices; // our interal device list 
 
+#if USE_VMA
+    VmaAllocator                    m_VMAallocator;
+#endif //USE_VMA
+
     void    InitInstanceProcs( void );
     void    LoadVulkanProcs( void );
     bool    ExtensionAvailable( const crString &in_ext ) const;
     bool    LayersAvailable( const crString &in_layer ) const;
+
+#if USE_VMA
+    void    SetVMAallocator( void );
+#endif //USE_VMA
 };
 
 #endif //!__CONTEXT_HPP__

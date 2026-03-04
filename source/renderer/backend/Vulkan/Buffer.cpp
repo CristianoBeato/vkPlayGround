@@ -21,6 +21,56 @@
 
 #include "Buffer.hpp" 
 
+// include VMA Here, since, his include of other headers 
+// can lead to naming polution
+#include <vk_mem_alloc.h>
+
+static const VkBufferUsageFlags k_USAGE_TABLE[] = 
+{
+    0, // BUFFER_TYPE_NONE
+    VK_BUFFER_USAGE_TRANSFER_SRC_BIT, // BUFFER_STAGING_SOURCE
+    VK_BUFFER_USAGE_TRANSFER_DST_BIT, // BUFFER_STAGING_DESTINATION
+    VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, // BUFFER_ELEMENT_ARRAY
+    VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, // BUFFER_VERTEX_ARRAY
+    VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, // BUFFER_SHADER_STORAGE
+};
+
+#if USE_VMA_BUFFERS
+
+static const VmaMemoryUsage k_MEMORY_USAGE_TABLE[] = 
+{
+    VMA_MEMORY_USAGE_UNKNOWN,               // BUFFER_TYPE_NONE
+    VMA_MEMORY_USAGE_AUTO_PREFER_HOST,      // BUFFER_STAGING_SOURCE
+    VMA_MEMORY_USAGE_AUTO_PREFER_HOST,      // BUFFER_STAGING_DESTINATION
+    VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE,    // BUFFER_ELEMENT_ARRAY
+    VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE,    // BUFFER_VERTEX_ARRAY
+    VMA_MEMORY_USAGE_AUTO_PREFER_HOST       // BUFFER_SHADER_STORAGE
+};
+
+static const VmaAllocationCreateFlags k_ALLOCATION_FLAGS[] = 
+{
+    0, // BUFFER_TYPE_NONE
+    VMA_ALLOCATION_CREATE_MAPPED_BIT | VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT, // BUFFER_STAGING_SOURCE
+    VMA_ALLOCATION_CREATE_MAPPED_BIT | VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT, // BUFFER_STAGING_DESTINATION
+    0, // BUFFER_ELEMENT_ARRAY
+    0, // BUFFER_VERTEX_ARRAY
+    VMA_ALLOCATION_CREATE_MAPPED_BIT | VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT // BUFFER_SHADER_STORAGE
+};
+
+#else
+
+const VkMemoryPropertyFlags k_MEMORY_PROPERTY_TABLE[] = 
+{
+    0, // BUFFER_TYPE_NONE
+    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, // BUFFER_STAGING_SOURCE
+    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, // BUFFER_STAGING_DESTINATION
+    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, // BUFFER_ELEMENT_ARRAY
+    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, // BUFFER_VERTEX_ARRAY
+    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, // BUFFER_SHADER_STORAGE
+};
+
+#endif //!#if USE_VMA_BUFFERS
+
 /*
 ===============================================================================================
 crBuffer 
@@ -41,13 +91,14 @@ crBuffer::~crBuffer( void )
     Destroy();
 }
 
-bool crBuffer::Create( const size_t in_size, const VkBufferUsageFlags in_usage, const VkMemoryPropertyFlags in_memoryProperty )
+bool crBuffer::Create( const size_t in_size, const buffer_type_e in_type )
 {   
     VkResult result = VK_SUCCESS; 
     uniqueQueue_t queues;
     VkMemoryRequirements requirements;
 
-    auto device = crContext::Get()->Device();
+    auto context = crContext::Get();
+    auto device = context->Device();
     auto graphicQ = device->GraphicQueue();
     auto transferQ = device->TransferQueue();
     auto computeQ = device->TransferQueue();
@@ -61,7 +112,7 @@ bool crBuffer::Create( const size_t in_size, const VkBufferUsageFlags in_usage, 
         queues.Append( computeQ->Family() );
 
     m_size = in_size;
-    m_usage = in_usage;
+    m_usage = k_USAGE_TABLE[in_type];
 
     ///
     ///
@@ -75,6 +126,14 @@ bool crBuffer::Create( const size_t in_size, const VkBufferUsageFlags in_usage, 
     bufferCI.sharingMode = queues.SharingMode();
     bufferCI.queueFamilyIndexCount = queues.count;
     bufferCI.pQueueFamilyIndices = queues.families;
+
+#if USE_VMA_BUFFERS
+    /// Vulkan Memory Allocator allocation structures
+    VmaAllocationCreateInfo allocInfo = {};
+    allocInfo.usage = k_MEMORY_USAGE_TABLE[in_type];
+    allocInfo.flags = k_ALLOCATION_FLAGS[in_type];    
+    vmaCreateBuffer( context->VMAAllocator(), &bufferCI, &allocInfo, &m_buffer, &m_memory, nullptr);
+#else
     result = vkCreateBuffer( *device, &bufferCI, k_allocationCallbacks, &m_buffer );
     if ( result != VK_SUCCESS )
     {
@@ -94,7 +153,7 @@ bool crBuffer::Create( const size_t in_size, const VkBufferUsageFlags in_usage, 
     allocInfo.allocationSize = requirements.size;
     // We need VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT (to map) and 
     // VK_MEMORY_PROPERTY_HOST_COHERENT_BIT (so we don't need to manually flush)
-    allocInfo.memoryTypeIndex = device->FindMemoryType( requirements.memoryTypeBits, in_memoryProperty ); 
+    allocInfo.memoryTypeIndex = device->FindMemoryType( requirements.memoryTypeBits, k_MEMORY_PROPERTY_TABLE[in_type] ); 
     result = vkAllocateMemory( *device, &allocInfo, k_allocationCallbacks, &m_memory );
     if( result != VK_SUCCESS )
     {
@@ -102,19 +161,35 @@ bool crBuffer::Create( const size_t in_size, const VkBufferUsageFlags in_usage, 
         return false;
     }
 
-    result = vkBindBufferMemory( *device, m_buffer, m_memory, 0 );
+    VkBindBufferMemoryInfo bindInfos{};
+    bindInfos.sType = VK_STRUCTURE_TYPE_BIND_BUFFER_MEMORY_INFO;
+    bindInfos.pNext = nullptr;
+    bindInfos.buffer = m_buffer;
+    bindInfos.memory = m_memory;
+    bindInfos.memoryOffset = 0;
+    result = vkBindBufferMemory2( *device, 1, &bindInfos );
     if( result != VK_SUCCESS )
     {
         crConsole::Error( "crBuffer::Create::vkBindBufferMemory %s\n", VulkanErrorString( result ).c_str() );
         return false;
     }
-
+#endif // !USE_VMA_BUFFERS
     return true;
 }
 
 void crBuffer::Destroy(void)
 {
-    auto device = crContext::Get()->Device();
+    auto context = crContext::Get();
+    auto device = context->Device();
+
+#if USE_VMA_BUFFERS
+    if( m_buffer != nullptr )
+    {
+        vmaDestroyBuffer( context->VMAAllocator(), m_buffer, m_memory );
+        m_buffer = nullptr;
+        m_memory = nullptr;
+    }
+#else
     if ( m_memory != nullptr )
     {
         vkFreeMemory( *device, m_memory, k_allocationCallbacks );
@@ -126,7 +201,8 @@ void crBuffer::Destroy(void)
         vkDestroyBuffer( *device, m_buffer, k_allocationCallbacks );
         m_buffer = nullptr;
     }
-
+#endif // USE_VMA_BUFFERS
+    
     m_stage = VK_PIPELINE_STAGE_2_NONE;
     m_access = VK_ACCESS_2_NONE;
 }
@@ -134,6 +210,12 @@ void crBuffer::Destroy(void)
 void *crBuffer::Map(void)
 {
     void* data = nullptr;
+    
+#if USE_VMA_BUFFERS
+    auto context = crContext::Get();
+    vmaMapMemory( context->VMAAllocator(), m_memory, &data );
+#else
+
     auto device = crContext::Get()->Device();
     auto result = vkMapMemory( *device, m_memory, 0, VK_WHOLE_SIZE, 0, &data );
     if( result != VK_SUCCESS )
@@ -142,13 +224,19 @@ void *crBuffer::Map(void)
         return nullptr;
     }
 
+#endif //USE_VMA_BUFFERS
     return data;
 }
 
 void crBuffer::Unmap(void)
 {
+#if USE_VMA_BUFFERS
+    auto context = crContext::Get();
+    vmaUnmapMemory( context->VMAAllocator(), m_memory );
+#else
     auto device = crContext::Get()->Device();
     vkUnmapMemory( *device, m_memory );
+#endif // USE_VMA_BUFFERS
 }
 
 void crBuffer::State(const VkCommandBuffer in_commandBuffer, const VkPipelineStageFlags2 in_stageMask, const VkAccessFlags2 in_accessMask)
@@ -266,9 +354,9 @@ crBufferAllocator::~crBufferAllocator( void )
     Destroy();
 }
 
-bool crBufferAllocator::Create(const size_t in_size, const VkBufferUsageFlags in_usage, const VkMemoryPropertyFlags in_memoryProperty)
+bool crBufferAllocator::Create(const size_t in_size, const buffer_type_e in_type )
 {
-    if ( !crBuffer::Create( in_size, in_usage, in_memoryProperty ) )
+    if ( !crBuffer::Create( in_size, in_type ) )
         return false;
 
     return true;
@@ -487,10 +575,10 @@ crBufferRing::~crBufferRing( void )
     Destroy();
 }
 
-bool crBufferRing::Create(const size_t in_size, const VkBufferUsageFlags in_usage, const VkMemoryPropertyFlags in_memoryProperty)
+bool crBufferRing::Create(const size_t in_size, const buffer_type_e in_type )
 {
     auto device = crContext::Get()->Device();
-    if( !crBuffer::Create( in_size, in_usage, in_memoryProperty ) )
+    if( !crBuffer::Create( in_size, in_type ) )
         return false;
 
     // Get Buffer Map

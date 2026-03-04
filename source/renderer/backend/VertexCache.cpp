@@ -45,14 +45,12 @@ void crVertexCache::StartUp(void)
 {
     /// our vertex cache buffer
     m_vertexBuffer = new crBufferAllocator();
-    if( m_vertexBuffer == nullptr || !m_vertexBuffer->Create( k_VERTEX_BUFFER_SIZE, 
-        VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT  ) )
+    if( m_vertexBuffer == nullptr || !m_vertexBuffer->Create( k_VERTEX_BUFFER_SIZE, crBuffer::BUFFER_VERTEX_ARRAY  ) )
         throw crException( "crVertexCache ( Failed to create vertex buffer! )" );
 
     /// our index cache buffer 
     m_indexBuffer = new crBufferAllocator();
-    if ( m_indexBuffer == nullptr || !m_indexBuffer->Create( k_INDEX_BUFFER_SIZE, 
-        VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT ) )
+    if ( m_indexBuffer == nullptr || !m_indexBuffer->Create( k_INDEX_BUFFER_SIZE, crBuffer::BUFFER_ELEMENT_ARRAY ) )
         throw crException( "crVertexCache ( Failed to create index buffer! )" );
 }
 
