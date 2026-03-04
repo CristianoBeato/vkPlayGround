@@ -31,6 +31,7 @@ crCommandbuffer::crCommandbuffer( void ) :
 
 crCommandbuffer::~crCommandbuffer( void )
 {
+    Destroy();
 }
 
 bool crCommandbuffer::Create(void)
