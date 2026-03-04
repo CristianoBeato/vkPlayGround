@@ -448,6 +448,18 @@ void crRenderDevice::ShutDown(void)
     }
 }
 
+
+/*
+==============
+crRenderDevice::Wait
+==============
+*/
+void crRenderDevice::Wait(void)
+{
+    vkDeviceWaitIdle( m_logic );
+}
+
+
 /*
 ==============
 crRenderDevice::DeviceScore

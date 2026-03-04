@@ -100,6 +100,13 @@ void crRenderSystemLocal::InitRendersystem(void)
 
 void crRenderSystemLocal::ReleaseRenderSystem(void)
 {
+    auto context = crContext::Get();
+    auto device = context->Device();
+    
+    /// wait the device become idle, and all syncs release,
+    /// before release structures
+    device->Wait();
+
     auto backend = crBackend::Get();
     backend->ShutDown();
     
@@ -112,7 +119,8 @@ void crRenderSystemLocal::ReleaseRenderSystem(void)
     auto modelManager = crModelManager::Get();
     modelManager->ShutDown();
 
-    auto context = crContext::Get();
+    /// release queues device, instance
+    /// and all context related
     context->Shutdown();
     
     m_renderInitialized = false;

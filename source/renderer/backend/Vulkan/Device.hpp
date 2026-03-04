@@ -81,6 +81,9 @@ public:
     bool        StartUp( const crList<const char*> &in_layers, const crList<const char*> &in_enabledExtensions );
     void        ShutDown( void );
 
+    /// @brief wait device become idle
+    void        Wait( void );
+
     uint32_t    Score(void) const;
 
     uint32_t    Mask( void ) const { return m_id + 1; }
