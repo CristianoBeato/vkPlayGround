@@ -22,6 +22,8 @@
 #ifndef __STRING_HPP__
 #define __STRING_HPP__
 
+#define USE_SDL_STRNLEN 1
+
 class crString
 {
 public:
@@ -39,7 +41,7 @@ public:
     void            StripFileName( void );
     void            StripFileExtension( void );
     inline void     Strcpy( const char* in_source ) { std::strncpy( m_string, in_source, m_allocated - 1 ); };
-    inline void     Strcpy( const const crString& in_string ){ std::strncpy( m_string, in_string.m_string, m_allocated - 1 ); };
+    inline void     Strcpy( const crString& in_string ){ std::strncpy( m_string, in_string.m_string, m_allocated - 1 ); };
     inline bool     Empty( void ) const { return ( m_allocated == 0 ) || m_string[0] == '\0'; }
     inline size_t   Lengenth( void ) const;
     inline bool     Compare( const crString& in_string ) const;
@@ -65,6 +67,8 @@ size_t crString::Lengenth(void) const
 {
 #if USE_STRNLEN
     return strnlen( m_string, m_allocated );
+#elif USE_SDL_STRNLEN
+    return SDL_strnlen( m_string, m_allocated );
 #else
     /// check for a \0 null terminator, before string allocation size
     for ( size_t i = 0; i < m_allocated; i++)
@@ -101,6 +105,10 @@ bool crString::operator!=(const crString &in_string) const
 
 inline crString crString::operator=(const crString &in_string)
 {
+    /// ignore zero len string
+    if( in_string.Lengenth() == 0 )
+        return *this;
+
     Alloc( in_string.Lengenth() );
     std::strncpy( m_string, in_string.m_string, m_allocated );
     return *this;

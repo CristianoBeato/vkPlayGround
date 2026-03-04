@@ -72,9 +72,9 @@ void crString::StripFileName( void )
     char* last_slash = std::strrchr( m_string, '/');
 
     /// make the rest of string null
-    while ( ( last_slash + 1 ) != nullptr && *( last_slash + 1 ) != '\0' )
+    while ( last_slash != nullptr && ( *( last_slash + 1 ) != '\0' ) )
     {
-        *(last_slash + 1) = '\0'; // Keep the trailing slash, or '0' to remove
+        *(++last_slash) = '\0'; // Keep the trailing slash, or '0' to remove
     } 
 }
 
