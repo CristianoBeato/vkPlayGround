@@ -426,7 +426,7 @@ void crFileSystem::BuildPath( const crString in_path )
         /// retrieve subdirs properties
         if( !SDL_GetPathInfo( fullpath, &info ) )
         {
-            crConsole::Error( "%s %s\n", fullpath, SDL_GetError() );
+            crConsole::Error( "%s %s\n", fullpath.c_str(), SDL_GetError() );
             continue;
         }
 
