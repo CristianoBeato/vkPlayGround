@@ -23,6 +23,28 @@
 
 constexpr size_t k_SURFACE_STAGING_BUFFER_SIZE = 128 * 1024 * 1024;
 
+halfFloat_t ONEhf = 0x3C00;
+
+// base face vertices 
+static const VertPos_t k_QUAD_VERTS[4] = 
+{ 
+    { -1.0f, -1.0f, 0.0f, 0x0000, 0x0000 }, // 0 top left
+    {  1.0f, -1.0f, 0.0f, 0x3C00, 0x0000 }, // 1 top right
+    { -1.0f,  1.0f, 0.0f, 0x0000, 0x3C00 }, // 2 botton left
+    {  1.0f,  1.0f, 0.0f, 0x3C00, 0x3C00 }, // 3 botton right
+};
+
+/// base face triangles
+static const uint16_t   faces[6] = 
+{       ///    ___
+    0,  /// 0 |  / 1 
+    2,  ///   | /
+    1,  /// 2 |/
+    1,  ///      /|1
+    2,  ///     / |
+    3,  ///   2/__|3
+};
+
 crModelManager *crModelManager::Get(void)
 {
     static crModelManager gModelManager = crModelManager();

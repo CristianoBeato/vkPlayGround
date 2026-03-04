@@ -1,21 +1,17 @@
 #version 460 core
 
-#extension GL_ARB_shading_language_include : require
-
-//
-#include "common.glsl"
-
 /// Vertex attribute 
-layout( location = 0 ) in vec3 attrPos;    // vertex position 
+layout( location = 0 ) in vec3 attrPos; // vertex position
+layout( location = 1 ) in vec2 attrTco; // texture coordinate
 
-layout( std140, binding = 1 ) uniform UniformBufferObject
+layout( std420, binding = 1 ) uniform UniformBufferObject
 {
+    vec4 viewPos;
     mat4 model;
     mat4 MVP;
 };
 
 void main( void )
 {
-
     gl_Position = MVP * vec4( attrPos, 1 );
 }
