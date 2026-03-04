@@ -127,7 +127,7 @@ add_library( renderer STATIC ${RENDERER_SOURCES} )
 target_compile_definitions( renderer PRIVATE __RENDERER_LIB__ ) 
 
 #set the renderer root dir as include
-target_include_directories( renderer PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ) 
+target_include_directories( renderer PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/contrib/VulkanMemoryAllocator/include ) 
 
 # set the precompiled common
 target_precompile_headers( renderer 
