@@ -88,6 +88,13 @@ inline __type__* MemAlloc( const uint32_t in_count )
 }
 
 template<typename __type__>
+inline __type__* MemAllocCleared( const uint32_t in_count )
+{
+    size_t size = sizeof( __type__ ) * in_count;
+    return static_cast<__type__*>( std::memset( SDL_malloc( size ), 0x00, size ) );
+}
+
+template<typename __type__>
 inline __type__* MemAllocAligned( const uint32_t in_count, const size_t in_align )
 {
     return static_cast<__type__*>( MemAllocAligned( sizeof( __type__ ) * in_count, in_align ) );
