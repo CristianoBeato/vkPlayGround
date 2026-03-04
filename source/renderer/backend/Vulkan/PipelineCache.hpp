@@ -55,7 +55,6 @@ class crPipelineCache
 public:
     crPipelineCache( void );
     ~crPipelineCache( void );
-
     bool    OpenCache( const crString &in_path );
     bool    SaveCache( const crString &in_path );
     inline bool Loaded( void ) const { return m_loaded; }

@@ -29,6 +29,7 @@ crFramebuffer::crFramebuffer( void ) : m_frame( 0 )
 
 crFramebuffer::~crFramebuffer( void )
 {
+    Destroy();
 }
 
 static inline bool IsDepthFormat( const VkFormat format ) 

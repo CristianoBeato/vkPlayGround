@@ -34,6 +34,12 @@ crPipelineCache::crPipelineCache( void ) :
 
 crPipelineCache::~crPipelineCache( void )
 {
+    auto device = crContext::Get()->Device();
+    if( m_cache != nullptr )
+    {
+        vkDestroyPipelineCache( *device, m_cache, k_allocationCallbacks );
+        m_cache = nullptr;
+    }
 }
 
 bool crPipelineCache::OpenCache( const crString &in_path )
