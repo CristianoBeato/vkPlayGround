@@ -117,8 +117,22 @@ bool crPipelineCache::OpenCache( const crString &in_path )
     auto result = vkCreatePipelineCache( *device, &pipelineCacheCI, k_allocationCallbacks, &m_cache );
     if ( result != VK_SUCCESS )
     {
-        crConsole::Error( "crPipelineManager::StartUp::vkCreatePipelineCache %s\n", VulkanErrorString( result ).c_str() );
-        return false;
+        if( pipelineCacheCI.pInitialData != nullptr )
+            MemFree( const_cast<void*>( pipelineCacheCI.pInitialData ) );
+
+        /// fallback, some drivers can invalidade cache data and pass a vkCreatePipelineCache error
+        /// so if we fail to create a cache from loaded data, try create a empty cache
+        /// recomandation from 
+        /// It’s not paranoia if they are really out to get you - "https://zeux.io/2019/07/17/serializing-pipeline-cache/" 
+        m_loaded = false;
+        pipelineCacheCI.initialDataSize = 0;    
+        pipelineCacheCI.pInitialData = nullptr;
+        result = vkCreatePipelineCache( *device, &pipelineCacheCI, k_allocationCallbacks, &m_cache );
+        if( result )
+        {
+            crConsole::Error( "crPipelineManager::StartUp::vkCreatePipelineCache %s\n", VulkanErrorString( result ).c_str() );
+            return false;
+        }
     }
 
     /// don't leak memory 
