@@ -70,8 +70,11 @@ extern PFN_vkQueuePresentKHR                            vkQueuePresentKHR;
 extern PFN_vkQueueSubmit                                vkQueueSubmit;
 extern PFN_vkQueueSubmit2                               vkQueueSubmit2;
 extern PFN_vkQueueWaitIdle                              vkQueueWaitIdle;
+
+// VkCommandPool
 extern PFN_vkCreateCommandPool                          vkCreateCommandPool;
 extern PFN_vkDestroyCommandPool                         vkDestroyCommandPool;
+extern PFN_vkResetCommandPool                           vkResetCommandPool;
 
 // VkFence
 extern PFN_vkCreateFence                                vkCreateFence;

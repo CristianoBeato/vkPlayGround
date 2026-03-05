@@ -70,8 +70,11 @@ PFN_vkQueuePresentKHR                           vkQueuePresentKHR = nullptr;
 PFN_vkQueueSubmit                               vkQueueSubmit = nullptr;
 PFN_vkQueueSubmit2                              vkQueueSubmit2 = nullptr;
 PFN_vkQueueWaitIdle                             vkQueueWaitIdle = nullptr;
+
+// VkCommandPool
 PFN_vkCreateCommandPool                         vkCreateCommandPool = nullptr;
 PFN_vkDestroyCommandPool                        vkDestroyCommandPool = nullptr;
+PFN_vkResetCommandPool                          vkResetCommandPool = nullptr;
 
 // VkFence
 PFN_vkCreateFence                                vkCreateFence = nullptr;
@@ -354,8 +357,11 @@ void crContext::LoadVulkanProcs( void )
     GET_VK_PROC( vkQueueSubmit, m_instance );
     GET_VK_PROC( vkQueueSubmit2, m_instance );
     GET_VK_PROC( vkQueueWaitIdle, m_instance );
+
+    // VkCommandPool
     GET_VK_PROC( vkCreateCommandPool, m_instance );
     GET_VK_PROC( vkDestroyCommandPool, m_instance );
+    GET_VK_PROC( vkResetCommandPool, m_instance );
 
     // VkFence
     GET_VK_PROC( vkCreateFence, m_instance );

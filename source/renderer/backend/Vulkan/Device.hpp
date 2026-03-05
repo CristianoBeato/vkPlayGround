@@ -46,13 +46,11 @@ public:
     uint32_t        Index( void ) const { return m_index; }
     uint32_t        Family( void ) const { return m_index; }
     VkQueue         Queue( void ) const { return m_queue; }
-    VkCommandPool   CommandPool( void ) const { return m_commandPool; }
 
 private:
     uint32_t                m_index;        // index in the family 
     uint32_t                m_family;       // the family index
     VkQueue                 m_queue;        // queue hanlde
-    VkCommandPool           m_commandPool;  // queue command pool
     VkDevice                m_device;       // parent device
 };
 

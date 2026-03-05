@@ -40,18 +40,42 @@ bool crCommandbuffer::Create(void)
     m_device = crContext::Get()->Device();
     m_graphicQueue = m_device->GraphicQueue();
 
-    // allocate command buffers
+    ///
+    /// Command Pool Create Info
+    /// Create queue command pool
+    VkCommandPoolCreateInfo commandPoolCI{};
+    commandPoolCI.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    commandPoolCI.pNext = nullptr;
+    commandPoolCI.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+    commandPoolCI.queueFamilyIndex = m_graphicQueue->Family();
+
+    ///
+    /// Command Buffer Allocate Info
+    /// allocate command buffers
     VkCommandBufferAllocateInfo commandBufferAllocateCI{};
     commandBufferAllocateCI.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     commandBufferAllocateCI.pNext = nullptr;
-    commandBufferAllocateCI.commandPool = m_graphicQueue->CommandPool();
     commandBufferAllocateCI.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    commandBufferAllocateCI.commandBufferCount = m_commandBuffers.Count();
-    result = vkAllocateCommandBuffers( m_device->Device(), &commandBufferAllocateCI, &m_commandBuffers );
-    if( result != VK_SUCCESS )
+    commandBufferAllocateCI.commandBufferCount = 1;
+
+    for ( uint32_t i = 0; i < SMP_FRAMES; i++)
     {
-        crConsole::Error( "crCommandbuffer::Create::vkAllocateCommandBuffers\n%s\n", VulkanErrorString( result ).c_str() );
-        return false;
+        result = vkCreateCommandPool( *m_device, &commandPoolCI, k_allocationCallbacks, &m_commandPools[i] );
+        if( result != VK_SUCCESS )
+        {
+            crConsole::Error( "crCommandbuffer::Create::vkCreateCommandPool\n%s\n", VulkanErrorString( result ).c_str() );
+            return false;
+        }
+
+        /// get command pool
+        commandBufferAllocateCI.commandPool = m_commandPools[i];
+
+        result = vkAllocateCommandBuffers( *m_device, &commandBufferAllocateCI, &m_commandBuffers[i] );
+        if( result != VK_SUCCESS )
+        {
+            crConsole::Error( "crCommandbuffer::Create::vkAllocateCommandBuffers\n%s\n", VulkanErrorString( result ).c_str() );
+            return false;
+        }
     }
 
     // Semaphore configuration
@@ -91,13 +115,23 @@ bool crCommandbuffer::Create(void)
 
 void crCommandbuffer::Destroy(void)
 {
+    /// release semaphores
     for ( uint32_t i = 0; i < SMP_FRAMES; i++)
     {
-        vkDestroySemaphore( *m_device, m_renderFinished[i], k_allocationCallbacks );
-        vkDestroyFence( m_device->Device(), m_frameFences[i], k_allocationCallbacks );
-    }
+        if ( m_renderFinished[i] != nullptr )
+           vkDestroySemaphore( *m_device, m_renderFinished[i], k_allocationCallbacks );
+        
+        if( m_frameFences[i] != nullptr )
+            vkDestroyFence( *m_device, m_frameFences[i], k_allocationCallbacks );
 
-    vkFreeCommandBuffers( m_device->Device(), m_graphicQueue->CommandPool(), m_commandBuffers.Count(), &m_commandBuffers );
+        /// Release command buffer 
+        if( m_commandBuffers[i] != nullptr )
+            vkFreeCommandBuffers( *m_device, m_commandPools[i], 1, &m_commandBuffers[i] );
+
+        /// Release frame pools
+        if( m_commandPools[i] != nullptr )
+            vkDestroyCommandPool( *m_device, m_commandPools[i], k_allocationCallbacks );
+    }
 }
 
 void crCommandbuffer::Begin(const uint64_t in_frame)
@@ -115,12 +149,21 @@ void crCommandbuffer::Begin(const uint64_t in_frame)
     else
         vkResetFences( *m_device, 1, &m_frameFences[m_bufferID] );
 
+#if 0
     ///
     ///
     /// Reset the main render command buffer
     result = vkResetCommandBuffer( m_commandBuffers[m_bufferID], 0 );
     if( result != VK_SUCCESS )
         crConsole::Error( "crCommandbuffer::Begin::vkResetCommandBuffer FAILED!\n%s\n", VulkanErrorString( result ).c_str() );
+#else
+    ///
+    ///
+    /// Reset the frame command pool
+    result = vkResetCommandPool( *m_device, m_commandPools[m_bufferID], 0 );
+    if( result != VK_SUCCESS )
+        crConsole::Error( "crCommandbuffer::Begin::vkResetCommandPool FAILED!\n%s\n", VulkanErrorString( result ).c_str() );
+#endif
 
     ///
     /// 

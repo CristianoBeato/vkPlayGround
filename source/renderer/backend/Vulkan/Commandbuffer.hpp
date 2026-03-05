@@ -40,6 +40,7 @@ private:
     crRenderDevicep                         m_device;
     crDeviceQueuep                          m_graphicQueue;
     crArray<VkCommandBuffer, SMP_FRAMES>    m_commandBuffers;
+    crArray<VkCommandPool, SMP_FRAMES>      m_commandPools;      
     crArray<VkSemaphore, SMP_FRAMES>        m_renderFinished;
     crArray<VkFence, SMP_FRAMES>            m_frameFences;
 

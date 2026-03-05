@@ -38,7 +38,6 @@ crDeviceQueue::crDeviceQueue( const uint32_t in_family, const uint32_t in_index 
     m_index( in_index ),
     m_family( in_family ),
     m_queue( nullptr ),
-    m_commandPool( nullptr ),
     m_device( nullptr )
 {
 }
@@ -50,12 +49,6 @@ crDeviceQueue::~crDeviceQueue
 */
 crDeviceQueue::~crDeviceQueue( void )
 {
-    if ( m_commandPool != nullptr )
-    {
-        vkDestroyCommandPool( m_device, m_commandPool, k_allocationCallbacks );
-        m_commandPool = nullptr;
-    }
-
     m_queue = nullptr;
     m_device = nullptr;
     m_family = 0;
@@ -82,20 +75,7 @@ bool crDeviceQueue::Init( const VkDevice in_device )
     queueInfo.queueIndex = m_index;
     vkGetDeviceQueue2( m_device, &queueInfo, &m_queue );
 
-    ///
-    ///
-    /// Create queue command pool
-    VkCommandPoolCreateInfo commandPoolCI{};
-    commandPoolCI.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    commandPoolCI.pNext = nullptr;
-    commandPoolCI.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-    commandPoolCI.queueFamilyIndex = m_family;
-    auto result = vkCreateCommandPool( m_device, &commandPoolCI, k_allocationCallbacks, &m_commandPool );
-    if ( !ResultCheck( result, "vkCreateCommandPool" ) )
-        return false;
-
     return true;
-    
 }
 
 /*
