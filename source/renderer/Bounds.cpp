@@ -29,7 +29,23 @@ crBounds::~crBounds( void )
 {
 }
 
-crVec3f crBounds::Center(void) const
+crBoundsVolume::crBoundsVolume(void)
 {
-    return crVec3f();
+}
+
+crBoundsVolume::~crBoundsVolume(void)
+{
+}
+
+crBoundsSphere::crBoundsSphere( void )
+{
+}
+
+crBoundsSphere::crBoundsSphere(const crVec3f &in_origin, const float in_radius)
+{
+    m_center = crVec4f( in_origin, in_radius );
+}
+
+crBoundsSphere::~crBoundsSphere( void )
+{
 }

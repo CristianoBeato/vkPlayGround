@@ -25,13 +25,51 @@
 class crBounds
 {
 public:
+    enum type_e
+    {
+        BOUNDS_NONE,
+        BOUNDS_VOLUME,
+        BOUNDS_SPHERE,
+
+    };
+
     crBounds( void );
     ~crBounds( void );
-    crVec3f Center( void ) const;
+    virtual type_e  Type( void ) const { return BOUNDS_NONE; }
+    virtual crVec3f Origin( void ) const { return crVec3f( 0.0f, 0.0f, 0.0f ); } 
+};
+
+
+/// @brief 
+class crBoundsVolume : public crBounds
+{
+public:
+    crBoundsVolume( void );
+    ~crBoundsVolume( void );
+    virtual type_e  Type( void ) const override { return BOUNDS_SPHERE; }
+    virtual crVec3f Origin( void ) const override { return m_max - m_min; }
+    crVec3f Min( void ) const { return m_min; }
+    crVec3f Max( void ) const { return m_max; }
     
 private:
     crVec3f     m_min;
     crVec3f     m_max;
 };
+
+class crBoundsSphere : public crBounds
+{
+public:
+    crBoundsSphere( void );
+    crBoundsSphere( const crVec3f &in_origin, const float in_radius );
+    ~crBoundsSphere( void );
+    virtual type_e  Type( void ) const override { return BOUNDS_NONE; }
+    virtual crVec3f Origin( void ) const override { return m_center.ToVec3(); }
+    const float Radius( void ) const { return m_center.w; }
+
+private:
+    crVec4f m_center; // w is radius
+};
+
+
 
 #endif //!__BOUNDS_HPP__
