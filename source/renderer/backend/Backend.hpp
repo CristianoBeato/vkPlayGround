@@ -37,7 +37,8 @@ public:
     void    SetBuffers( void );
     void    SwapBuffers( void );
     void    DrawView( void );
-    crSwapchain*    Swapchain( void ) const { return m_swapchain; }
+    crSwapchain*        Swapchain( void ) const { return m_swapchain; }
+    crCommandbuffer*    Commandbuffer( void ) const { return m_graphicCMD; }
 
 private:
     uint64_t            m_frame;

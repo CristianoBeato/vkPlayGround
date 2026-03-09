@@ -65,7 +65,8 @@ protected:
 private:
     bool                m_cacheModified;
     uint32_t            m_pipelineCount;
-    crPipelineCache*    m_cache; 
+    crPipelineCache*    m_cache;
+    crPipelineLayout*   m_layout;
     crList<crProgram*>  m_programs;
     bool        LoadPrograms( void );
 };

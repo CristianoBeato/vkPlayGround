@@ -48,16 +48,25 @@ void crPipelineManager::StartUp(void)
     /// create cache storage path if don't exist
     if ( !fs->PathExist( k_CACHE_PATH, true ) )
         fs->CreatePath( k_CACHE_PATH, true );
-    
 
     if( !m_cache->OpenCache( k_CACHE_FILE ) )
         crConsole::Error( "Failed to create pipeline cache\n");
 
     m_cacheModified = false;
+
+    m_layout = new crPipelineLayout();
+    if( m_layout->Create() )
+        throw crException( "Failed to create pipeline layout\n" );
 }
 
 void crPipelineManager::ShutDown(void)
 {
+    if( m_layout != nullptr )
+    {
+        delete m_layout;
+        m_layout = nullptr;
+    }
+
     if ( m_cache != nullptr )
     {
         /// save pipeline cache before exit, if we have changes
@@ -67,7 +76,6 @@ void crPipelineManager::ShutDown(void)
         delete m_cache;
         m_cache = nullptr;
     }
-    
 }
 
 crPipeline *crPipelineManager::Pipelines(const uint64_t in_flags, const uint32_t in_vertexShader, const uint32_t in_fragmentShader)
