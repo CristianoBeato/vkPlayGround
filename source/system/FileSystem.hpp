@@ -41,36 +41,36 @@ public:
 
 
     /// read signed integers 
-    uintptr_t   ReadInt8( int8_t* out_values, const uint32_t in_count );
-    uintptr_t   ReadInt16( int16_t* out_values, const uint32_t in_count );
-    uintptr_t   ReadInt32( int32_t* out_values, const uint32_t in_count );
-    uintptr_t   ReadInt64( int64_t* out_values, const uint32_t in_count );
+    uintptr_t   ReadInt8( int8_t* out_values, const uint32_t in_count = 1 ) const;
+    uintptr_t   ReadInt16( int16_t* out_values, const uint32_t in_count = 1 ) const;
+    uintptr_t   ReadInt32( int32_t* out_values, const uint32_t in_count = 1 ) const;
+    uintptr_t   ReadInt64( int64_t* out_values, const uint32_t in_count = 1 ) const;
     
     /// read unsigned integers
-    uintptr_t   ReadUint8( uint8_t* out_values, const uint32_t in_count );
-    uintptr_t   ReadUint16( uint16_t* out_values, const uint32_t in_count );
-    uintptr_t   ReadUint32( uint32_t* out_values, const uint32_t in_count );
-    uintptr_t   ReadUint64( uint64_t* out_values, const uint32_t in_count );
+    uintptr_t   ReadUint8( uint8_t* out_values, const uint32_t in_count = 1 ) const;
+    uintptr_t   ReadUint16( uint16_t* out_values, const uint32_t in_count = 1 ) const;
+    uintptr_t   ReadUint32( uint32_t* out_values, const uint32_t in_count = 1 ) const;
+    uintptr_t   ReadUint64( uint64_t* out_values, const uint32_t in_count = 1 ) const;
 
     /// read float
-    uintptr_t   ReadFloat( float* out_values, const uint32_t in_count );
+    uintptr_t   ReadFloat( float* out_values, const uint32_t in_count = 1 ) const;
 
     /// Write signed integers
-    uintptr_t   WriteInt8( const int8_t* in_values, const uint32_t in_count );
-    uintptr_t   WriteInt16( const int16_t* in_values, const uint32_t in_count );
-    uintptr_t   WriteInt32( const int32_t* in_values, const uint32_t in_count );
-    uintptr_t   WriteInt64( const int64_t* in_values, const uint32_t in_count );
+    uintptr_t   WriteInt8( const int8_t* in_values, const uint32_t in_count = 1 );
+    uintptr_t   WriteInt16( const int16_t* in_values, const uint32_t in_count = 1 );
+    uintptr_t   WriteInt32( const int32_t* in_values, const uint32_t in_count = 1 );
+    uintptr_t   WriteInt64( const int64_t* in_values, const uint32_t in_count = 1 );
 
     /// write unsigned integers
-    uintptr_t   writeUint8( const uint8_t* in_values, const uint32_t in_count );
-    uintptr_t   writeUint16( const uint16_t* in_values, const uint32_t in_count );
-    uintptr_t   writeUint32( const uint32_t* in_values, const uint32_t in_count );
-    uintptr_t   writeUint64( const uint64_t* in_values, const uint32_t in_count );
+    uintptr_t   writeUint8( const uint8_t* in_values, const uint32_t in_count = 1 );
+    uintptr_t   writeUint16( const uint16_t* in_values, const uint32_t in_count = 1 );
+    uintptr_t   writeUint32( const uint32_t* in_values, const uint32_t in_count = 1 );
+    uintptr_t   writeUint64( const uint64_t* in_values, const uint32_t in_count = 1 );
 
     /// write float
     uintptr_t   WriteFloat( const float* in_values, const uint32_t in_count );
 
-    virtual uintptr_t   Read( void*  in_data, const size_t in_size, const uint32_t in_count ) = 0;
+    virtual uintptr_t   Read( void*  in_data, const size_t in_size, const uint32_t in_count ) const = 0;
     virtual uintptr_t   Write( const void* in_data, const size_t in_size, const uint32_t in_count ) = 0;
     virtual uintptr_t   Seek( const uintptr_t in_offset, const whence_e in_whence ) = 0;
     virtual uintptr_t   Tell( void ) const = 0;

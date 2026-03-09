@@ -47,7 +47,7 @@ public:
     crBoundsVolume( void );
     ~crBoundsVolume( void );
     virtual type_e  Type( void ) const override { return BOUNDS_SPHERE; }
-    virtual crVec3f Origin( void ) const override { return m_max - m_min; }
+    virtual crVec3f Origin( void ) const override { return  ( m_max + m_min ) * 0.5f ; }
     crVec3f Min( void ) const { return m_min; }
     crVec3f Max( void ) const { return m_max; }
     
