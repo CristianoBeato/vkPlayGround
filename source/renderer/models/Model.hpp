@@ -28,9 +28,13 @@ public:
     crModel( void );
     ~crModel( void );
 
-    virtual void    Time( const uint32_t in_time );
-    virtual void    View( const crVec3f in_viewPoint );
-    virtual void    Update( void );
+    virtual void        Time( const uint32_t in_time );
+    virtual void        View( const crVec3f in_viewPoint );
+    virtual void        Update( void );
+    virtual crBounds*    Bounds( void ) const { return m_bounds; }
+
+protected:
+    crBounds*   m_bounds;
 
 private:
 
