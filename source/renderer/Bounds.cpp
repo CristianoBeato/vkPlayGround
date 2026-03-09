@@ -28,3 +28,8 @@ crBounds::crBounds( void )
 crBounds::~crBounds( void )
 {
 }
+
+crVec3f crBounds::Center(void) const
+{
+    return crVec3f();
+}

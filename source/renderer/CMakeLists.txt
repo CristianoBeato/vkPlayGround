@@ -25,16 +25,18 @@
 set( BASE_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/Bounds.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Bounds.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Frustrum.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Frustrum.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Mesh.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Mesh.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/renderer_common.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/Surface.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/Surface.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Resources.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Resources.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/RenderSystem.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/RenderSystemLocal.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/RenderSystemLocal.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Surface.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Surface.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Vertexes.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Vertexes.hpp
 	)
@@ -93,6 +95,8 @@ set( MODEL_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/models/ModelBSM.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/models/ModelManager.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/models/ModelManager.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/models/ModelTerrain.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/models/ModelTerrain.hpp
 	)
 
 set( TEXTURE_SOURCES 

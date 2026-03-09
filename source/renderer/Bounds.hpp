@@ -27,7 +27,8 @@ class crBounds
 public:
     crBounds( void );
     ~crBounds( void );
-
+    crVec3f Center( void ) const;
+    
 private:
     crVec3f     m_min;
     crVec3f     m_max;

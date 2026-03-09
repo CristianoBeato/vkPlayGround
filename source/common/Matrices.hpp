@@ -46,6 +46,7 @@ private:
     float m_mat[9];
 };
 
+/// @brief colunm major 4x4 matrix
 class alignas( 16 ) crMatrix4
 {
 public:
@@ -61,8 +62,8 @@ public:
     /// @brief set matrix to zero
     void    Zero( void );
 
-    inline float*  Ptr( void ) { return &m_mat[0]; }
-    inline float*  Ptr( void ) const { return const_cast<float*>( &m_mat[0] ); }
+    inline float*  FloatPtr( void ) { return &m_mat[0]; }
+    inline float*  FloatPtr( void ) const { return const_cast<float*>( &m_mat[0] ); }
 
     crMatrix4   operator*( const crMatrix4 &in_ref ) const;
     crMatrix4   operator*=( const crMatrix4 &in_ref );

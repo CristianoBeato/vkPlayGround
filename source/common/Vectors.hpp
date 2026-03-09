@@ -66,6 +66,11 @@ public:
     
     inline float &operator[]( const uint32_t i );
     inline float operator[]( const uint32_t i ) const;
+    
+    inline constexpr float Length( void ) const
+    {
+		return std::hypot( x, y );
+	}
 
     inline const float*    ToFloatPtr( void ) const { return &x; }
 };
@@ -195,6 +200,9 @@ public:
     
     inline float &operator[]( const uint32_t i );
     inline float operator[]( const uint32_t i ) const;
+
+    inline constexpr float  Length( void ) const;
+    inline const float      Dot( const crVec3f &in_vec ) const;
 
     inline const float*     ToFloatPtr( void ) const { return &x; }
     inline const crVec2f    ToVec2( void ) const { return { x, y }; }
@@ -346,6 +354,16 @@ float crVec3f::operator[]( const uint32_t i ) const
     return (&x)[i];
 }
 
+constexpr float crVec3f::Length(void) const
+{
+    return std::hypot( x, y, z );
+}
+
+const float crVec3f::Dot( const crVec3f &in_vec ) const
+{
+    return ( x * in_vec.x ) + ( y * in_vec.y ) + ( z * in_vec.z );
+}
+
 class alignas( 16 ) crVec4f
 {
 public:
@@ -375,9 +393,38 @@ public:
     inline float &operator[]( const uint32_t i );
     inline float operator[]( const uint32_t i ) const;
 
+    inline constexpr float  Length( void ) const;
+    inline const float      Dot( const crVec4f &in_vec ) const;
+
     inline const float*     ToFloatPtr( void ) const { return &x; }
     inline const crVec3f    ToVec3( void ) const { return { x, y, z }; }
     inline const crVec2f    ToVec2( void ) const { return { x, y }; }
 };
+
+constexpr float crVec4f::Length(void) const
+{
+    float ax = std::abs( x );
+    float ay = std::abs( y );
+    float az = std::abs( z );
+    float aw = std::abs( w );
+
+    float max_val = std::max({ax, ay, az, aw});
+
+    if (max_val == 0.0f) 
+        return 0.0f;
+
+    // Normaliza os valores antes de elevar ao quadrado
+    float nx = ax / max_val;
+    float ny = ay / max_val;
+    float nz = az / max_val;
+    float nw = aw / max_val;
+
+    return max_val * std::sqrt( nx * nx + ny * ny + nz * nz + nw * nw );
+}
+
+const float crVec4f::Dot( const crVec4f &in_vec ) const
+{
+    return  ( x * in_vec.x ) + ( y * in_vec.y ) + ( z * in_vec.z ) + ( w * in_vec.w );
+}
 
 #endif //!__VECTORS_HPP__
