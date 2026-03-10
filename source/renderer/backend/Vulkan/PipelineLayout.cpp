@@ -214,23 +214,22 @@ crShaderStorageLayout::~crShaderStorageLayout( void )
 {
 }
 
-bool crShaderStorageLayout::Create( crList<storage_binging_t> in_bingings )
+bool crShaderStorageLayout::Create( const uint32_t in_bindingCount )
 {
     VkResult result = VK_SUCCESS;
     uint32_t i = 0;
     crList<VkDescriptorBindingFlags>        bindingFlagsArr;
     crList<VkDescriptorSetLayoutBinding>    bindings;
     auto device = crContext::Get()->Device();
-    uint32_t descriptorCountForBinding1 = in_bingings.Count();
 
-    bindingFlagsArr.Resize( descriptorCountForBinding1 );
-    bindings.Resize( descriptorCountForBinding1 );
-
-    for ( i = 0; i < descriptorCountForBinding1; i++)
+    /// configure bindings and flags
+    bindingFlagsArr.Resize( in_bindingCount );
+    bindings.Resize( in_bindingCount );
+    for ( i = 0; i < in_bindingCount; i++)
     {
         VkDescriptorSetLayoutBinding binding{};
         binding.binding = i;
-        binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        binding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
         binding.descriptorCount = 1;
         binding.stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS; // generic for now
         binding.pImmutableSamplers = nullptr;
@@ -248,8 +247,8 @@ bool crShaderStorageLayout::Create( crList<storage_binging_t> in_bingings )
     flagsCreateInfo.pBindingFlags = bindingFlagsArr.GetData();
 
     ///
-    ///
-    ///
+    /// VkDescriptorSetLayoutCreateInfo
+    /// Explicitly describe the interface of the resources accessed by the shader.
     VkDescriptorSetLayoutCreateInfo layoutInfo{};
     layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     layoutInfo.pNext = &flagsCreateInfo;
@@ -264,38 +263,38 @@ bool crShaderStorageLayout::Create( crList<storage_binging_t> in_bingings )
     }
 
     ///
-    ///
-    ///
+    /// VkDescriptorPoolSize
+    /// Describe which descriptor types our descriptor sets are going to contain and how many of them
     VkDescriptorPoolSize poolSize{};
-    poolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    poolSize.descriptorCount = 16; // quantos SSBOs você planeja (normalmente 1 por binding)
+    poolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;  // storage buffers 
+    poolSize.descriptorCount = SMP_FRAMES * in_bindingCount; // 4 storages buffers by 3 frames   
 
-    ///
-    ///
-    ///
+    /// VkDescriptorPoolCreateInfo
+    /// It reserves blocks of GPU resources in advance so that the allocation of descriptor 
+    /// sets is fast and does not cause crashes during the rendering loop.
     VkDescriptorPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
     poolInfo.poolSizeCount = 1;
     poolInfo.pPoolSizes = &poolSize;
-    poolInfo.maxSets = 1; // provavelmente 1 set global
-    result = vkCreateDescriptorPool( *device, &poolInfo, nullptr, &m_descriptorPool );
+    poolInfo.maxSets = SMP_FRAMES; // probably 1 "global" set per frame
+    result = vkCreateDescriptorPool( *device, &poolInfo, k_allocationCallbacks, &m_descriptorPool );
     if( result != VK_SUCCESS )
     {
         crConsole::Error( "vkCreateDescriptorPool %s\n", VulkanErrorString( result ).c_str() );
         return false;
     }
 
-    ///
-    ///
+    /// 
+    /// VkDescriptorSetVariableDescriptorCountAllocateInfo
     ///    
     VkDescriptorSetVariableDescriptorCountAllocateInfo  varCountAlloc{};
     varCountAlloc.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO;
     varCountAlloc.descriptorSetCount = 1;
-    varCountAlloc.pDescriptorCounts = &descriptorCountForBinding1;
+    varCountAlloc.pDescriptorCounts = &in_bindingCount;
 
     ///
-    ///
+    /// VkDescriptorSetAllocateInfo
     ///
     VkDescriptorSetAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -303,14 +302,54 @@ bool crShaderStorageLayout::Create( crList<storage_binging_t> in_bingings )
     allocInfo.descriptorPool = m_descriptorPool;
     allocInfo.descriptorSetCount = 1;
     allocInfo.pSetLayouts = &m_descriptorSetLayout;
-    result = vkAllocateDescriptorSets( *device, &allocInfo, &m_descriptorSet );
-    if( result != VK_SUCCESS )
+    for( i = 0; i < SMP_FRAMES; i++ )
     {
-        crConsole::Error( "vkAllocateDescriptorSets %s\n", VulkanErrorString( result ).c_str() );
-        return false;
+        result = vkAllocateDescriptorSets( *device, &allocInfo, &m_descriptorSet[i] );
+        if( result != VK_SUCCESS )
+        {
+            crConsole::Error( "vkAllocateDescriptorSets %s\n", VulkanErrorString( result ).c_str() );
+            return false;
+        }
     }
 
     return true;
+}
+
+void crShaderStorageLayout::Bind( const VkCommandBuffer in_commandBuffer, const VkPipelineLayout in_pipelineLayout )
+{
+    vkCmdBindDescriptorSets( in_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, in_pipelineLayout, 0, 1, &m_descriptorSet[m_bufferID], 0, nullptr  );
+}
+
+void crShaderStorageLayout::Update( const uint32_t in_bufferID, const VkBuffer* in_buffers, const uint32_t in_count )
+{
+    crList<VkDescriptorBufferInfo> bufferDescriptors = crList<VkDescriptorBufferInfo>(); 
+    crList<VkWriteDescriptorSet> writeDescriptors = crList<VkWriteDescriptorSet>();
+    auto device = crContext::Get()->Device();
+    m_bufferID = in_bufferID;
+    bufferDescriptors.Resize( in_count );
+    writeDescriptors.Resize( in_count );
+    for (size_t i = 0; i < in_count ; i++)
+    {
+        /// we make the whole buffer accessible
+        VkDescriptorBufferInfo descriptorBuffer{};
+        descriptorBuffer.buffer = in_buffers[i];
+        descriptorBuffer.offset = 0;
+        descriptorBuffer.range = VK_WHOLE_SIZE;
+        bufferDescriptors[i] = descriptorBuffer;
+
+        VkWriteDescriptorSet set{};
+        set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        set.pNext = nullptr;
+        set.dstSet = m_descriptorSet[m_bufferID];
+        set.dstBinding = i;
+        set.dstArrayElement = 0;
+        set.descriptorCount = 1;
+        set.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
+        set.pBufferInfo = &bufferDescriptors[i];
+        writeDescriptors[i] = set;
+    }
+
+    vkUpdateDescriptorSets( *device, m_bindings, &writeDescriptors, 0, nullptr );
 }
 
 /*
@@ -373,16 +412,4 @@ void crPipelineLayout::Destroy(void)
         vkDestroyPipelineLayout( *device, m_layout, k_allocationCallbacks );
         m_layout = nullptr;
     }
-}
-
-void crPipelineLayout::SetBuffers( const crList<VkWriteDescriptorSet> in_buffers )
-{
-    auto device = crContext::Get()->Device();
-    vkUpdateDescriptorSets( *device, in_buffers.Count(), in_buffers.GetData(), 0, nullptr );
-}
-
-void crPipelineLayout::Bind( void ) const
-{
-    auto command = crBackend::Get()->Commandbuffer();
-    vkCmdBindDescriptorSets( *command, VK_PIPELINE_BIND_POINT_GRAPHICS, m_layout, 0, 2, m_descriptorSets, 0, nullptr );
 }

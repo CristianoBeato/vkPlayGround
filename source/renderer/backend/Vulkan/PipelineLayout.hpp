@@ -57,6 +57,7 @@ public:
 
     operator VkDescriptorSetLayout( void ) const { return m_bindlessLayout; }
     operator VkDescriptorSet( void ) const { return m_bindlessSet; }
+
 private:
     VkDescriptorSet			                                    m_bindlessSet;
     VkDescriptorSetLayout	                                    m_bindlessLayout;
@@ -68,22 +69,45 @@ private:
 class crShaderStorageLayout
 {
 public:
-    struct storage_binging_t
-    {
-    };
-
     crShaderStorageLayout( void );
     ~crShaderStorageLayout( void );
-    bool    Create( crList<storage_binging_t> in_bingings );
+
+    /// @brief Create a shader storage layout
+    /// @param in_bindingCount 
+    /// @return true on success, false on error
+    bool    Create( const uint32_t in_bindingCount );
+
+    /// @brief Destroy pipeline layout object
     void    Destroy( void );
-    void    Bind( void );
-    void    Update( void );
+
+    /// @brief 
+    /// @param in_commandBuffer 
+    /// @param in_pipelineLayout 
+    void    Bind( const VkCommandBuffer in_commandBuffer, const VkPipelineLayout in_pipelineLayout );
+
+    /// @brief Update descriptor set layout buffers
+    /// @param in_bufferID 
+    /// @param in_buffers 
+    /// @param in_count 
+    void    Update( const uint32_t in_bufferID, const VkBuffer* in_buffers, const uint32_t in_count );
+
     operator VkDescriptorSetLayout( void ) const { return m_descriptorSetLayout; }
-    operator VkDescriptorSet( void ) const { return m_descriptorSet; }
+    operator VkDescriptorSet( void ) const { return m_descriptorSet[m_bufferID]; }
+
 private:
-    VkDescriptorSet			                                    m_descriptorSet;
-    VkDescriptorSetLayout	                                    m_descriptorSetLayout;
-    VkDescriptorPool		                                    m_descriptorPool;
+    uint32_t                                    m_bufferID;
+    uint32_t                                    m_bindings;
+    
+    /// @brief Explicitly describe the interface of the resources accessed by the shader.
+    VkDescriptorSetLayout                       m_descriptorSetLayout;
+
+    /// @brief It reserves blocks of GPU resources in advance so that the allocation of descriptor 
+    /// sets is fast and does not cause crashes during the rendering loop.
+    VkDescriptorPool		                    m_descriptorPool;
+
+    /// @brief Real Resource Binding, this is where you associate a specific VkBuffer 
+    /// with a binding number defined in the shader.
+    crArray<VkDescriptorSet, SMP_FRAMES>        m_descriptorSet;
 };
 
 class crPipelineLayout
@@ -94,9 +118,6 @@ public:
 
     bool    Create( const crSamplerSlotArray* in_bindlessArrays, const crShaderStorageLayout* in_bindingStorage );
     void    Destroy( void );
-    void    SetBuffers( const crList<VkWriteDescriptorSet > in_buffers );
-    void    Bind( void ) const;
-
     operator VkPipelineLayout( void ) const { return m_layout; }
 
 private:

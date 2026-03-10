@@ -22,10 +22,12 @@
 #ifndef __UNIFORM_MANAGER_HPP__
 #define __UNIFORM_MANAGER_HPP__
 
-inline constexpr uint32_t k_BINDLESS_SAMPLERS_BINDING   = 00u;
-inline constexpr uint32_t k_MESH_UNIFORM_BINDING        = 01u;
-inline constexpr uint32_t k_MATERIAL_UNIFORM_BINDING    = 02u;
-inline constexpr uint32_t k_LIGTH_UNIFORM_BINDING       = 03u;
+inline constexpr uint32_t k_BINDLESS_SAMPLERS_BINDING   = 00u; /// bindless sampler location
+inline constexpr uint32_t k_MESH_UNIFORM_BINDING        = 00u; ///
+inline constexpr uint32_t k_MATERIAL_UNIFORM_BINDING    = 01u; /// 
+inline constexpr uint32_t k_LIGTH_UNIFORM_BINDING       = 02u; ///
+inline constexpr uint32_t k_JOINT_UNIFORM_BINDING       = 03u; ///
+inline constexpr uint32_t k_NUM_SHADER_STORAGE          = 04u; ///
 
 /// @brief Mesh uniform
 struct alignas( 16 ) uMesh_t
@@ -120,6 +122,8 @@ private:
     crUniform<uMesh_t>      m_mesh;
     crUniform<uMaterial_t>  m_material;
     crUniform<uLight_t>     m_ligth;
+    crShaderStorageLayout*  m_storageLayout;
+    crSamplerSlotArray*     m_samplerSlotArray; // store combined sampler arrai location
     crPipelineLayout*       m_layout;
     crBuffer*               m_meshSSBO;     // mesh shader storage buffer
     crBuffer*               m_materialSSBO; // material shader storage buffer
