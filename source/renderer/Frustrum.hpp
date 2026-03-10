@@ -31,7 +31,10 @@ public:
     crFrustrum( void );
     ~crFrustrum( void );
 
+    void Update( const crVec3f &in_viewPos, const float in_aspect, const float in_fovY, const float in_zNear, const float in_zFar );
     void Update( const crMatrix4& in_viewProj );
+    bool IsBoxInside( const crBoundsVolume &in_bounds );
+    bool IsSphereInside( const crBoundsSphere &in_sphere ) const;
 
 private:
     Plane_s m_faces[NUM_PLANES];

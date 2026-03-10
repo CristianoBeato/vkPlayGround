@@ -29,7 +29,18 @@ crFrustrum::~crFrustrum( void )
 {
 }
 
-void crFrustrum::Update( const crMatrix4 &in_viewProj )
+void crFrustrum::Update(const crVec3f &in_viewPos, const float in_aspect, const float in_fovY, const float in_zNear, const float in_zFar)
+{
+    const float halfVSide = in_zFar * std::tan( in_fovY * 0.5f );
+    const float halfHSide = halfVSide * in_aspect;
+    const crVec3f frontMultFar = in_viewPos * in_zFar;
+
+    
+
+    
+}
+
+void crFrustrum::Update(const crMatrix4 &in_viewProj)
 {
     const float* m = in_viewProj.FloatPtr(); // Assume que retorna float[16]
     // Atalhos para as linhas da matriz (padrão column-major)
@@ -62,4 +73,56 @@ void crFrustrum::Update( const crMatrix4 &in_viewProj )
 
     // Far: Row4 - Row3
     SetupPlane( PLANE_FRONT,  m[3] - m[2], m[7] - m[6], m[11] - m[10], m[15] - m[14] );
+}
+
+bool crFrustrum::IsBoxInside(const crBoundsVolume &in_bounds)
+{
+    return false;
+}
+
+bool crFrustrum::IsBoxInside(const crBoundsVolume &in_bounds )
+{
+    const crVec3f min = in_bounds.Min();
+    const crVec3f max = in_bounds.Max();
+
+    // Para cada um dos 6 planos do frustum
+    for (int i = 0; i < NUM_PLANES; ++i) 
+    {
+        const Plane_s& plane = m_faces[i];
+
+        // Encontramos o "Ponto P" (P-vertex): o canto da caixa mais 
+        // alinhado com a normal do plano (o ponto "mais para dentro").
+        crVec3f p = min;
+        if ( plane.normal.x >= 0 ) 
+            p.x = max.x;
+
+        if ( plane.normal.y >= 0 ) 
+            p.y = max.y;
+
+        if ( plane.normal.z >= 0 ) 
+            p.z = max.z;
+
+        // Se o ponto mais "positivo" da caixa em relação ao plano 
+        // ainda está atrás do plano (distância negativa), a caixa está fora.
+        // Nota: O sinal depende se sua normal aponta para DENTRO.
+        // Se a normal aponta para dentro, 'distancia < 0' significa 'fora'.
+        if (plane.GetSignedDistanceToPlane(p) < 0) 
+        {
+            return false; 
+        }
+    }
+
+    return true; // Está dentro ou interceptando
+}
+
+bool crFrustrum::IsSphereInside( const crBoundsSphere &in_sphere ) const
+{
+    float radius = in_sphere.Radius();
+    for ( uint32_t i = 0; i < NUM_PLANES; ++i )
+    {
+        if (m_faces[i].GetSignedDistanceToPlane( in_sphere.Origin() ) < -radius) 
+            return false;
+    }
+
+    return true;
 }
