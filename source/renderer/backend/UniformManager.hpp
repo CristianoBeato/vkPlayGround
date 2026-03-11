@@ -69,16 +69,18 @@ public:
     /// acess buffer position
     inline pointer Get( void ) const 
     { 
-        return &m_array[m_current]; 
+        return &m_array[m_head]; 
     }
 
     /// get next element 
     inline uint32_t Next( void ) 
     { 
-        uint32_t a = m_current; 
-        m_current = ( m_current + 1) % m_count;
-        return a; 
+        m_tail = m_head;
+        m_head = ( m_head + 1) % m_count;
+        return m_tail; 
     }
+
+    inline uint32_t CurrentOffset( void ) const { <>( sizeof( _t ) * m_tail ); }
 
 protected:
     crUniform( const uint32_t in_count, const pointer in_array )
@@ -87,7 +89,8 @@ protected:
 
 private:
     uint32_t    m_count;    /// uniform array size
-    uint32_t    m_current;
+    uint32_t    m_tail;
+    uint32_t    m_head;
     pointer     m_array;    ///
 
     // don't permit class copy 
@@ -104,6 +107,8 @@ public:
     ~crUniformManager( void );
     void    StartUp( void );
     void    ShutDown( void );
+    void    Bind( const uint32_t in_bufferID );
+    void    Update( const crCommandbuffer *in_commandbuffer );
 
     // Mesh properties uniform array 
     crUniform<uMesh_t>*     Mesh( void ) const { return const_cast<crUniform<uMesh_t>*>( &m_mesh ); }
@@ -122,12 +127,14 @@ private:
     crUniform<uMesh_t>      m_mesh;
     crUniform<uMaterial_t>  m_material;
     crUniform<uLight_t>     m_ligth;
+    crUniform<crMatrix4>    m_joints;
     crShaderStorageLayout*  m_storageLayout;
     crSamplerSlotArray*     m_samplerSlotArray; // store combined sampler arrai location
     crPipelineLayout*       m_layout;
     crBuffer*               m_meshSSBO;     // mesh shader storage buffer
     crBuffer*               m_materialSSBO; // material shader storage buffer
     crBuffer*               m_lightSSBO;    // light shader storage buffer
+    crBuffer*               m_jointSSBO;    // joint matrix array
     uMesh_t*                m_meshUniformMap;
     uMaterial_t*            m_materialUniformMap;
     uLight_t*               m_lightUniformMap;

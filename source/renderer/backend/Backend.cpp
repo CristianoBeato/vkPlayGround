@@ -79,9 +79,14 @@ void crBackend::ShutDown(void)
 
 void crBackend::SetBuffers(void)
 {
+    auto uniforms = crUniformManager::Get();
+
     /// begin record
-    m_graphicCMD->Begin( m_frame );
-    m_swapchain->Acquire( m_frame );
+    m_graphicCMD->Begin( m_bufferID );
+    m_swapchain->Acquire( m_bufferID );
+
+    /// Bind/Set shader storage buffers to frame
+    uniforms->Bind( m_graphicCMD, m_bufferID );
 
     auto presentImages = m_swapchain->Image(); 
 
@@ -95,7 +100,7 @@ void crBackend::SetBuffers(void)
     presentImages->State( *m_graphicCMD, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_2_NONE );
 #endif
 
-    m_defaultFB->Bind( m_graphicCMD, m_frame );
+    m_defaultFB->Bind( m_graphicCMD, m_bufferID );
 }
 
 void crBackend::SwapBuffers(void)

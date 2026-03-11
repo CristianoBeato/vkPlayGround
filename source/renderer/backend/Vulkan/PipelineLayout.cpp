@@ -322,9 +322,8 @@ void crShaderStorageLayout::Bind( const VkCommandBuffer in_commandBuffer, const 
 
 void crShaderStorageLayout::Update( const uint32_t in_bufferID, const VkBuffer* in_buffers, const uint32_t in_count )
 {
-    crList<VkDescriptorBufferInfo> bufferDescriptors = crList<VkDescriptorBufferInfo>(); 
-    crList<VkWriteDescriptorSet> writeDescriptors = crList<VkWriteDescriptorSet>();
-    auto device = crContext::Get()->Device();
+    
+
     m_bufferID = in_bufferID;
     bufferDescriptors.Resize( in_count );
     writeDescriptors.Resize( in_count );
@@ -349,7 +348,7 @@ void crShaderStorageLayout::Update( const uint32_t in_bufferID, const VkBuffer* 
         writeDescriptors[i] = set;
     }
 
-    vkUpdateDescriptorSets( *device, m_bindings, &writeDescriptors, 0, nullptr );
+    
 }
 
 /*

@@ -130,3 +130,90 @@ void crUniformManager::ShutDown( void )
         m_meshSSBO = nullptr;
     }
 }
+
+void crUniformManager::Bind( const uint32_t in_bufferID )
+{
+    crArray<VkDescriptorBufferInfo, k_NUM_SHADER_STORAGE> bufferDescriptors = crArray<VkDescriptorBufferInfo, k_NUM_SHADER_STORAGE>(); 
+    crArray<VkWriteDescriptorSet, k_NUM_SHADER_STORAGE> writeDescriptors = crArray<VkWriteDescriptorSet, k_NUM_SHADER_STORAGE>();
+    auto device = crContext::Get()->Device();
+
+    m_storageLayout->SetBufferID( in_bufferID );
+
+    /// ------------------------------------------------------------------------------------
+    /// Bind the mesh shader storage buffer
+    bufferDescriptors[k_MESH_UNIFORM_BINDING].buffer = m_meshSSBO->Buffer();
+    bufferDescriptors[k_MESH_UNIFORM_BINDING].offset = 0;
+    bufferDescriptors[k_MESH_UNIFORM_BINDING].range = VK_WHOLE_SIZE; /// access whole buffer
+
+    /// Mesh buffer binding decriptor
+    writeDescriptors[k_MESH_UNIFORM_BINDING].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writeDescriptors[k_MESH_UNIFORM_BINDING].pNext = nullptr;
+    writeDescriptors[k_MESH_UNIFORM_BINDING].dstSet = *m_storageLayout;
+    writeDescriptors[k_MESH_UNIFORM_BINDING].dstBinding = k_MESH_UNIFORM_BINDING;
+    writeDescriptors[k_MESH_UNIFORM_BINDING].dstArrayElement = 0;
+    writeDescriptors[k_MESH_UNIFORM_BINDING].descriptorCount = 1;
+    writeDescriptors[k_MESH_UNIFORM_BINDING].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
+    writeDescriptors[k_MESH_UNIFORM_BINDING].pBufferInfo = &bufferDescriptors[k_MESH_UNIFORM_BINDING];
+
+    /// ------------------------------------------------------------------------------------
+    /// Bind the material shader storage buffer
+    bufferDescriptors[k_MATERIAL_UNIFORM_BINDING].buffer = m_materialSSBO->Buffer();
+    bufferDescriptors[k_MATERIAL_UNIFORM_BINDING].offset = 0;
+    bufferDescriptors[k_MATERIAL_UNIFORM_BINDING].range = VK_WHOLE_SIZE; /// access whole buffer
+
+    /// Material buffer binding decriptor
+    writeDescriptors[k_MATERIAL_UNIFORM_BINDING].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writeDescriptors[k_MATERIAL_UNIFORM_BINDING].pNext = nullptr;
+    writeDescriptors[k_MATERIAL_UNIFORM_BINDING].dstSet = *m_storageLayout;
+    writeDescriptors[k_MATERIAL_UNIFORM_BINDING].dstBinding = k_MATERIAL_UNIFORM_BINDING;
+    writeDescriptors[k_MATERIAL_UNIFORM_BINDING].dstArrayElement = 0;
+    writeDescriptors[k_MATERIAL_UNIFORM_BINDING].descriptorCount = 1;
+    writeDescriptors[k_MATERIAL_UNIFORM_BINDING].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
+    writeDescriptors[k_MATERIAL_UNIFORM_BINDING].pBufferInfo = &bufferDescriptors[k_MATERIAL_UNIFORM_BINDING];
+
+    /// ------------------------------------------------------------------------------------
+    /// Bind the light shader storage buffer
+    bufferDescriptors[k_LIGTH_UNIFORM_BINDING].buffer = m_lightSSBO->Buffer();
+    bufferDescriptors[k_LIGTH_UNIFORM_BINDING].offset = 0;
+    bufferDescriptors[k_LIGTH_UNIFORM_BINDING].range = VK_WHOLE_SIZE; /// access whole buffer
+
+    /// Light buffer binding decriptor
+    writeDescriptors[k_LIGTH_UNIFORM_BINDING].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writeDescriptors[k_LIGTH_UNIFORM_BINDING].pNext = nullptr;
+    writeDescriptors[k_LIGTH_UNIFORM_BINDING].dstSet = *m_storageLayout;
+    writeDescriptors[k_LIGTH_UNIFORM_BINDING].dstBinding = k_LIGTH_UNIFORM_BINDING;
+    writeDescriptors[k_LIGTH_UNIFORM_BINDING].dstArrayElement = 0;
+    writeDescriptors[k_LIGTH_UNIFORM_BINDING].descriptorCount = 1;
+    writeDescriptors[k_LIGTH_UNIFORM_BINDING].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
+    writeDescriptors[k_LIGTH_UNIFORM_BINDING].pBufferInfo = &bufferDescriptors[k_LIGTH_UNIFORM_BINDING];
+
+    /// ------------------------------------------------------------------------------------
+    /// Bind the joint shader storage buffer
+    bufferDescriptors[k_JOINT_UNIFORM_BINDING].buffer = m_jointSSBO->Buffer();
+    bufferDescriptors[k_JOINT_UNIFORM_BINDING].offset = 0;
+    bufferDescriptors[k_JOINT_UNIFORM_BINDING].range = VK_WHOLE_SIZE; /// access whole buffer
+
+    /// Joint buffer binding decriptor
+    writeDescriptors[k_JOINT_UNIFORM_BINDING].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writeDescriptors[k_JOINT_UNIFORM_BINDING].pNext = nullptr;
+    writeDescriptors[k_JOINT_UNIFORM_BINDING].dstSet = *m_storageLayout;
+    writeDescriptors[k_JOINT_UNIFORM_BINDING].dstBinding = k_JOINT_UNIFORM_BINDING;
+    writeDescriptors[k_JOINT_UNIFORM_BINDING].dstArrayElement = 0;
+    writeDescriptors[k_JOINT_UNIFORM_BINDING].descriptorCount = 1;
+    writeDescriptors[k_JOINT_UNIFORM_BINDING].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
+    writeDescriptors[k_JOINT_UNIFORM_BINDING].pBufferInfo = &bufferDescriptors[k_JOINT_UNIFORM_BINDING];
+
+    vkUpdateDescriptorSets( *device, k_NUM_SHADER_STORAGE, &writeDescriptors, 0, nullptr );
+}
+
+void crUniformManager::Update( const crCommandbuffer *in_commandbuffer )
+{
+    uint32_t dynamicOffsets[4]{ 00u };
+    dynamicOffsets[k_MESH_UNIFORM_BINDING] = m_mesh.CurrentOffset();
+    dynamicOffsets[k_MESH_UNIFORM_BINDING] = m_material.CurrentOffset();
+    dynamicOffsets[k_MESH_UNIFORM_BINDING] = m_ligth.CurrentOffset();
+    dynamicOffsets[k_MESH_UNIFORM_BINDING] = m_joints.CurrentOffset();
+
+    VkDescriptorSet descriptor = *m_storageLayout;
+    vkCmdBindDescriptorSets( *in_commandbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, *m_layout, 0, 1, &descriptor, k_NUM_SHADER_STORAGE, dynamicOffsets );
+}

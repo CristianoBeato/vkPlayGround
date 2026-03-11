@@ -80,16 +80,7 @@ public:
     /// @brief Destroy pipeline layout object
     void    Destroy( void );
 
-    /// @brief 
-    /// @param in_commandBuffer 
-    /// @param in_pipelineLayout 
-    void    Bind( const VkCommandBuffer in_commandBuffer, const VkPipelineLayout in_pipelineLayout );
-
-    /// @brief Update descriptor set layout buffers
-    /// @param in_bufferID 
-    /// @param in_buffers 
-    /// @param in_count 
-    void    Update( const uint32_t in_bufferID, const VkBuffer* in_buffers, const uint32_t in_count );
+    void    SetBufferID( const uint32_t in_bufferID ) { m_bufferID = in_bufferID; }
 
     operator VkDescriptorSetLayout( void ) const { return m_descriptorSetLayout; }
     operator VkDescriptorSet( void ) const { return m_descriptorSet[m_bufferID]; }

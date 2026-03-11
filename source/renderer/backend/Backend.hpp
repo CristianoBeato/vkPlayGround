@@ -32,15 +32,18 @@ public:
     
     static crBackend*  Get( void );
 
-    void    StartUp( void );
-    void    ShutDown( void );
-    void    SetBuffers( void );
-    void    SwapBuffers( void );
-    void    DrawView( void );
+    void                StartUp( void );
+    void                ShutDown( void );
+    void                SetBuffers( void );
+    void                SwapBuffers( void );
+    void                DrawView( void );
+    const uint32_t      BufferID( void ) const { return m_bufferID; }
+    const uint64_t      FrameCount( void ) const { return m_frame; }
     crSwapchain*        Swapchain( void ) const { return m_swapchain; }
     crCommandbuffer*    Commandbuffer( void ) const { return m_graphicCMD; }
 
 private:
+    uint32_t            m_bufferID;
     uint64_t            m_frame;
     crView*             m_viewChain;
     crSwapchain*        m_swapchain;
